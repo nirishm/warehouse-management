@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Warehouse Management SaaS
+
+A multi-tenant, modular warehouse management system built for SaaS distribution.
+
+## Features
+
+- **Multi-Tenant**: Each customer gets isolated data via Postgres schema-per-tenant
+- **Modular**: Enable/disable features per tenant (Inventory, Dispatch, Purchase, Sale, Analytics, Shortage Tracking, User Management, Audit Trail)
+- **Custom Fields**: Tenants define custom fields on any entity (stored as JSONB)
+- **Configurable Units**: Metric defaults + custom units per tenant
+- **Role-Based Access**: Granular permissions per module per user
+- **Real-Time**: Live updates via Supabase Realtime subscriptions
+- **Admin Dashboards**: Super Admin (platform) + Tenant Admin (per-customer)
+
+## Tech Stack
+
+- Next.js 14 (App Router) + TypeScript
+- Supabase (PostgreSQL + Auth + Realtime)
+- Tailwind CSS + shadcn/ui
+- Zod validation
+- Vitest + Playwright testing
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
+2. Copy `.env.local.example` to `.env.local` and fill in your Supabase credentials
+3. Install dependencies: `pnpm install`
+4. Run migrations: `pnpm db:migrate`
+5. Start development: `pnpm dev`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Project Structure
+
+```
+src/
+├── app/              # Next.js pages and API routes
+│   ├── (auth)/       # Login, register, forgot-password
+│   ├── (platform)/   # Super admin dashboard
+│   ├── t/[slug]/     # Tenant-scoped routes
+│   └── api/          # API endpoints
+├── core/             # Framework: auth, db, modules, permissions
+├── modules/          # Feature modules (self-contained)
+├── components/       # Shared UI components
+└── lib/              # Utilities
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## License
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Proprietary — All rights reserved.

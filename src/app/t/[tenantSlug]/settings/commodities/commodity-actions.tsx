@@ -1,0 +1,119 @@
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { useTenant } from '@/components/layout/tenant-provider';
+import { CommodityForm } from './commodity-form';
+
+interface CommodityRow {
+  id: string;
+  name: string;
+  code: string;
+  description: string | null;
+  category: string | null;
+  default_unit_id: string | null;
+}
+
+interface CommodityActionsProps {
+  commodity: CommodityRow;
+  onSuccess: () => void;
+}
+
+export function CommodityActions({ commodity, onSuccess }: CommodityActionsProps) {
+  const [deleting, setDeleting] = useState(false);
+  const ctx = useTenant();
+
+  async function handleDelete() {
+    if (!confirm(`Delete commodity "${commodity.name}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/t/${ctx.tenantId}/commodities/${commodity.id}`, {
+        method: 'DELETE',
+        headers: {
+          'x-tenant-id': ctx.tenantId,
+          'x-tenant-schema': ctx.schemaName,
+          'x-tenant-role': ctx.role,
+          'x-tenant-modules': JSON.stringify(ctx.enabledModules),
+        },
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error ?? 'Delete failed');
+      }
+
+      onSuccess();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to delete commodity');
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  const formData = {
+    id: commodity.id,
+    name: commodity.name,
+    code: commodity.code,
+    description: commodity.description ?? '',
+    category: commodity.category ?? '',
+    default_unit_id: commodity.default_unit_id ?? '',
+  };
+
+  return (
+    <div className="flex items-center gap-1">
+      <CommodityForm
+        commodity={formData}
+        onSuccess={onSuccess}
+        trigger={
+          <Button variant="ghost" size="icon-sm" className="text-zinc-400 hover:text-zinc-100">
+            <Pencil className="size-3.5" />
+          </Button>
+        }
+      />
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              disabled={deleting}
+              className="text-zinc-400 hover:text-zinc-100"
+            />
+          }
+        >
+          <MoreHorizontal className="size-3.5" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="bg-zinc-950 border-zinc-800">
+          <DropdownMenuItem
+            className="text-zinc-300 focus:text-zinc-100"
+            onSelect={() => {
+              // The edit trigger button handles this
+            }}
+          >
+            <Pencil className="size-3.5 mr-1.5" />
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="bg-zinc-800" />
+          <DropdownMenuItem
+            variant="destructive"
+            onSelect={handleDelete}
+          >
+            <Trash2 className="size-3.5 mr-1.5" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
