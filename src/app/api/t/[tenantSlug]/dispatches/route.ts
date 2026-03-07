@@ -8,7 +8,9 @@ export async function GET(request: NextRequest) {
     requireModule(ctx, 'dispatch');
     requirePermission(ctx, 'canDispatch');
 
-    const dispatches = await listDispatches(ctx.schemaName);
+    const dispatches = await listDispatches(ctx.schemaName, {
+      allowedLocationIds: ctx.allowedLocationIds,
+    });
     return NextResponse.json({ data: dispatches });
   });
 }

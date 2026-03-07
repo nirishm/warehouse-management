@@ -1,9 +1,12 @@
 import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
 import type { CreateSaleInput, Sale } from '../validations/sale';
 
-export async function listSales(schemaName: string): Promise<Sale[]> {
+export async function listSales(
+  schemaName: string,
+  options?: { allowedLocationIds?: string[] | null }
+): Promise<Sale[]> {
   const client = createTenantClient(schemaName);
-  const { data, error } = await client
+  let query = client
     .from('sales')
     .select(`
       *,
@@ -13,6 +16,13 @@ export async function listSales(schemaName: string): Promise<Sale[]> {
     `)
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
+
+  const ids = options?.allowedLocationIds;
+  if (ids !== null && ids !== undefined && ids.length > 0) {
+    query = query.in('location_id', ids);
+  }
+
+  const { data, error } = await query;
 
   if (error) throw new Error(`Failed to list sales: ${error.message}`);
   return (data ?? []) as Sale[];

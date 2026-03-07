@@ -31,8 +31,8 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Tenant routes — resolve tenant from URL
-  const tenantMatch = path.match(/^\/t\/([^/]+)/);
+  // Tenant routes — resolve tenant from URL (both /t/[slug] and /api/t/[slug])
+  const tenantMatch = path.match(/^(?:\/api)?\/t\/([^/]+)/);
   if (tenantMatch) {
     const slug = tenantMatch[1];
     const { data: tenant } = await supabase
@@ -53,12 +53,13 @@ export async function middleware(request: NextRequest) {
 
     if (!membership) return NextResponse.redirect(new URL('/', request.url));
 
-    // Pass tenant context via headers
-    response.headers.set('x-tenant-id', tenant.id);
-    response.headers.set('x-tenant-schema', tenant.schema_name);
-    response.headers.set('x-tenant-role', membership.role);
-    response.headers.set('x-tenant-modules', JSON.stringify(tenant.enabled_modules));
-    return response;
+    // Pass tenant context via request headers (forwarded to route handlers)
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-tenant-id', tenant.id);
+    requestHeaders.set('x-tenant-schema', tenant.schema_name);
+    requestHeaders.set('x-tenant-role', membership.role);
+    requestHeaders.set('x-tenant-modules', JSON.stringify(tenant.enabled_modules));
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   // Root: redirect to default tenant

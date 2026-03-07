@@ -1,9 +1,12 @@
 import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
 import type { CreatePurchaseInput, Purchase, PurchaseItem } from '../validations/purchase';
 
-export async function listPurchases(schemaName: string): Promise<Purchase[]> {
+export async function listPurchases(
+  schemaName: string,
+  options?: { allowedLocationIds?: string[] | null }
+): Promise<Purchase[]> {
   const client = createTenantClient(schemaName);
-  const { data, error } = await client
+  let query = client
     .from('purchases')
     .select(`
       *,
@@ -13,6 +16,13 @@ export async function listPurchases(schemaName: string): Promise<Purchase[]> {
     `)
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
+
+  const ids = options?.allowedLocationIds;
+  if (ids !== null && ids !== undefined && ids.length > 0) {
+    query = query.in('location_id', ids);
+  }
+
+  const { data, error } = await query;
 
   if (error) throw new Error(`Failed to list purchases: ${error.message}`);
   return (data ?? []) as Purchase[];

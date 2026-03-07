@@ -56,6 +56,16 @@ export default async function TenantLayout({ children, params }: Props) {
     });
   }
 
+  let allowedLocationIds: string[] | null = null;
+  if (role !== 'tenant_admin') {
+    const { data: locs } = await tenantClient
+      .from('user_locations')
+      .select('location_id')
+      .eq('user_id', user.id);
+    const ids = (locs ?? []).map((l: { location_id: string }) => l.location_id);
+    allowedLocationIds = ids.length > 0 ? ids : null;
+  }
+
   const ctx: TenantContext = {
     tenantId: tenant.id,
     schemaName: tenant.schema_name,
@@ -63,6 +73,7 @@ export default async function TenantLayout({ children, params }: Props) {
     enabledModules: tenant.enabled_modules || [],
     userId: user.id,
     permissions,
+    allowedLocationIds,
   };
 
   const navItems = moduleRegistry.getNavItems(

@@ -11,4 +11,5 @@ export interface TenantContext {
   enabledModules: string[];
   userId: string;
   permissions: Record<Permission, boolean>;
+  allowedLocationIds: string[] | null;
 }

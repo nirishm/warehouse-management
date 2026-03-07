@@ -35,9 +35,19 @@ export async function withTenantContext(
       });
     }
 
+    let allowedLocationIds: string[] | null = null;
+    if (role !== 'tenant_admin') {
+      const { data: locs } = await tenantClient
+        .from('user_locations')
+        .select('location_id')
+        .eq('user_id', user.id);
+      const ids = (locs ?? []).map((l: { location_id: string }) => l.location_id);
+      allowedLocationIds = ids.length > 0 ? ids : null;
+    }
+
     return handler({
       tenantId, schemaName, role, enabledModules,
-      userId: user.id, permissions,
+      userId: user.id, permissions, allowedLocationIds,
     });
   } catch (error) {
     console.error('Tenant context error:', error);
@@ -55,5 +65,12 @@ export function requirePermission(ctx: TenantContext, permission: Permission): v
 export function requireModule(ctx: TenantContext, moduleId: string): void {
   if (!ctx.enabledModules.includes(moduleId)) {
     throw new Error(`Module not enabled: ${moduleId}`);
+  }
+}
+
+export function requireLocationAccess(ctx: TenantContext, locationId: string): void {
+  if (ctx.allowedLocationIds === null) return;
+  if (!ctx.allowedLocationIds.includes(locationId)) {
+    throw new Error('Access denied: location not assigned');
   }
 }

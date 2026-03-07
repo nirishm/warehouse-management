@@ -8,7 +8,9 @@ export async function GET(request: NextRequest) {
     requireModule(ctx, 'purchase');
     requirePermission(ctx, 'canPurchase');
 
-    const purchases = await listPurchases(ctx.schemaName);
+    const purchases = await listPurchases(ctx.schemaName, {
+      allowedLocationIds: ctx.allowedLocationIds,
+    });
     return NextResponse.json({ data: purchases });
   });
 }

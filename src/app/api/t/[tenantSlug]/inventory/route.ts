@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
       const stockLevels = await getStockLevels(ctx.schemaName, {
         locationId,
         commodityId,
+        allowedLocationIds: ctx.allowedLocationIds,
       });
 
       return NextResponse.json({ data: stockLevels });

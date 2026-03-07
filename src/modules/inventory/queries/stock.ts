@@ -16,6 +16,7 @@ export interface StockLevelRow {
 export interface StockFilters {
   locationId?: string;
   commodityId?: string;
+  allowedLocationIds?: string[] | null;
 }
 
 export async function getStockLevels(
@@ -25,7 +26,11 @@ export async function getStockLevels(
   const client = createTenantClient(schemaName);
 
   let query = client.from('stock_levels').select('*');
-  if (filters?.locationId) query = query.eq('location_id', filters.locationId);
+  if (filters?.locationId) {
+    query = query.eq('location_id', filters.locationId);
+  } else if (filters?.allowedLocationIds && filters.allowedLocationIds.length > 0) {
+    query = query.in('location_id', filters.allowedLocationIds);
+  }
   if (filters?.commodityId) query = query.eq('commodity_id', filters.commodityId);
   const { data: stockData, error } = await query;
 

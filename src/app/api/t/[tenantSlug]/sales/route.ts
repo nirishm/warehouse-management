@@ -8,7 +8,9 @@ export async function GET(request: NextRequest) {
     requireModule(ctx, 'sale');
     requirePermission(ctx, 'canSale');
 
-    const sales = await listSales(ctx.schemaName);
+    const sales = await listSales(ctx.schemaName, {
+      allowedLocationIds: ctx.allowedLocationIds,
+    });
     return NextResponse.json({ data: sales });
   });
 }

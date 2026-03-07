@@ -7,16 +7,25 @@ import type {
 } from '../validations/dispatch';
 
 export async function listDispatches(
-  schemaName: string
+  schemaName: string,
+  options?: { allowedLocationIds?: string[] | null }
 ): Promise<DispatchWithLocations[]> {
   const client = createTenantClient(schemaName);
-  const { data, error } = await client
+  let query = client
     .from('dispatches')
     .select(
       '*, origin_location:locations!origin_location_id(name), dest_location:locations!dest_location_id(name), dispatch_items(id)'
     )
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
+
+  const ids = options?.allowedLocationIds;
+  if (ids !== null && ids !== undefined && ids.length > 0) {
+    const list = ids.join(',');
+    query = query.or(`origin_location_id.in.(${list}),dest_location_id.in.(${list})`);
+  }
+
+  const { data, error } = await query;
 
   if (error) throw new Error(`Failed to list dispatches: ${error.message}`);
 
