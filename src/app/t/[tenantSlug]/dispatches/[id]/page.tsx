@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
+import { DownloadDocumentButton } from '@/components/document-gen/download-document-button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -55,12 +56,13 @@ export default async function DispatchDetailPage({ params }: Props) {
 
   const { data: tenant } = await supabase
     .from('tenants')
-    .select('schema_name')
+    .select('schema_name, enabled_modules')
     .eq('slug', tenantSlug)
     .single();
 
   if (!tenant) return null;
 
+  const docGenEnabled = tenant.enabled_modules?.includes('document-gen') ?? false;
   const tenantClient = createTenantClient(tenant.schema_name);
   const { data: dispatch, error } = await tenantClient
     .from('dispatches')
@@ -127,6 +129,12 @@ export default async function DispatchDetailPage({ params }: Props) {
             {d.dest_location?.name ?? 'Unknown'}
           </p>
         </div>
+        {docGenEnabled && (
+          <DownloadDocumentButton
+            href={`/api/t/${tenantSlug}/documents/dispatch-challan/${id}`}
+            label="Download Challan"
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

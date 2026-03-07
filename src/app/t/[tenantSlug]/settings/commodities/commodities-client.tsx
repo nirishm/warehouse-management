@@ -29,9 +29,16 @@ interface CommodityRow {
 interface CommoditiesClientProps {
   initialData: CommodityRow[];
   renderMode: 'button' | 'table';
+  tenantSlug?: string;
+  barcodeEnabled?: boolean;
 }
 
-export function CommoditiesClient({ initialData, renderMode }: CommoditiesClientProps) {
+export function CommoditiesClient({
+  initialData,
+  renderMode,
+  tenantSlug,
+  barcodeEnabled,
+}: CommoditiesClientProps) {
   const router = useRouter();
 
   const refresh = useCallback(() => {
@@ -112,7 +119,19 @@ export function CommoditiesClient({ initialData, renderMode }: CommoditiesClient
               )}
             </TableCell>
             <TableCell className="text-right">
-              <CommodityActions commodity={commodity} onSuccess={refresh} />
+              <div className="flex items-center justify-end gap-3">
+                {barcodeEnabled && tenantSlug && (
+                  <a
+                    href={`/api/t/${tenantSlug}/barcodes/${commodity.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
+                  >
+                    QR
+                  </a>
+                )}
+                <CommodityActions commodity={commodity} onSuccess={refresh} />
+              </div>
             </TableCell>
           </TableRow>
         ))}

@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 const ALL_MODULES = [
   'inventory', 'dispatch', 'purchase', 'sale',
   'analytics', 'shortage_tracking', 'user_management', 'audit_trail',
+  'payments', 'stock-alerts', 'document-gen', 'lot-tracking',
+  'returns', 'bulk-import', 'barcode',
 ];
 
 interface Props {
