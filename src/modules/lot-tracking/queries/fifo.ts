@@ -5,10 +5,13 @@ import type { LotStockLevel } from '../validations/lot';
  * Returns available lots for a commodity+location in FIFO order (oldest first).
  * Used by dispatch and sale forms to suggest which lots to consume from.
  */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function getFIFOLotsForAllocation(
   schemaName: string,
   commodityId: string
 ): Promise<LotStockLevel[]> {
+  if (!UUID_RE.test(commodityId)) throw new Error('Invalid commodity ID');
   const adminClient = createAdminClient();
   const { data, error } = await adminClient.rpc('exec_sql', {
     query: `
@@ -17,6 +20,7 @@ export async function getFIFOLotsForAllocation(
       FROM "${schemaName}".lot_stock_levels
       WHERE commodity_id = '${commodityId}'
         AND current_quantity > 0
+        AND (expiry_date IS NULL OR expiry_date > NOW())
       ORDER BY received_date ASC
     `,
   });

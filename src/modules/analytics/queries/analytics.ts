@@ -2,6 +2,10 @@ import { createTenantClient } from '@/core/db/tenant-query';
 
 // ── Types ──────────────────────────────────────────────────────────
 
+export interface AnalyticsLocationFilter {
+  allowedLocationIds?: string[] | null;
+}
+
 export interface OverviewStats {
   totalDispatches: number;
   totalPurchases: number;
@@ -43,30 +47,48 @@ export interface MovementEntry {
 // ── Overview Stats ─────────────────────────────────────────────────
 
 export async function getOverviewStats(
-  schemaName: string
+  schemaName: string,
+  filters?: AnalyticsLocationFilter
 ): Promise<OverviewStats> {
   const client = createTenantClient(schemaName);
+  const locIds = filters?.allowedLocationIds;
+  const hasLocFilter = locIds !== null && locIds !== undefined && locIds.length > 0;
+
+  let dispatchQuery = client
+    .from('dispatches')
+    .select('*', { count: 'exact', head: true })
+    .is('deleted_at', null);
+  if (hasLocFilter) dispatchQuery = dispatchQuery.in('origin_location_id', locIds!);
+
+  let purchaseQuery = client
+    .from('purchases')
+    .select('*', { count: 'exact', head: true })
+    .is('deleted_at', null);
+  if (hasLocFilter) purchaseQuery = purchaseQuery.in('location_id', locIds!);
+
+  let salesQuery = client
+    .from('sales')
+    .select('*', { count: 'exact', head: true })
+    .is('deleted_at', null);
+  if (hasLocFilter) salesQuery = salesQuery.in('location_id', locIds!);
+
+  let stockQuery = client.from('stock_levels').select('current_stock');
+  if (hasLocFilter) stockQuery = stockQuery.in('location_id', locIds!);
+
+  let locationsQuery = client
+    .from('locations')
+    .select('*', { count: 'exact', head: true })
+    .is('deleted_at', null)
+    .eq('is_active', true);
+  if (hasLocFilter) locationsQuery = locationsQuery.in('id', locIds!);
 
   const [dispatches, purchases, sales, stockLevels, locations, commodities] =
     await Promise.all([
-      client
-        .from('dispatches')
-        .select('*', { count: 'exact', head: true })
-        .is('deleted_at', null),
-      client
-        .from('purchases')
-        .select('*', { count: 'exact', head: true })
-        .is('deleted_at', null),
-      client
-        .from('sales')
-        .select('*', { count: 'exact', head: true })
-        .is('deleted_at', null),
-      client.from('stock_levels').select('current_stock'),
-      client
-        .from('locations')
-        .select('*', { count: 'exact', head: true })
-        .is('deleted_at', null)
-        .eq('is_active', true),
+      dispatchQuery,
+      purchaseQuery,
+      salesQuery,
+      stockQuery,
+      locationsQuery,
       client
         .from('commodities')
         .select('*', { count: 'exact', head: true })
@@ -92,17 +114,23 @@ export async function getOverviewStats(
 // ── Dispatch Analytics ─────────────────────────────────────────────
 
 export async function getDispatchAnalytics(
-  schemaName: string
+  schemaName: string,
+  filters?: AnalyticsLocationFilter
 ): Promise<DispatchAnalytics> {
   const client = createTenantClient(schemaName);
+  const locIds = filters?.allowedLocationIds;
+  const hasLocFilter = locIds !== null && locIds !== undefined && locIds.length > 0;
 
   // Fetch all dispatches with items and location names
-  const { data: dispatchRows, error: dispatchError } = await client
+  let dispatchQuery = client
     .from('dispatches')
     .select(
       'id, status, origin_location_id, dest_location_id, origin_location:locations!origin_location_id(name), dest_location:locations!dest_location_id(name)'
     )
     .is('deleted_at', null);
+  if (hasLocFilter) dispatchQuery = dispatchQuery.in('origin_location_id', locIds!);
+
+  const { data: dispatchRows, error: dispatchError } = await dispatchQuery;
 
   if (dispatchError)
     throw new Error(`Failed to fetch dispatches: ${dispatchError.message}`);
@@ -125,10 +153,18 @@ export async function getDispatchAnalytics(
     statusMap.entries()
   ).map(([status, count]) => ({ status, count }));
 
-  // Fetch all dispatch items for quantity aggregation
-  const { data: itemRows, error: itemError } = await client
+  // Fetch dispatch items for the filtered dispatches
+  const dispatchIds = allDispatches.map((d) => d.id);
+  let itemQuery = client
     .from('dispatch_items')
     .select('dispatch_id, sent_quantity, received_quantity');
+  if (dispatchIds.length > 0) {
+    itemQuery = itemQuery.in('dispatch_id', dispatchIds);
+  }
+
+  const { data: itemRows, error: itemError } = dispatchIds.length > 0
+    ? await itemQuery
+    : { data: [], error: null };
 
   if (itemError)
     throw new Error(`Failed to fetch dispatch items: ${itemError.message}`);
@@ -222,35 +258,47 @@ export async function getDispatchAnalytics(
 // ── Movement Summary ───────────────────────────────────────────────
 
 export async function getMovementSummary(
-  schemaName: string
+  schemaName: string,
+  filters?: AnalyticsLocationFilter
 ): Promise<MovementEntry[]> {
   const client = createTenantClient(schemaName);
+  const locIds = filters?.allowedLocationIds;
+  const hasLocFilter = locIds !== null && locIds !== undefined && locIds.length > 0;
+
+  let dispatchQueryBuilder = client
+    .from('dispatches')
+    .select(
+      'id, dispatch_number, status, dispatched_at, created_at, origin_location:locations!origin_location_id(name), dest_location:locations!dest_location_id(name)'
+    )
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  if (hasLocFilter) dispatchQueryBuilder = dispatchQueryBuilder.in('origin_location_id', locIds!);
+
+  let purchaseQueryBuilder = client
+    .from('purchases')
+    .select(
+      'id, purchase_number, status, received_at, created_at, location:locations!location_id(name)'
+    )
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  if (hasLocFilter) purchaseQueryBuilder = purchaseQueryBuilder.in('location_id', locIds!);
+
+  let saleQueryBuilder = client
+    .from('sales')
+    .select(
+      'id, sale_number, status, sold_at, created_at, location:locations!location_id(name)'
+    )
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  if (hasLocFilter) saleQueryBuilder = saleQueryBuilder.in('location_id', locIds!);
 
   const [dispatchRes, purchaseRes, saleRes] = await Promise.all([
-    client
-      .from('dispatches')
-      .select(
-        'id, dispatch_number, status, dispatched_at, created_at, origin_location:locations!origin_location_id(name), dest_location:locations!dest_location_id(name)'
-      )
-      .is('deleted_at', null)
-      .order('created_at', { ascending: false })
-      .limit(10),
-    client
-      .from('purchases')
-      .select(
-        'id, purchase_number, status, received_at, created_at, location:locations!location_id(name)'
-      )
-      .is('deleted_at', null)
-      .order('created_at', { ascending: false })
-      .limit(10),
-    client
-      .from('sales')
-      .select(
-        'id, sale_number, status, sold_at, created_at, location:locations!location_id(name)'
-      )
-      .is('deleted_at', null)
-      .order('created_at', { ascending: false })
-      .limit(10),
+    dispatchQueryBuilder,
+    purchaseQueryBuilder,
+    saleQueryBuilder,
   ]);
 
   const movements: MovementEntry[] = [];

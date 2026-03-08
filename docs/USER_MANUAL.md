@@ -616,11 +616,11 @@ Tenant admins can:
 
 ### Employee (Managed User)
 
-An employee is any user who is not an admin. Their access is controlled by the 11 permission flags below. By default, all employees can view stock. All other permissions are off by default and must be explicitly enabled.
+An employee is any user who is not an admin. Their access is controlled by the 16 permission flags below. By default, all employees can view stock. All other permissions are off by default and must be explicitly enabled.
 
 ---
 
-### The 11 Permission Flags
+### The 16 Permission Flags
 
 When you add a user to your team, you can toggle any combination of these permissions. Each flag grants access to a specific capability.
 
@@ -637,8 +637,13 @@ When you add a user to your team, you can toggle any combination of these permis
 | **Can View Analytics** | Access the analytics dashboards and reports |
 | **Can Export Data** | Download reports and data exports |
 | **Can View Audit Log** | Access the full audit trail |
+| **Can Manage Payments** | Create and manage payment records linked to purchases and sales |
+| **Can Manage Alerts** | Configure and manage stock alert thresholds |
+| **Can Generate Documents** | Generate PDF documents (dispatch challans, GRNs, delivery notes) |
+| **Can Manage Lots** | Create and manage lot tracking records (FIFO allocation, expiry tracking) |
+| **Can Manage Returns** | Create and manage purchase returns and sale returns |
 
-**Note on returns:** Access to the returns feature is controlled by enabling the returns module at the tenant level (done by the super admin), not by a separate permission flag. Any user who can view the purchase or sale detail page will see the "Create Return" or "Accept Return" button when the module is enabled.
+Returns are auto-numbered with the prefix **RET-** (e.g. `RET-000001`). Confirmed returns automatically adjust stock levels: a **sale return** increases stock at the location (goods come back from the customer), while a **purchase return** decreases stock (goods go back to the supplier).
 
 ### How to Assign Permissions
 
@@ -895,7 +900,10 @@ If you cannot find the source of the discrepancy, use the **Audit Trail** to tra
 
 ```sql
 UPDATE tenant_yourslug.sequence_counters
-SET current_value = (SELECT COUNT(*) FROM tenant_yourslug.dispatches)
+SET current_value = (
+  SELECT COALESCE(MAX(CAST(SUBSTRING(dispatch_number FROM '[0-9]+$') AS INTEGER)), 0)
+  FROM tenant_yourslug.dispatches
+)
 WHERE name = 'dispatch';
 ```
 

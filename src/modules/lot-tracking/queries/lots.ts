@@ -79,10 +79,13 @@ export async function createLot(
   return data as Lot;
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function getLotMovements(
   schemaName: string,
   lotId: string
 ): Promise<LotMovement[]> {
+  if (!UUID_RE.test(lotId)) throw new Error('Invalid lot ID');
   const adminClient = createAdminClient();
   const { data, error } = await adminClient.rpc('exec_sql', {
     query: `

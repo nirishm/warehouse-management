@@ -13,6 +13,7 @@ Multi-tenant SaaS Warehouse Management System built with Next.js + Supabase.
 - **PDF generation**: @react-pdf/renderer (dispatch challan, GRN, delivery note)
 - **Barcode/QR**: qrcode, react-qr-code
 - **CSV**: papaparse (bulk import/export)
+- **Email**: Resend (configured as Supabase SMTP; sends invite & password-reset emails)
 
 ## Architecture
 - `src/app/` — Next.js App Router pages and API routes
@@ -39,6 +40,14 @@ Multi-tenant SaaS Warehouse Management System built with Next.js + Supabase.
 - Module DDL registered via `registerModuleMigration(id, fn)` in `src/core/db/module-migrations.ts`
 - Migrations run idempotently when a module is enabled via admin PATCH route (`applyModuleMigration`)
 
+## Environment Variables
+Required in `.env.local`:
+- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key
+- `SUPABASE_SERVICE_ROLE_KEY` — Service role key (server-only)
+- `NEXT_PUBLIC_APP_URL` — App base URL (e.g. `https://wareos.in`)
+- `RESEND_API_KEY` — Resend API key (set as SMTP provider in Supabase Auth dashboard settings)
+
 ## Key Commands
 - `pnpm dev` — Start development server
 - `pnpm test` — Run unit tests
@@ -54,6 +63,17 @@ Multi-tenant SaaS Warehouse Management System built with Next.js + Supabase.
 - Soft deletes (`deleted_at` column) on all entity tables
 - Sequence counters for auto-numbering (DSP-000001, PUR-000001, SAL-000001)
 - Permission types: canPurchase, canDispatch, canReceive, canSale, canViewStock, canManageLocations, canManageCommodities, canManageContacts, canViewAnalytics, canExportData, canViewAuditLog, canManagePayments, canManageAlerts, canGenerateDocuments, canManageLots, canManageReturns, canImportData
+
+## Auth Pages & Flow
+- `/login` — Combined sign-in + forgot-password (3 views: `login`, `forgot`, `forgot-sent`)
+- `/reset-password` — Password recovery; handles both PKCE `?code=` and OTP `?token_hash=` flows
+- `/set-password` — First-time password set for invited users (reached via `/auth/callback?next=/set-password`)
+- `/auth/callback` — PKCE exchange route; accepts `?next=` param for post-auth redirect
+- Invite flow: admin calls `POST /api/admin/tenants/[id]/invite` → Supabase sends email via Resend → user lands on `/set-password`
+- Middleware public routes: `/login`, `/register`, `/auth/callback`, `/reset-password`, `/set-password`, `/no-tenant`
+- `/set-password` and `/no-tenant` are public routes but exempt from the auth'd-user redirect to `/` (users arrive already authenticated)
+- `/no-tenant` — "Access Pending" page for users with no tenant membership; auto-creates access request
+- Self-signup flow: register → confirm email → login → middleware redirects to `/no-tenant` → admin approves via `/admin/access-requests`
 
 ## UI / Design System (WareOS)
 - Theme: light Swiss-editorial — white backgrounds, `#F45F00` orange primary, black type
@@ -88,6 +108,16 @@ For comprehensive reviews (major UI features, design system changes, pre-merge):
 This command auto-injects `git diff` context and invokes the `design-review` agent, which runs all 7 review phases: Preparation → User Flows → Responsiveness → Visual Polish → Accessibility → Robustness → Code Health.
 
 The agent returns a structured report with screenshots, findings by severity (Blocker / High / Medium / Nitpick), and concrete fix suggestions.
+
+### Screenshots
+
+All screenshots taken during Playwright MCP sessions, design reviews, or visual checks **must** be saved to the `screenshots/` folder at the project root. Use descriptive filenames with the pattern:
+```
+screenshots/{page}-{viewport}-{description}.png
+```
+Examples: `screenshots/login-desktop-initial.png`, `screenshots/dashboard-mobile-375-sidebar.png`
+
+This folder is gitignored. Old screenshots can be overwritten or cleaned up freely.
 
 ### Playwright Tool Prefix
 

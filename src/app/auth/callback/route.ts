@@ -6,7 +6,8 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get('code');
 
   if (code) {
-    const response = NextResponse.redirect(new URL('/', request.url));
+    const next = requestUrl.searchParams.get('next') || '/';
+    const response = NextResponse.redirect(new URL(next, request.url));
     const supabase = createMiddlewareClient(request, response);
     await supabase.auth.exchangeCodeForSession(code);
     return response;

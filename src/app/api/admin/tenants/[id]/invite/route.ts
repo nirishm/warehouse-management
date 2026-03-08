@@ -39,7 +39,7 @@ export async function POST(
   // Create auth user via admin API (invite)
   const { data: inviteData, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
     data: { full_name: fullName || email.split('@')[0] },
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/set-password`,
   });
 
   if (inviteError) return NextResponse.json({ error: inviteError.message }, { status: 500 });

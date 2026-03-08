@@ -30,13 +30,22 @@ export default function ResetPasswordPage() {
         }
       });
     } else {
-      // Fallback: hash-based recovery token
       const supabase = createBrowserClient();
+      // Subscribe BEFORE exchange so we never miss the PASSWORD_RECOVERY event
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
         if (event === 'PASSWORD_RECOVERY') {
           setReady(true);
         }
       });
+      // PKCE flow: the email link delivers ?code=... which must be exchanged for a session
+      const code = searchParams.get('code');
+      if (code) {
+        supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+          if (error) {
+            setError('This reset link is invalid or has expired. Please request a new one.');
+          }
+        });
+      }
       return () => subscription.unsubscribe();
     }
   }, [searchParams]);
@@ -64,7 +73,7 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    router.push('/login');
+    router.push('/');
   }
 
   return (
@@ -95,6 +104,7 @@ export default function ResetPasswordPage() {
           <Input
             id="password"
             type="password"
+            autoComplete="new-password"
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -111,6 +121,7 @@ export default function ResetPasswordPage() {
           <Input
             id="confirm"
             type="password"
+            autoComplete="new-password"
             placeholder="••••••••"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}

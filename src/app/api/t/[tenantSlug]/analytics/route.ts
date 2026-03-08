@@ -16,9 +16,9 @@ export async function GET(request: NextRequest) {
     requirePermission(ctx, 'canViewAnalytics');
 
     const [overview, dispatches, movements] = await Promise.all([
-      getOverviewStats(ctx.schemaName),
-      getDispatchAnalytics(ctx.schemaName),
-      getMovementSummary(ctx.schemaName),
+      getOverviewStats(ctx.schemaName, { allowedLocationIds: ctx.allowedLocationIds }),
+      getDispatchAnalytics(ctx.schemaName, { allowedLocationIds: ctx.allowedLocationIds }),
+      getMovementSummary(ctx.schemaName, { allowedLocationIds: ctx.allowedLocationIds }),
     ]);
 
     return NextResponse.json({

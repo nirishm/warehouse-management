@@ -33,6 +33,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Name and slug are required' }, { status: 400 });
   }
 
+  if (!/^[a-z0-9][a-z0-9-]{1,48}[a-z0-9]$/.test(slug)) {
+    return NextResponse.json(
+      { error: 'Slug must be 3–50 lowercase alphanumeric characters and hyphens, starting and ending with a letter or number' },
+      { status: 400 }
+    );
+  }
+
   const schemaName = `tenant_${slug.replace(/-/g, '_')}`;
 
   const admin = createAdminClient();

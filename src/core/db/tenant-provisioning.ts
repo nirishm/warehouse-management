@@ -3,6 +3,9 @@ import fs from 'fs';
 import path from 'path';
 
 export async function provisionTenantSchema(tenantSlug: string): Promise<string> {
+  if (!/^[a-z0-9][a-z0-9-]{1,48}[a-z0-9]$/.test(tenantSlug)) {
+    throw new Error(`Invalid tenant slug: "${tenantSlug}"`);
+  }
   const schemaName = `tenant_${tenantSlug.replace(/-/g, '_')}`;
   const admin = createAdminClient();
 

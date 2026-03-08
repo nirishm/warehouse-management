@@ -12,6 +12,7 @@ import {
   getCommoditiesForFilter,
 } from '@/modules/inventory/queries/stock';
 import { DashboardHome } from './dashboard-home';
+import { OnboardingWizard } from './onboarding-wizard';
 import type { DashboardFilters } from '@/modules/analytics/queries/dashboard';
 
 interface Props {
@@ -77,6 +78,18 @@ export default async function TenantDashboard({ params, searchParams }: Props) {
       getLocationsForFilter(tenant.schema_name),
       getCommoditiesForFilter(tenant.schema_name),
     ]);
+
+  // Show onboarding wizard for new tenant admins with no locations
+  const needsOnboarding = membership?.role === 'tenant_admin' && locations.length === 0;
+  if (needsOnboarding) {
+    return (
+      <OnboardingWizard
+        tenantSlug={tenantSlug}
+        tenantId={tenant.id}
+        schemaName={tenant.schema_name}
+      />
+    );
+  }
 
   // If user has location restrictions, filter the locations dropdown
   const filteredLocations = allowedLocationIds

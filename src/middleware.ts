@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createMiddlewareClient } from '@/lib/supabase/middleware';
 
-const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password', '/auth/callback'];
+const PUBLIC_ROUTES = ['/login', '/register', '/auth/callback', '/reset-password', '/set-password', '/no-tenant'];
 const LANDING_ROUTES = ['/'];
 
 export async function middleware(request: NextRequest) {
@@ -32,14 +32,37 @@ export async function middleware(request: NextRequest) {
         const tenantData = defaultTenant.tenants as unknown as { slug: string };
         return NextResponse.redirect(new URL(`/t/${tenantData.slug}`, request.url));
       }
+
+      // Auth'd but no memberships → access pending page
+      return NextResponse.redirect(new URL('/no-tenant', request.url));
     }
-    // Unauthenticated (or no memberships): show landing page
+    // Unauthenticated: show landing page
     return response;
   }
 
   // Public routes
   if (PUBLIC_ROUTES.some(r => path.startsWith(r))) {
-    if (user) return NextResponse.redirect(new URL('/', request.url));
+    if (user) {
+      // /set-password: users arrive authenticated from invite callback — let through
+      if (path.startsWith('/set-password')) return response;
+
+      // /no-tenant: let through, but if they now have memberships redirect to tenant
+      if (path.startsWith('/no-tenant')) {
+        const { data: memberships } = await supabase
+          .from('user_tenants')
+          .select('tenant_id, is_default, tenants(slug)')
+          .eq('user_id', user.id);
+        if (memberships?.length) {
+          const defaultTenant = memberships.find(m => m.is_default) || memberships[0];
+          const tenantData = defaultTenant.tenants as unknown as { slug: string };
+          return NextResponse.redirect(new URL(`/t/${tenantData.slug}`, request.url));
+        }
+        return response;
+      }
+
+      // All other public routes: redirect auth'd users to home
+      return NextResponse.redirect(new URL('/', request.url));
+    }
     return response;
   }
 

@@ -22,6 +22,9 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
             <Link href="/admin/tenants" className="text-[var(--text-muted)] hover:text-foreground transition-colors">
               Tenants
             </Link>
+            <Link href="/admin/access-requests" className="text-[var(--text-muted)] hover:text-foreground transition-colors">
+              Requests
+            </Link>
           </nav>
         </div>
       </header>
