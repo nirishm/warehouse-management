@@ -13,9 +13,9 @@ CREATE TABLE {schema}.locations (
     custom_fields   JSONB NOT NULL DEFAULT '{}',
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at      TIMESTAMPTZ,
-    UNIQUE(code) WHERE deleted_at IS NULL
+    deleted_at      TIMESTAMPTZ
 );
+CREATE UNIQUE INDEX idx_locations_code_active ON {schema}.locations(code) WHERE deleted_at IS NULL;
 
 -- Commodities (products/items/grains)
 CREATE TABLE {schema}.commodities (
@@ -29,9 +29,9 @@ CREATE TABLE {schema}.commodities (
     custom_fields   JSONB NOT NULL DEFAULT '{}',
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at      TIMESTAMPTZ,
-    UNIQUE(code) WHERE deleted_at IS NULL
+    deleted_at      TIMESTAMPTZ
 );
+CREATE UNIQUE INDEX idx_commodities_code_active ON {schema}.commodities(code) WHERE deleted_at IS NULL;
 
 -- Units of measure
 CREATE TABLE {schema}.units (
