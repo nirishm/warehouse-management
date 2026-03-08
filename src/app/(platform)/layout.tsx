@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { SignOutButton } from './sign-out-button';
 
 export const metadata: Metadata = {
   title: 'Platform Admin — WareOS',
@@ -25,6 +26,8 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
             <Link href="/admin/access-requests" className="text-[var(--text-muted)] hover:text-foreground transition-colors">
               Requests
             </Link>
+            <div className="w-px h-4 bg-border" />
+            <SignOutButton />
           </nav>
         </div>
       </header>
