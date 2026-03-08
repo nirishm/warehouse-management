@@ -1,4 +1,4 @@
-# Warehouse Management SaaS — User Manual
+# WareOS — User Manual
 
 **Audience:** Business owners, warehouse managers, and employees
 **Last updated:** March 2026
@@ -23,11 +23,30 @@
 
 ## 1. What Is This App?
 
-This is a cloud-based Warehouse Management System (WMS) designed to help commodity-trading and logistics businesses track stock, movements, purchases, and sales across one or more physical locations.
+WareOS is a cloud-based Warehouse Management System (WMS) designed to help commodity-trading and logistics businesses track stock, movements, purchases, sales, and returns across one or more physical locations.
 
-Think of it as a digital ledger for your warehouse. Every time goods arrive from a supplier, move between your storage points, or leave to a customer, you record that event here. The system keeps a running total of what you have, where it is, and whether anything is short or over. At any time, you can pull up a stock report, trace every movement back to its source, and know exactly who did what.
+Think of it as a digital ledger for your warehouse. Every time goods arrive from a supplier, move between your storage points, leave to a customer, or come back as a return, you record that event here. The system keeps a running total of what you have, where it is, and whether anything is short or over. At any time, you can pull up a stock report, trace every movement back to its source, and know exactly who did what.
 
 The application is multi-tenant, meaning one installation of the software can serve multiple independent companies simultaneously. Each company's data is kept completely separate — like separate apartments in the same building. If you are a business owner using this system, you are a tenant. If you are the person who runs the software platform itself, you are the super admin.
+
+### Visual Identity
+
+WareOS uses a clean, light editorial design. The interface features white backgrounds with an orange (#F45F00) accent color. Typography is built on three typefaces:
+
+- **Hedvig Letters Serif** — page headlines and section titles
+- **Rethink Sans** — body text, navigation labels, and form fields
+- **Space Mono** — reference numbers (DSP-000001), codes, labels, and data values
+
+Buttons use a pill shape. Status badges throughout the application are color-coded:
+
+| Color | Meaning |
+|---|---|
+| **Green** | Received, completed |
+| **Orange** | Dispatched, in-progress |
+| **Blue** | Confirmed, ordered |
+| **Red** | Cancelled |
+
+The sidebar displays the WareOS brand mark — an orange dot followed by "WAREOS" in monospace capitals — alongside your organization name. Active navigation items are highlighted with a soft orange tint background and an orange left border.
 
 ---
 
@@ -37,7 +56,7 @@ The application is multi-tenant, meaning one installation of the software can se
 A single company or organisation using the system. Your company is one tenant. Another company using the same software installation is a separate tenant. Your data and theirs never mix. Think of a tenant as a separate filing cabinet in a shared office — same building, but only you have the key to yours.
 
 **Module**
-A feature set that can be switched on or off for your company. The system ships with eight modules (inventory, purchase, sale, dispatch, analytics, shortage tracking, user management, and audit trail). If your business only does inbound purchasing and stock management, you can leave the sale module disabled. Modules are like apps on a phone — you install only what you need.
+A feature set that can be switched on or off for your company. The system ships with nine modules (inventory, purchase, sale, dispatch, returns, analytics, shortage tracking, user management, and audit trail). If your business only does inbound purchasing and stock management, you can leave the sale and returns modules disabled. Modules are like apps on a phone — you install only what you need.
 
 **Location**
 A physical place where stock is stored or handled. This could be a warehouse, a storage yard, a depot, or a shop floor. Each location is named and managed separately. Users can be assigned to specific locations, so a warehouse keeper in Delhi only sees the Delhi location.
@@ -72,6 +91,12 @@ A permanent, append-only record of every action taken in the system. Every time 
 **Sequence Counter**
 The mechanism that auto-numbers your documents. The first dispatch you create is DSP-000001, the next is DSP-000002, and so on. These numbers never repeat and cannot be changed manually.
 
+**Return**
+A transaction that reverses part or all of a previous purchase or sale. A purchase return sends goods back to a supplier (for example, damaged or incorrect items). A sale return accepts goods back from a customer (for example, a rejected shipment). Returns are always linked to the original transaction and affect stock levels accordingly. The returns module must be enabled for your tenant before you can create returns.
+
+**Module Gating**
+The mechanism by which features appear or disappear based on which modules your company has enabled. For example, the "Create Return" button on a purchase detail page only appears when the returns module is turned on. When a module is disabled, all of its related buttons, pages, and sidebar entries are hidden entirely — they are not shown in a disabled or greyed-out state.
+
 ---
 
 ## 3. The Big Picture: Two Layers of the System
@@ -103,7 +128,7 @@ https://your-app.com/t/your-company-name/...
 Inside your tenant, you have:
 - Your own locations, commodities, and contacts
 - Your own users with their own roles and permissions
-- Your own transaction records (purchases, sales, dispatches)
+- Your own transaction records (purchases, sales, dispatches, and returns)
 - Your own settings and custom fields
 
 No other company can see any of this.
@@ -112,7 +137,7 @@ No other company can see any of this.
 
 ## 4. Modules — What Each One Does
 
-The system is divided into eight modules. Each module solves a distinct business problem. They are listed here roughly in the order you would set them up.
+The system is divided into nine modules. Each module solves a distinct business problem. They are listed here roughly in the order you would set them up.
 
 ---
 
@@ -152,6 +177,7 @@ Every time you receive goods from a vendor, you create a purchase record. The pu
 - Record the date goods were received
 - Edit or cancel purchases
 - View a history of all purchases, filterable by date or supplier
+- Initiate a purchase return (if the returns module is enabled) — a **Create Return** button appears on the purchase detail page, linking directly to the returns form pre-filled with the purchase data
 
 **Data it tracks:**
 - Unique purchase number (PUR-000001...)
@@ -176,6 +202,7 @@ When you sell and dispatch goods to a buyer, you create a sale record. The sale 
 - Add multiple line items per sale
 - Record the sale date
 - View a history of all sales
+- Accept a sale return (if the returns module is enabled) — an **Accept Return** button appears on the sale detail page, linking directly to the returns form pre-filled with the sale data
 
 **Data it tracks:**
 - Unique sale number (SAL-000001...)
@@ -294,6 +321,36 @@ Every action in the system — creating a dispatch, editing a commodity, deletin
 
 ---
 
+### 4.9 Returns
+
+**For handling goods sent back to suppliers or received back from customers.**
+
+The returns module manages reverse logistics. A purchase return sends goods back to a supplier — for example, if a delivery contained damaged or incorrect items. A sale return accepts goods back from a customer — for example, if a shipment was rejected or partially defective.
+
+Returns are never standalone records. Every return is linked to an original purchase or sale transaction, ensuring full traceability. When a return is created, stock levels are adjusted automatically at the relevant location.
+
+**What you can do:**
+- Create a purchase return from any purchase detail page (via the **Create Return** button in the top-right corner)
+- Create a sale return from any sale detail page (via the **Accept Return** button in the top-right corner)
+- Track return status and trace it back to the originating transaction
+- View a history of all returns
+
+**How it integrates with other modules:**
+- On the **purchase detail page**, a "Create Return" button appears when this module is enabled. Clicking it navigates to the returns form pre-linked to that purchase.
+- On the **sale detail page**, an "Accept Return" button appears when this module is enabled. Clicking it navigates to the returns form pre-linked to that sale.
+- When the returns module is **disabled** for a tenant, these buttons are completely absent from the page — not shown in a disabled state.
+
+**Data it tracks:**
+- Link to the original purchase or sale
+- Return type (purchase return or sale return)
+- Commodities and quantities being returned
+- Return date and status
+- Audit trail entries for all return actions
+
+**Dependencies:** Inventory module must be enabled. Purchase module is required for purchase returns. Sale module is required for sale returns.
+
+---
+
 ## 5. Setup From Scratch
 
 This section walks you through getting the system running for the first time. It assumes you have access to a computer with an internet connection and basic comfort using a terminal (command-line window).
@@ -405,7 +462,7 @@ As the super admin:
 
 1. Navigate to `http://localhost:3000/admin`.
 2. Create a new tenant for your company. Give it a short "slug" (a URL-safe name, e.g., `acme-corp`). This becomes part of your company's URL: `/t/acme-corp/`.
-3. Enable the modules your business needs.
+3. Enable the modules your business needs. WareOS offers nine modules; enable only the ones relevant to your operations.
 
 ### Step 10: Register and Log In
 
@@ -499,6 +556,38 @@ Stock levels are always current — they reflect every purchase, sale, and dispa
 
 ---
 
+### Workflow F: Create a Purchase Return
+
+When goods received from a supplier need to be sent back (damaged, incorrect, or excess):
+
+1. Navigate to **Purchases** in the sidebar.
+2. Find the purchase by its reference number and click on it to open the detail page.
+3. In the top-right corner, click **Create Return**. (This button only appears if the returns module is enabled for your company. If you do not see it, ask your admin to enable the returns module.)
+4. You are taken to the returns form, which is pre-linked to the original purchase.
+5. Select the commodities and quantities being returned.
+6. Enter the return date and any notes.
+7. Click **Submit**.
+
+Stock at the purchase's receiving location is adjusted to reflect the returned goods.
+
+---
+
+### Workflow G: Accept a Sale Return
+
+When a customer returns goods that were previously sold:
+
+1. Navigate to **Sales** in the sidebar.
+2. Find the sale by its reference number and click on it to open the detail page.
+3. In the top-right corner, click **Accept Return**. (This button only appears if the returns module is enabled for your company. If you do not see it, ask your admin to enable the returns module.)
+4. You are taken to the returns form, which is pre-linked to the original sale.
+5. Select the commodities and quantities being returned.
+6. Enter the return date and any notes.
+7. Click **Submit**.
+
+Stock at the sale's source location is adjusted to reflect the returned goods.
+
+---
+
 ## 7. User Roles and Permissions
 
 The system has three types of users. Understanding roles helps you set up your team correctly.
@@ -548,6 +637,8 @@ When you add a user to your team, you can toggle any combination of these permis
 | **Can View Analytics** | Access the analytics dashboards and reports |
 | **Can Export Data** | Download reports and data exports |
 | **Can View Audit Log** | Access the full audit trail |
+
+**Note on returns:** Access to the returns feature is controlled by enabling the returns module at the tenant level (done by the super admin), not by a separate permission flag. Any user who can view the purchase or sale detail page will see the "Create Return" or "Accept Return" button when the module is enabled.
 
 ### How to Assign Permissions
 
@@ -820,4 +911,22 @@ Replace `yourslug` with your actual tenant slug, and repeat for `purchase` and `
 
 ---
 
-*For technical assistance, contact your system administrator or refer to the developer documentation in `README.md` and `docs/deployment.md`.*
+### Problem 11: The "Create Return" or "Accept Return" button is not visible on purchase/sale detail pages
+
+**Cause:** The returns module is not enabled for your tenant.
+
+**Fix:** Log in as the super admin and navigate to `/admin`. Find your tenant, and enable the **returns** module. Save your changes. The tenant user should refresh their browser — the button will now appear on purchase and sale detail pages.
+
+Note: the button is completely hidden when the module is disabled, not greyed out. This is by design (module gating).
+
+---
+
+### Problem 12: The app looks different from what is described here (dark theme, different fonts)
+
+**Cause:** You may be running an older version of the application from before the WareOS visual overhaul.
+
+**Fix:** Pull the latest code from the repository and rebuild the application (`pnpm build`). The current design uses white backgrounds, orange (#F45F00) accents, and three Google Fonts (Hedvig Letters Serif, Rethink Sans, Space Mono). If you see dark backgrounds with amber accents, your codebase is out of date.
+
+---
+
+*For technical assistance, contact your system administrator or refer to the developer documentation in `README.md` and `docs/deployment.md`. WareOS is the brand name for the Warehouse Management System platform.*
