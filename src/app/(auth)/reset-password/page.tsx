@@ -76,8 +76,15 @@ export default function ResetPasswordPage() {
           <p className="text-sm text-[var(--text-muted)]">Verifying reset link…</p>
         )}
         {error && (
-          <div className="text-sm text-[var(--red)] bg-[var(--red-bg)] border border-[var(--red)]/20 rounded-lg px-3 py-2">
-            {error}
+          <div className="space-y-3">
+            <div className="text-sm text-[var(--red)] bg-[var(--red-bg)] border border-[var(--red)]/20 rounded-lg px-3 py-2">
+              {error}
+            </div>
+            <p className="text-sm text-center text-[var(--text-muted)]">
+              <a href="/login" className="text-[var(--accent-color)] hover:text-[var(--accent-dark)] transition-colors font-medium">
+                Back to sign in
+              </a>
+            </p>
           </div>
         )}
 
