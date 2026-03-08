@@ -54,10 +54,11 @@ test.describe('No-Tenant Redirect', () => {
 });
 
 test.describe('Reset Password Page', () => {
-  test('reset-password page shows verifying state', async ({ page }) => {
+  test('reset-password page shows error without code or token', async ({ page }) => {
     await page.goto(`${BASE_URL}/reset-password`);
     await expect(page.locator('text=Set new password')).toBeVisible();
-    // Without a code/token, should show verifying or no form interaction
-    await expect(page.locator('text=Verifying reset link')).toBeVisible();
+    // Without a code/token, should show an error with link back to sign in
+    await expect(page.locator('text=This reset link is invalid')).toBeVisible();
+    await expect(page.locator('text=Back to sign in')).toBeVisible();
   });
 });

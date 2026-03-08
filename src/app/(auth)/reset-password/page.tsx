@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
@@ -17,11 +17,13 @@ export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    const supabase = createBrowserClient();
     const tokenHash = searchParams.get('token_hash');
     const type = searchParams.get('type');
+    const code = searchParams.get('code');
 
     if (tokenHash && type === 'recovery') {
-      const supabase = createBrowserClient();
+      // OTP flow: verify the token hash directly
       supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error }) => {
         if (error) {
           setError('This reset link is invalid or has expired. Please request a new one.');
@@ -29,23 +31,47 @@ export default function ResetPasswordPage() {
           setReady(true);
         }
       });
-    } else {
-      const supabase = createBrowserClient();
-      // Subscribe BEFORE exchange so we never miss the PASSWORD_RECOVERY event
+    } else if (code) {
+      // PKCE flow: exchange the ?code= param for a session
+      // Subscribe BEFORE exchange so we catch PASSWORD_RECOVERY if it fires
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
         if (event === 'PASSWORD_RECOVERY') {
           setReady(true);
         }
       });
-      // PKCE flow: the email link delivers ?code=... which must be exchanged for a session
-      const code = searchParams.get('code');
-      if (code) {
-        supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-          if (error) {
-            setError('This reset link is invalid or has expired. Please request a new one.');
-          }
-        });
-      }
+
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (error) {
+          setError('This reset link is invalid or has expired. Please request a new one.');
+        } else {
+          // Session exchanged successfully — enable the form even if
+          // PASSWORD_RECOVERY event didn't fire (may fire as SIGNED_IN)
+          setReady(true);
+        }
+      });
+
+      return () => subscription.unsubscribe();
+    } else {
+      // Implicit flow: Supabase dashboard recovery link lands on root with
+      // #access_token=...&type=recovery in the hash. The Supabase JS client
+      // parses the hash automatically and fires PASSWORD_RECOVERY. Listen for
+      // it here, and also check if there's already an active recovery session.
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setReady(true);
+        }
+      });
+
+      // Also check if a recovery session is already established (user navigated
+      // here after the hash was parsed on another page)
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          setReady(true);
+        } else {
+          setError('This reset link is invalid. Please request a new password reset from the sign in page.');
+        }
+      });
+
       return () => subscription.unsubscribe();
     }
   }, [searchParams]);
@@ -140,5 +166,20 @@ export default function ResetPasswordPage() {
         </Button>
       </form>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="bg-[var(--bg-base)] rounded-2xl border border-[var(--text-dim)]/15 shadow-sm px-8 py-8">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-6">Set new password</h2>
+          <p className="text-sm text-[var(--text-muted)]">Verifying reset link…</p>
+        </div>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

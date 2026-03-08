@@ -46,6 +46,9 @@ export async function middleware(request: NextRequest) {
       // /set-password: users arrive authenticated from invite callback — let through
       if (path.startsWith('/set-password')) return response;
 
+      // /reset-password: users arrive authenticated after code exchange — let through
+      if (path.startsWith('/reset-password')) return response;
+
       // /no-tenant: let through, but if they now have memberships redirect to tenant
       if (path.startsWith('/no-tenant')) {
         const { data: memberships } = await supabase
