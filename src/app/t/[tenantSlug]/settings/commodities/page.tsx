@@ -22,12 +22,13 @@ export default async function CommoditiesPage({ params }: Props) {
 
   const { data: tenant } = await supabase
     .from('tenants')
-    .select('id, schema_name, name, enabled_modules')
+    .select('id, schema_name, name, enabled_modules, slug')
     .eq('slug', tenantSlug)
     .single();
 
   if (!tenant) return null;
 
+  const barcodeEnabled = (tenant.enabled_modules ?? []).includes('barcode');
   const tenantClient = createTenantClient(tenant.schema_name);
 
   const { data: commodities } = await tenantClient
@@ -60,7 +61,12 @@ export default async function CommoditiesPage({ params }: Props) {
             Manage the commodities tracked in your warehouse
           </p>
         </div>
-        <CommoditiesClient initialData={rows} renderMode="button" />
+        <CommoditiesClient
+          initialData={rows}
+          renderMode="button"
+          tenantSlug={tenantSlug}
+          barcodeEnabled={barcodeEnabled}
+        />
       </div>
 
       <Card className="border-zinc-800 bg-zinc-900/60">
@@ -70,7 +76,12 @@ export default async function CommoditiesPage({ params }: Props) {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <CommoditiesClient initialData={rows} renderMode="table" />
+          <CommoditiesClient
+            initialData={rows}
+            renderMode="table"
+            tenantSlug={tenantSlug}
+            barcodeEnabled={barcodeEnabled}
+          />
         </CardContent>
       </Card>
     </div>

@@ -1,6 +1,8 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertSummaryWidget } from '@/components/stock-alerts/alert-summary-widget';
+import { getAlertSummary } from '@/modules/stock-alerts/queries/alerts';
 
 interface Props {
   params: Promise<{ tenantSlug: string }>;
@@ -20,15 +22,22 @@ export default async function TenantDashboard({ params }: Props) {
 
   const tenantClient = createTenantClient(tenant.schema_name);
 
-  const { count: locationCount } = await tenantClient
-    .from('locations')
-    .select('*', { count: 'exact', head: true })
-    .is('deleted_at', null);
+  const stockAlertsEnabled = tenant.enabled_modules?.includes('stock-alerts') ?? false;
 
-  const { count: commodityCount } = await tenantClient
-    .from('commodities')
-    .select('*', { count: 'exact', head: true })
-    .is('deleted_at', null);
+  const [locationResult, commodityResult, alertSummary] = await Promise.all([
+    tenantClient
+      .from('locations')
+      .select('*', { count: 'exact', head: true })
+      .is('deleted_at', null),
+    tenantClient
+      .from('commodities')
+      .select('*', { count: 'exact', head: true })
+      .is('deleted_at', null),
+    stockAlertsEnabled ? getAlertSummary(tenant.schema_name) : null,
+  ]);
+
+  const locationCount = locationResult.count;
+  const commodityCount = commodityResult.count;
 
   const stats = [
     { label: 'Locations', value: locationCount ?? 0 },
@@ -57,6 +66,10 @@ export default async function TenantDashboard({ params }: Props) {
           </Card>
         ))}
       </div>
+
+      {alertSummary && alertSummary.total > 0 && (
+        <AlertSummaryWidget summary={alertSummary} tenantSlug={tenantSlug} />
+      )}
     </div>
   );
 }

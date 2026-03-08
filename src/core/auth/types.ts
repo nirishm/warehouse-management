@@ -2,7 +2,13 @@ export type Permission =
   | 'canPurchase' | 'canDispatch' | 'canReceive' | 'canSale'
   | 'canViewStock' | 'canManageLocations' | 'canManageCommodities'
   | 'canManageContacts' | 'canViewAnalytics' | 'canExportData'
-  | 'canViewAuditLog';
+  | 'canViewAuditLog'
+  | 'canManagePayments'
+  | 'canManageAlerts'
+  | 'canGenerateDocuments'
+  | 'canManageLots'
+  | 'canManageReturns'
+  | 'canImportData';
 
 export interface TenantContext {
   tenantId: string;

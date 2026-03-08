@@ -7,6 +7,13 @@ import { analyticsManifest } from './analytics/manifest';
 import { shortageTrackingManifest } from './shortage-tracking/manifest';
 import { userManagementManifest } from './user-management/manifest';
 import { auditTrailManifest } from './audit-trail/manifest';
+import { paymentsManifest } from './payments/manifest';
+import { stockAlertsManifest } from './stock-alerts/manifest';
+import { documentGenManifest } from './document-gen/manifest';
+import { lotTrackingManifest } from './lot-tracking/manifest';
+import { returnsManifest } from './returns/manifest';
+import { bulkImportManifest } from './bulk-import/manifest';
+import { barcodeManifest } from './barcode/manifest';
 
 // Register all modules
 moduleRegistry.register(inventoryManifest);
@@ -17,6 +24,13 @@ moduleRegistry.register(analyticsManifest);
 moduleRegistry.register(shortageTrackingManifest);
 moduleRegistry.register(userManagementManifest);
 moduleRegistry.register(auditTrailManifest);
+moduleRegistry.register(paymentsManifest);
+moduleRegistry.register(stockAlertsManifest);
+moduleRegistry.register(documentGenManifest);
+moduleRegistry.register(lotTrackingManifest);
+moduleRegistry.register(returnsManifest);
+moduleRegistry.register(bulkImportManifest);
+moduleRegistry.register(barcodeManifest);
 
 export {
   inventoryManifest,
@@ -27,4 +41,11 @@ export {
   shortageTrackingManifest,
   userManagementManifest,
   auditTrailManifest,
+  paymentsManifest,
+  stockAlertsManifest,
+  documentGenManifest,
+  lotTrackingManifest,
+  returnsManifest,
+  bulkImportManifest,
+  barcodeManifest,
 };

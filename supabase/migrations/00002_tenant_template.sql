@@ -194,7 +194,13 @@ CREATE TABLE {schema}.user_profiles (
         "canManageContacts": false,
         "canViewAnalytics": false,
         "canExportData": false,
-        "canViewAuditLog": false
+        "canViewAuditLog": false,
+        "canManagePayments": false,
+        "canManageAlerts": false,
+        "canGenerateDocuments": false,
+        "canManageLots": false,
+        "canManageReturns": false,
+        "canImportData": false
     }',
     is_active           BOOLEAN NOT NULL DEFAULT true,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -337,7 +343,10 @@ INSERT INTO {schema}.units (name, abbreviation, type, is_default) VALUES
 INSERT INTO {schema}.sequence_counters (id, prefix, current_value) VALUES
     ('dispatch', 'DSP', 0),
     ('purchase', 'PUR', 0),
-    ('sale', 'SAL', 0);
+    ('sale', 'SAL', 0),
+    ('payment', 'PAY', 0),
+    ('lot', 'LOT', 0),
+    ('return', 'RET', 0);
 
 -- Updated_at triggers
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON {schema}.locations

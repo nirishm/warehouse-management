@@ -12,6 +12,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type { SaleStatus } from '@/modules/sale/validations/sale';
+import { PaymentPanel } from '@/components/payments/payment-panel';
+import { DownloadDocumentButton } from '@/components/document-gen/download-document-button';
+import { createTenantClient } from '@/core/db/tenant-query';
+import type { Permission } from '@/core/auth/types';
 
 interface Props {
   params: Promise<{ tenantSlug: string; id: string }>;
@@ -40,11 +44,22 @@ export default async function SaleDetailPage({ params }: Props) {
 
   const { data: tenant } = await supabase
     .from('tenants')
-    .select('schema_name')
+    .select('schema_name, enabled_modules')
     .eq('slug', tenantSlug)
     .single();
 
   if (!tenant) return null;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  const tenantClient = createTenantClient(tenant.schema_name);
+  const { data: profile } = user
+    ? await tenantClient.from('user_profiles').select('permissions').eq('user_id', user.id).single()
+    : { data: null };
+  const permissions = (profile?.permissions ?? {}) as Record<Permission, boolean>;
+
+  const paymentsModuleEnabled = (tenant.enabled_modules ?? []).includes('payments');
+  const canManagePayments = permissions.canManagePayments ?? false;
+  const docGenEnabled = (tenant.enabled_modules ?? []).includes('document-gen');
 
   const sale = await getSaleById(tenant.schema_name, id);
 
@@ -85,12 +100,20 @@ export default async function SaleDetailPage({ params }: Props) {
             {formatDate(sale.sold_at ?? sale.created_at)}
           </p>
         </div>
-        <Link
-          href={`/t/${tenantSlug}/sales`}
-          className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
-        >
-          Back to sales
-        </Link>
+        <div className="flex items-center gap-2">
+          {docGenEnabled && (
+            <DownloadDocumentButton
+              href={`/api/t/${tenantSlug}/documents/delivery-note/${id}`}
+              label="Download Delivery Note"
+            />
+          )}
+          <Link
+            href={`/t/${tenantSlug}/sales`}
+            className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
+          >
+            Back to sales
+          </Link>
+        </div>
       </div>
 
       {/* Details */}
@@ -241,6 +264,16 @@ export default async function SaleDetailPage({ params }: Props) {
           )}
         </CardContent>
       </Card>
+
+      {/* Payments panel — shown when payments module is enabled */}
+      {paymentsModuleEnabled && (
+        <PaymentPanel
+          tenantSlug={tenantSlug}
+          transactionType="sale"
+          transactionId={id}
+          canManage={canManagePayments}
+        />
+      )}
     </div>
   );
 }
