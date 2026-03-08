@@ -6,7 +6,8 @@ export async function importPurchases(
   schemaName: string,
   rows: PurchaseRow[],
   parseErrors: { row: number; field: string; message: string }[],
-  userId: string
+  userId: string,
+  allowedLocationIds?: string[] | null
 ): Promise<ImportResult> {
   const client = createTenantClient(schemaName);
   let inserted = 0;
@@ -35,6 +36,10 @@ export async function importPurchases(
     const locationId = locationMap.get(row.location_code.toLowerCase());
     if (!locationId) {
       errors.push({ row: rowNum, field: 'location_code', message: `Location '${row.location_code}' not found` });
+      continue;
+    }
+    if (allowedLocationIds !== null && allowedLocationIds !== undefined && !allowedLocationIds.includes(locationId)) {
+      errors.push({ row: rowNum, field: 'location_code', message: `Access denied: location '${row.location_code}' not assigned` });
       continue;
     }
 

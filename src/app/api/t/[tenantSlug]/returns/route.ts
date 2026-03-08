@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenantContext, requireModule, requirePermission } from '@/core/auth/guards';
+import { withTenantContext, requireModule, requirePermission, requireLocationAccess } from '@/core/auth/guards';
 import { listReturns, createReturn } from '@/modules/returns/queries/returns';
 import { createReturnSchema } from '@/modules/returns/validations/return';
 
@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     requireModule(ctx, 'returns');
     requirePermission(ctx, 'canManageReturns');
 
-    const returns = await listReturns(ctx.schemaName);
+    const returns = await listReturns(ctx.schemaName, { allowedLocationIds: ctx.allowedLocationIds });
     return NextResponse.json({ data: returns });
   });
 }
@@ -25,6 +25,12 @@ export async function POST(request: NextRequest) {
         { error: 'Validation failed', details: parsed.error.flatten() },
         { status: 400 }
       );
+    }
+
+    try {
+      requireLocationAccess(ctx, parsed.data.location_id);
+    } catch {
+      return NextResponse.json({ error: 'Access denied: location not assigned' }, { status: 403 });
     }
 
     const ret = await createReturn(ctx.schemaName, parsed.data, ctx.userId);

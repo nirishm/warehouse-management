@@ -98,6 +98,33 @@
   --red: #DC2626;
   --red-bg: rgba(220,38,38,0.08);
   --orange-bg: rgba(244,95,0,0.08);
+
+  /* ─── Layout ─────────────────────────────────── */
+  --header-h: 60px;
+  --sidebar-w: 240px;
+  --content-px: 28px;
+
+  /* ─── Component Sizing ──────────────────────── */
+  --input-h: 38px;
+  --btn-h: 40px;
+  --btn-h-sm: 36px;
+  --btn-h-lg: 48px;
+  --table-cell-px: 16px;
+  --table-cell-py: 11px;
+  --card-padding: 20px;
+
+  /* ─── Borders ────────────────────────────────── */
+  --border-mid: rgba(0,0,0,0.12);
+
+  /* ─── Typography Scale ──────────────────────── */
+  --fs-xs: 10px;
+  --fs-sm: 12px;
+  --fs-base: 14px;
+  --fs-lg: 18px;
+  --fs-xl: 20px;
+  --fs-2xl: 28px;
+  --kpi-letter-spacing: -0.5px;
+  --heading-letter-spacing: -0.3px;
 }
 
 @layer base {

@@ -14,6 +14,9 @@ export async function GET(request: NextRequest, { params }: Props) {
 
     const ret = await getReturn(ctx.schemaName, id);
     if (!ret) return NextResponse.json({ error: 'Return not found' }, { status: 404 });
+    if (ctx.allowedLocationIds !== null && !ctx.allowedLocationIds.includes(ret.location_id)) {
+      return NextResponse.json({ error: 'Return not found' }, { status: 404 });
+    }
     return NextResponse.json({ data: ret });
   });
 }

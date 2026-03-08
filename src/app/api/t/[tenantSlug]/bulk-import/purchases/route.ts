@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     const text = await (file as File).text();
     const { rows, errors: parseErrors } = parseCSV(text, purchaseRowSchema);
-    const result = await importPurchases(ctx.schemaName, rows, parseErrors, ctx.userId);
+    const result = await importPurchases(ctx.schemaName, rows, parseErrors, ctx.userId, ctx.allowedLocationIds);
     return NextResponse.json(result, { status: result.summary.failed > 0 ? 207 : 200 });
   });
 }

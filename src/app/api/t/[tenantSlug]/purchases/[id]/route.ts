@@ -14,6 +14,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
     if (!purchase) {
       return NextResponse.json({ error: 'Purchase not found' }, { status: 404 });
     }
+    if (ctx.allowedLocationIds !== null && !ctx.allowedLocationIds.includes(purchase.location_id)) {
+      return NextResponse.json({ error: 'Purchase not found' }, { status: 404 });
+    }
     return NextResponse.json({ data: purchase });
   });
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withTenantContext, requirePermission, requireModule } from '@/core/auth/guards';
 import { receiveDispatch } from '@/modules/dispatch/queries/receive';
+import { getDispatchById } from '@/modules/dispatch/queries/dispatches';
 import { receiveDispatchSchema } from '@/modules/dispatch/validations/receive';
 
 type RouteContext = { params: Promise<{ tenantSlug: string; id: string }> };
@@ -11,6 +12,18 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     requirePermission(ctx, 'canReceive');
 
     const { id } = await params;
+
+    const dispatch = await getDispatchById(ctx.schemaName, id);
+    if (!dispatch) {
+      return NextResponse.json({ error: 'Dispatch not found' }, { status: 404 });
+    }
+    if (
+      ctx.allowedLocationIds !== null &&
+      !ctx.allowedLocationIds.includes(dispatch.dest_location_id)
+    ) {
+      return NextResponse.json({ error: 'Dispatch not found' }, { status: 404 });
+    }
+
     const body = await request.json();
     const parsed = receiveDispatchSchema.safeParse(body);
 
@@ -22,13 +35,13 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     }
 
     try {
-      const dispatch = await receiveDispatch(
+      const result = await receiveDispatch(
         ctx.schemaName,
         id,
         parsed.data.items,
         ctx.userId
       );
-      return NextResponse.json(dispatch);
+      return NextResponse.json(result);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to receive dispatch';
 

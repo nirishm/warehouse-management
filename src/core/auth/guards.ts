@@ -29,10 +29,19 @@ export async function withTenantContext(
 
     const permissions = (profile?.permissions ?? {}) as Record<Permission, boolean>;
 
+    const ALL_PERMISSIONS: Permission[] = [
+      'canPurchase', 'canDispatch', 'canReceive', 'canSale',
+      'canViewStock', 'canManageLocations', 'canManageCommodities',
+      'canManageContacts', 'canViewAnalytics', 'canExportData',
+      'canViewAuditLog', 'canManagePayments', 'canManageAlerts',
+      'canGenerateDocuments', 'canManageLots', 'canManageReturns',
+      'canImportData',
+    ];
+
     if (role === 'tenant_admin') {
-      Object.keys(permissions).forEach(k => {
-        (permissions as Record<string, boolean>)[k] = true;
-      });
+      for (const p of ALL_PERMISSIONS) {
+        permissions[p] = true;
+      }
     }
 
     let allowedLocationIds: string[] | null = null;
@@ -41,8 +50,7 @@ export async function withTenantContext(
         .from('user_locations')
         .select('location_id')
         .eq('user_id', user.id);
-      const ids = (locs ?? []).map((l: { location_id: string }) => l.location_id);
-      allowedLocationIds = ids.length > 0 ? ids : null;
+      allowedLocationIds = (locs ?? []).map((l: { location_id: string }) => l.location_id);
     }
 
     return handler({

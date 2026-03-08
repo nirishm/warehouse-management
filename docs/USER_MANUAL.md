@@ -930,3 +930,299 @@ Note: the button is completely hidden when the module is disabled, not greyed ou
 ---
 
 *For technical assistance, contact your system administrator or refer to the developer documentation in `README.md` and `docs/deployment.md`. WareOS is the brand name for the Warehouse Management System platform.*
+
+---
+
+## v2 Updates — New Modules and Enhancements
+
+WareOS expanded from 9 to 15 modules in v2. Six new modules were released alongside a mobile-optimised receiving experience and six new permission flags. All existing functionality is unchanged — the sections below extend the manual with everything that is new.
+
+---
+
+### 4.10 Payments
+
+**Module ID:** `payments` | **Required permission:** Can Manage Payments | **Depends on:** inventory
+
+The Payments module lets you record money received or paid against any purchase or sale. It maintains a running balance — total document value minus total payments received — so you always know what is outstanding at a glance.
+
+**What you can do:**
+- Record a payment against a purchase or a sale from the detail page
+- Enter payment date, amount, method (cash, bank transfer, cheque, etc.), and an optional reference number
+- View the full payment history for any purchase or sale
+- Void a payment if it was entered in error
+- Each payment is automatically assigned a sequence number (PAY-000001, PAY-000002, …)
+
+**Data it tracks:**
+- Payment amount and currency
+- Payment method and reference
+- Date recorded and which user recorded it
+- Outstanding balance (recalculated in real time)
+
+---
+
+### 4.11 Stock Alerts
+
+**Module ID:** `stock-alerts` | **Required permission:** Can Manage Alerts | **Depends on:** inventory
+
+The Stock Alerts module lets you define minimum-stock and reorder-point thresholds for any commodity at any location. The system continuously compares current stock against these thresholds and surfaces alerts when stock falls below the configured levels.
+
+**What you can do:**
+- Set a minimum-stock threshold and a reorder-point threshold per commodity + location combination
+- Toggle any alert threshold active or inactive without deleting it
+- View a dashboard summary widget showing the count of OK, WARNING, and CRITICAL commodities
+- Receive a clear visual indicator for each state directly from the inventory view
+
+**Alert states:**
+
+| State | Meaning |
+|---|---|
+| **OK** | Current stock is above the reorder point |
+| **WARNING** | Stock has fallen below the reorder point but is above the minimum |
+| **CRITICAL** | Stock has fallen below the minimum threshold |
+
+**Data it tracks:**
+- Thresholds per commodity + location pair
+- Current alert state (OK / WARNING / CRITICAL)
+- Whether the threshold is active or paused
+
+---
+
+### 4.12 Document Generation
+
+**Module ID:** `document-gen` | **Required permission:** Can Generate Documents | **Depends on:** inventory
+
+The Document Generation module enables PDF downloads for three key business documents: Dispatch Challan, Goods Receipt Note (GRN), and Delivery Note. Before documents can be generated, you must configure your company branding in Settings.
+
+**What you can do:**
+- Configure company name, address, and logo in **Settings > Documents**
+- Download a **Dispatch Challan** PDF from the dispatch detail page (summarises outbound goods)
+- Download a **Goods Receipt Note (GRN)** PDF from the purchase detail page (confirms goods received from a supplier)
+- Download a **Delivery Note** PDF from the sale detail page (accompanies goods sent to a customer)
+
+**Data it tracks:**
+- Company branding configuration (name, address, logo URL)
+- Document metadata embedded in each generated PDF (reference number, date, parties, line items)
+
+> **Note:** The PDF download button only appears if the module is enabled and document configuration has been saved. If you do not see the button, check both conditions.
+
+---
+
+### 4.13 Lot Tracking
+
+**Module ID:** `lot-tracking` | **Required permission:** Can Manage Lots | **Depends on:** inventory, purchase
+
+The Lot Tracking module adds batch/lot-level traceability to your stock. Lots are assigned when goods arrive (on purchase creation) and consumed FIFO (first in, first out) when goods leave via dispatch or sale.
+
+**What you can do:**
+- Assign a lot number and optional expiry date when creating a purchase
+- Select from available lots using the FIFO-ordered lot selector on dispatch and sale items
+- View current stock levels broken down by lot number
+- View expiry dates and flag near-expiry lots
+- Trace every movement (in and out) for a specific lot
+
+**Data it tracks:**
+- Lot number and expiry date per purchase line
+- Quantity received, consumed, and remaining per lot
+- Movement history per lot (which dispatches or sales consumed it)
+
+---
+
+### 4.14 Bulk Import / Export
+
+**Module ID:** `bulk-import` | **Required permission:** Can Import Data | **Depends on:** inventory
+
+The Bulk Import / Export module lets you upload CSV files to create records in bulk and export any entity list to CSV for use in external tools (spreadsheets, accounting software, etc.).
+
+**What you can do:**
+- Upload a CSV to bulk-create **commodities**, **contacts**, or **purchases**
+- Receive row-level validation errors if any row fails (other rows are still imported)
+- Export any entity list (commodities, contacts, dispatches, purchases, sales) to CSV
+- Use exported CSVs as a template for future imports
+
+**CSV requirements:**
+- The first row must be a header row with the expected column names
+- Codes used in CSV rows (commodity code, location code, contact code) must already exist in the system
+- Rows with errors are skipped and reported; valid rows are imported successfully
+
+**Data it tracks:**
+- Import history (file name, date, rows processed, errors)
+- All standard entity data as per the relevant module
+
+---
+
+### 4.15 Barcode & QR Codes
+
+**Module ID:** `barcode` | **Required permission:** None — available to all users | **Depends on:** inventory
+
+The Barcode & QR Codes module generates QR codes for every commodity and provides a print-ready 4-up label sheet. On mobile, scanning a QR code during receiving automatically filters the dispatch item list to the scanned commodity.
+
+**What you can do:**
+- View a QR code for any commodity from the commodity detail page
+- Print a 4-up label sheet (four labels per A4 page) containing the commodity name, code, and QR code
+- On the mobile receiving screen, tap **Scan QR** and point your device camera at a label to auto-filter the item list
+
+**Data it tracks:**
+- The QR code encodes the commodity code (no sensitive data is embedded)
+- No additional database records are created; codes are generated on demand
+
+---
+
+### Mobile-Optimised Receiving (UX Enhancement)
+
+The dispatch receiving screen (`/dispatches/[id]/receive`) has a dedicated mobile layout that activates automatically on screens narrower than the `md` Tailwind breakpoint (~768 px). No configuration is required — users on phones and tablets get the mobile experience automatically.
+
+**Mobile receiving features:**
+- **Card-per-item layout** — each dispatch line is shown as a full-width card with a large quantity input, making it easy to tap without zooming
+- **Numeric keyboard** — the quantity field uses `inputMode="numeric"` so the phone keyboard shows only numbers
+- **QR scan filter** — if the barcode module is enabled, a **Scan QR** button appears; scanning a commodity QR code scrolls directly to that item and highlights it
+- **Real-time shortage badge** — as you type a received quantity lower than the dispatched quantity, a red shortage badge updates instantly
+- **Sticky submit button** — the **Submit** button is fixed to the bottom of the screen so it is always reachable without scrolling back to the top
+
+Desktop users continue to see the original table-based layout (`hidden md:block`).
+
+---
+
+### Updated Permissions (v2 Additions)
+
+The following six permissions were added in v2. They appear in **User Management > Users > Edit Permissions** alongside the original permission flags.
+
+| Permission | What It Allows |
+|---|---|
+| **Can Manage Payments** | Record, view, and void payments on purchases and sales |
+| **Can Manage Alerts** | Create, edit, and deactivate stock alert thresholds |
+| **Can Generate Documents** | Download Dispatch Challan, GRN, and Delivery Note PDFs |
+| **Can Manage Lots** | Create lots, assign them to purchases, view lot stock and trace movements |
+| **Can Manage Returns** | Create purchase returns and sale returns (requires returns module) |
+| **Can Import Data** | Upload CSV files to bulk-import commodities, contacts, and purchases |
+
+---
+
+## v2 Workflows (H–M)
+
+---
+
+### Workflow H: Record a Payment on a Purchase or Sale
+
+1. Navigate to the **Purchases** or **Sales** section from the sidebar.
+2. Click the reference number of the purchase or sale you want to record payment for.
+3. On the detail page, scroll to the **Payments** panel. You will see the total value, total paid to date, and outstanding balance.
+4. Click **Record Payment**.
+5. Fill in the payment date, amount, and payment method. Add an optional reference number (e.g., bank transaction ID).
+6. Click **Save**. The payment appears in the history list and the outstanding balance updates immediately.
+
+> To void a payment, click the three-dot menu next to the payment row and select **Void**. This cannot be undone.
+
+---
+
+### Workflow I: Set a Stock Alert Threshold
+
+1. Navigate to **Stock Alerts** in the sidebar (visible when the stock-alerts module is enabled).
+2. Click **New Threshold**.
+3. Select the **Commodity** and **Location** you want to monitor.
+4. Enter the **Reorder Point** (trigger for WARNING state) and the **Minimum Stock** (trigger for CRITICAL state).
+5. Ensure the threshold is set to **Active** and click **Save**.
+6. The commodity will now appear in the alerts dashboard with its current state colour-coded as OK, WARNING, or CRITICAL.
+
+> To pause monitoring temporarily without deleting the threshold, toggle the threshold to **Inactive**.
+
+---
+
+### Workflow J: Download a Document (Challan / GRN / Delivery Note)
+
+**One-time setup (admin only):**
+
+1. Go to **Settings > Documents**.
+2. Enter your company name, address, and optionally a logo URL.
+3. Click **Save**.
+
+**Downloading a document:**
+
+- **Dispatch Challan** — open a dispatch detail page and click **Download Challan** (PDF).
+- **Goods Receipt Note** — open a purchase detail page and click **Download GRN** (PDF).
+- **Delivery Note** — open a sale detail page and click **Download Delivery Note** (PDF).
+
+The PDF opens in a new browser tab and can be saved or printed from there.
+
+---
+
+### Workflow K: Import Records from a CSV File
+
+1. Navigate to **Bulk Import** in the sidebar.
+2. Select the entity type you want to import: **Commodities**, **Contacts**, or **Purchases**.
+3. Download the **CSV template** for that entity type to see the required column headers.
+4. Fill in your data in the template. Codes (commodity code, location code, contact code) must match records already in the system.
+5. Click **Upload CSV** and select your file.
+6. The system validates each row. A summary shows how many rows were imported successfully and lists any rows that failed with a reason.
+7. Fix the failed rows in your spreadsheet and re-upload if needed.
+
+---
+
+### Workflow L: Print Barcode Labels for a Commodity
+
+1. Navigate to **Inventory > Commodities**.
+2. Click a commodity name to open its detail page.
+3. Scroll to the **Barcode** section. A QR code is shown encoding the commodity code.
+4. Click **Print Labels** to open a print-ready page with four labels per A4 sheet.
+5. Use your browser's print dialog (Ctrl+P / Cmd+P) to send the page to a printer. For best results, set margins to **None** in the print settings.
+
+---
+
+### Workflow M: Receive a Dispatch on a Mobile Device
+
+1. Open WareOS in your phone's browser and log in.
+2. Navigate to **Dispatches** and tap the reference of the dispatch you are receiving.
+3. Tap **Receive Goods**. The mobile card layout activates automatically.
+4. For each item card, enter the quantity you physically counted in the **Received Qty** field. A numeric keyboard appears automatically.
+5. If you have a QR code on the goods, tap **Scan QR** and point your camera at the label. The corresponding item card scrolls into view and is highlighted.
+6. If the received quantity is less than dispatched, a red shortage badge appears on the card immediately — note this for your records.
+7. When all items are entered, tap the sticky **Submit** button at the bottom of the screen.
+8. A confirmation appears and the dispatch status updates to **Received**.
+
+---
+
+## v2 Troubleshooting (Problems 13–16)
+
+---
+
+### Problem 13: Payments panel not visible on purchase or sale detail page
+
+**Cause:** The payments module is not enabled for your tenant.
+
+**Fix:** Log in as the super admin and navigate to `/admin`. Find your tenant and enable the **payments** module. Save your changes. Users should refresh their browser — the Payments panel will appear on both purchase and sale detail pages.
+
+---
+
+### Problem 14: Stock alerts dashboard is empty
+
+**Cause:** Either no alert thresholds have been configured, or the stock-alerts module is not enabled.
+
+**Fix:**
+- If the Stock Alerts sidebar item is missing: log in as super admin, navigate to `/admin`, and enable the **stock-alerts** module for your tenant.
+- If the module is enabled but the dashboard is empty: no thresholds have been set yet. Follow **Workflow I** to create your first threshold.
+
+---
+
+### Problem 15: PDF download buttons are not appearing on dispatch, purchase, or sale detail pages
+
+**Cause:** Either the document-gen module is not enabled, or the document settings (company name and address) have not been saved.
+
+**Fix:**
+1. Log in as the super admin and confirm the **document-gen** module is enabled for your tenant.
+2. Log in as a tenant admin and go to **Settings > Documents**. Ensure your company name and address are filled in and saved.
+3. Reload the detail page — the download button should now appear.
+
+If only one of the three document types is missing (e.g., GRN appears but Delivery Note does not), check that you have the **Can Generate Documents** permission on your user account.
+
+---
+
+### Problem 16: CSV import fails with "location not found" or "commodity not found"
+
+**Cause:** The CSV file references a location code or commodity code that does not exist in the database. Codes in the import CSV must exactly match codes already configured in the system (case-sensitive).
+
+**Fix:**
+1. Export your current commodities and locations to CSV (**Bulk Import > Export**) to get the exact codes used in the system.
+2. Open your import file and find any rows flagged in the error summary.
+3. Correct the codes in those rows to match the exported values exactly.
+4. Re-upload the corrected file.
+
+> If you need to import a commodity that does not yet exist, create it manually first (or include it in a commodities import), then reference its code in the purchases import.

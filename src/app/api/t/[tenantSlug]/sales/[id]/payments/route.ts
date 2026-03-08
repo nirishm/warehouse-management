@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withTenantContext, requireModule, requirePermission } from '@/core/auth/guards';
 import { getPaymentsForTransaction, createPayment, getBalance } from '@/modules/payments/queries/payments';
+import { getSaleById } from '@/modules/sale/queries/sales';
 import { createPaymentSchema } from '@/modules/payments/validations/payment';
 
 export async function GET(
@@ -12,6 +13,12 @@ export async function GET(
     requirePermission(ctx, 'canManagePayments');
 
     const { id } = await params;
+    const sale = await getSaleById(ctx.schemaName, id);
+    if (!sale) return NextResponse.json({ error: 'Sale not found' }, { status: 404 });
+    if (ctx.allowedLocationIds !== null && !ctx.allowedLocationIds.includes(sale.location_id)) {
+      return NextResponse.json({ error: 'Sale not found' }, { status: 404 });
+    }
+
     const [payments, balance] = await Promise.all([
       getPaymentsForTransaction(ctx.schemaName, 'sale', id),
       getBalance(ctx.schemaName, 'sale', id),
@@ -29,6 +36,12 @@ export async function POST(
     requirePermission(ctx, 'canManagePayments');
 
     const { id } = await params;
+    const sale = await getSaleById(ctx.schemaName, id);
+    if (!sale) return NextResponse.json({ error: 'Sale not found' }, { status: 404 });
+    if (ctx.allowedLocationIds !== null && !ctx.allowedLocationIds.includes(sale.location_id)) {
+      return NextResponse.json({ error: 'Sale not found' }, { status: 404 });
+    }
+
     const body = await request.json();
     const parsed = createPaymentSchema.safeParse({
       ...body,

@@ -24,6 +24,9 @@ export async function GET(request: NextRequest, { params }: Props) {
     if (!sale) {
       return NextResponse.json({ error: 'Sale not found' }, { status: 404 });
     }
+    if (ctx.allowedLocationIds !== null && !ctx.allowedLocationIds.includes(sale.location_id)) {
+      return NextResponse.json({ error: 'Sale not found' }, { status: 404 });
+    }
 
     const safeConfig = config ?? {
       id: '',

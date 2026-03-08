@@ -1,9 +1,12 @@
 import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
 import type { CreateReturnInput, Return, ReturnWithItems } from '../validations/return';
 
-export async function listReturns(schemaName: string): Promise<ReturnWithItems[]> {
+export async function listReturns(
+  schemaName: string,
+  options?: { allowedLocationIds?: string[] | null }
+): Promise<ReturnWithItems[]> {
   const client = createTenantClient(schemaName);
-  const { data, error } = await client
+  let query = client
     .from('returns')
     .select(
       `*, location:locations(id,name,code), contact:contacts(id,name),
@@ -11,6 +14,13 @@ export async function listReturns(schemaName: string): Promise<ReturnWithItems[]
     )
     .is('deleted_at', null)
     .order('return_date', { ascending: false });
+
+  const ids = options?.allowedLocationIds;
+  if (ids !== null && ids !== undefined && ids.length > 0) {
+    query = query.in('location_id', ids);
+  }
+
+  const { data, error } = await query;
 
   if (error) throw new Error(`Failed to list returns: ${error.message}`);
   return (data ?? []) as unknown as ReturnWithItems[];

@@ -14,6 +14,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
     if (!sale) {
       return NextResponse.json({ error: 'Sale not found' }, { status: 404 });
     }
+    if (ctx.allowedLocationIds !== null && !ctx.allowedLocationIds.includes(sale.location_id)) {
+      return NextResponse.json({ error: 'Sale not found' }, { status: 404 });
+    }
     return NextResponse.json({ data: sale });
   });
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenantContext, requireModule, requirePermission } from '@/core/auth/guards';
+import { withTenantContext, requireModule, requirePermission, requireLocationAccess } from '@/core/auth/guards';
 import { listPurchases, createPurchase } from '@/modules/purchase/queries/purchases';
 import { createPurchaseSchema } from '@/modules/purchase/validations/purchase';
 
@@ -28,6 +28,12 @@ export async function POST(request: NextRequest) {
         { error: 'Validation failed', details: parsed.error.flatten() },
         { status: 400 }
       );
+    }
+
+    try {
+      requireLocationAccess(ctx, parsed.data.location_id);
+    } catch {
+      return NextResponse.json({ error: 'Access denied: location not assigned' }, { status: 403 });
     }
 
     const purchase = await createPurchase(ctx.schemaName, parsed.data, ctx.userId);

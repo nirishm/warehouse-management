@@ -14,6 +14,13 @@ export async function GET(request: NextRequest, context: RouteContext) {
     if (!dispatch) {
       return NextResponse.json({ error: 'Dispatch not found' }, { status: 404 });
     }
+    if (
+      ctx.allowedLocationIds !== null &&
+      !ctx.allowedLocationIds.includes(dispatch.origin_location_id) &&
+      !ctx.allowedLocationIds.includes(dispatch.dest_location_id)
+    ) {
+      return NextResponse.json({ error: 'Dispatch not found' }, { status: 404 });
+    }
     return NextResponse.json({ data: dispatch });
   });
 }
