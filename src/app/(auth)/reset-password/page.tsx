@@ -6,7 +6,6 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
@@ -22,7 +21,6 @@ export default function ResetPasswordPage() {
     const type = searchParams.get('type');
 
     if (tokenHash && type === 'recovery') {
-      // Exchange the token_hash for a session
       const supabase = createBrowserClient();
       supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error }) => {
         if (error) {
@@ -32,7 +30,7 @@ export default function ResetPasswordPage() {
         }
       });
     } else {
-      // Fallback: handle hash-based recovery token (older flow)
+      // Fallback: hash-based recovery token
       const supabase = createBrowserClient();
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
         if (event === 'PASSWORD_RECOVERY') {
@@ -70,57 +68,59 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <Card className="border-border bg-[var(--bg-off)] backdrop-blur shadow-2xl">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg text-foreground font-medium">Set new password</CardTitle>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          {!ready && !error && (
-            <p className="text-sm text-[var(--text-muted)]">Verifying reset link…</p>
-          )}
-          {error && (
-            <div className="text-sm text-[var(--red)] bg-[var(--red-bg)] border border-[var(--red)]/20 rounded-md px-3 py-2">
-              {error}
-            </div>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-[var(--text-muted)] text-sm">New password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={!ready}
-              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent-color)] focus:ring-[var(--accent-color)]/20"
-            />
+    <div className="bg-[var(--bg-base)] rounded-2xl border border-[var(--text-dim)]/15 shadow-sm px-8 py-8">
+      <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-6">Set new password</h2>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {!ready && !error && (
+          <p className="text-sm text-[var(--text-muted)]">Verifying reset link…</p>
+        )}
+        {error && (
+          <div className="text-sm text-[var(--red)] bg-[var(--red-bg)] border border-[var(--red)]/20 rounded-lg px-3 py-2">
+            {error}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirm" className="text-[var(--text-muted)] text-sm">Confirm password</Label>
-            <Input
-              id="confirm"
-              type="password"
-              placeholder="••••••••"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              required
-              disabled={!ready}
-              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent-color)] focus:ring-[var(--accent-color)]/20"
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button
-            type="submit"
-            disabled={loading || !ready}
-            className="w-full bg-[var(--accent-color)] hover:bg-[var(--accent-color)] text-background font-semibold tracking-wide"
-          >
-            {loading ? 'Updating…' : 'Update password'}
-          </Button>
-        </CardFooter>
+        )}
+
+        <div className="space-y-1.5">
+          <Label htmlFor="password" className="text-sm text-[var(--text-muted)] font-normal">
+            New password
+          </Label>
+          <Input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            disabled={!ready}
+            className="h-[var(--input-h)] bg-white border-[var(--text-dim)]/30 text-[var(--text-body)] placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/10 rounded-lg disabled:opacity-40"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="confirm" className="text-sm text-[var(--text-muted)] font-normal">
+            Confirm password
+          </Label>
+          <Input
+            id="confirm"
+            type="password"
+            placeholder="••••••••"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            required
+            disabled={!ready}
+            className="h-[var(--input-h)] bg-white border-[var(--text-dim)]/30 text-[var(--text-body)] placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/10 rounded-lg disabled:opacity-40"
+          />
+        </div>
+
+        <Button
+          type="submit"
+          disabled={loading || !ready}
+          className="w-full h-12 rounded-full bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold tracking-wide active:scale-[0.98] transition-all mt-2 disabled:opacity-40"
+        >
+          {loading ? 'Updating…' : 'Update password'}
+        </Button>
       </form>
-    </Card>
+    </div>
   );
 }

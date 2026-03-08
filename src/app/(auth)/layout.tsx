@@ -9,10 +9,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg-off)] px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-mono uppercase">
-            <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent-color)] mr-1.5"></span>WareOS
+          <h1 className="inline-flex items-center gap-2 font-mono text-sm font-bold tracking-[0.08em] text-[var(--text-primary)]">
+            <span className="inline-block w-[22px] h-[22px] rounded-[5px] bg-[var(--accent-color)]" />
+            WareOS
           </h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1 tracking-wide">Inventory Control System</p>
+          <p className="text-sm text-[var(--text-muted)] mt-2 tracking-wide">Inventory Control System</p>
         </div>
         {children}
       </div>
