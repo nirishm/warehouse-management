@@ -363,3 +363,50 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON {schema}.sales
     FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON {schema}.user_profiles
     FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+-- Security: deny direct schema access to public roles
+REVOKE USAGE ON SCHEMA {schema} FROM anon, authenticated;
+REVOKE ALL ON ALL TABLES IN SCHEMA {schema} FROM anon, authenticated;
+
+-- RLS on all tables (service_role bypasses RLS by default)
+ALTER TABLE {schema}.locations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.commodities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.units ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.contacts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.dispatches ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.dispatch_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.purchases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.purchase_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.sales ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.sale_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.user_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.user_locations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.custom_field_definitions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.audit_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE {schema}.sequence_counters ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "service_role_only" ON {schema}.locations AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.commodities AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.units AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.contacts AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.dispatches AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.dispatch_items AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.purchases AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.purchase_items AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.sales AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.sale_items AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.user_profiles AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.user_locations AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.custom_field_definitions AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.audit_log AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+CREATE POLICY "service_role_only" ON {schema}.sequence_counters AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+
+-- Additional performance indexes
+CREATE INDEX idx_purchases_status ON {schema}.purchases(status) WHERE deleted_at IS NULL;
+CREATE INDEX idx_sales_status ON {schema}.sales(status) WHERE deleted_at IS NULL;
+CREATE INDEX idx_dispatch_items_commodity ON {schema}.dispatch_items(commodity_id);
+
+-- Received quantity constraint
+ALTER TABLE {schema}.dispatch_items
+  ADD CONSTRAINT chk_received_not_exceed_sent
+  CHECK (received_quantity IS NULL OR received_quantity <= sent_quantity);

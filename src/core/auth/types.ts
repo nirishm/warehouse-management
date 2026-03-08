@@ -16,6 +16,7 @@ export interface TenantContext {
   role: 'tenant_admin' | 'manager' | 'employee';
   enabledModules: string[];
   userId: string;
+  userName: string;
   permissions: Record<Permission, boolean>;
   allowedLocationIds: string[] | null;
 }

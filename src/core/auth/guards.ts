@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { TenantContext, Permission } from './types';
 
@@ -10,7 +11,6 @@ export async function withTenantContext(
   try {
     const tenantId = request.headers.get('x-tenant-id');
     const schemaName = request.headers.get('x-tenant-schema');
-    const role = request.headers.get('x-tenant-role') as TenantContext['role'];
     const enabledModules = JSON.parse(request.headers.get('x-tenant-modules') || '[]');
 
     const supabase = await createServerSupabaseClient();
@@ -20,14 +20,29 @@ export async function withTenantContext(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Verify actual DB membership — prevents header forgery
+    const adminClient = createAdminClient();
+    const { data: membership } = await adminClient
+      .from('user_tenants')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('tenant_id', tenantId)
+      .single();
+
+    if (!membership) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const verifiedRole = membership.role as TenantContext['role'];
+
     const tenantClient = createTenantClient(schemaName);
     const { data: profile } = await tenantClient
       .from('user_profiles')
-      .select('permissions')
+      .select('permissions, display_name')
       .eq('user_id', user.id)
       .single();
 
     const permissions = (profile?.permissions ?? {}) as Record<Permission, boolean>;
+    const userName = profile?.display_name ?? user.email ?? user.id;
 
     const ALL_PERMISSIONS: Permission[] = [
       'canPurchase', 'canDispatch', 'canReceive', 'canSale',
@@ -38,14 +53,14 @@ export async function withTenantContext(
       'canImportData',
     ];
 
-    if (role === 'tenant_admin') {
+    if (verifiedRole === 'tenant_admin') {
       for (const p of ALL_PERMISSIONS) {
         permissions[p] = true;
       }
     }
 
     let allowedLocationIds: string[] | null = null;
-    if (role !== 'tenant_admin') {
+    if (verifiedRole !== 'tenant_admin') {
       const { data: locs } = await tenantClient
         .from('user_locations')
         .select('location_id')
@@ -54,8 +69,8 @@ export async function withTenantContext(
     }
 
     return handler({
-      tenantId, schemaName, role, enabledModules,
-      userId: user.id, permissions, allowedLocationIds,
+      tenantId, schemaName, role: verifiedRole, enabledModules,
+      userId: user.id, userName, permissions, allowedLocationIds,
     });
   } catch (error) {
     console.error('Tenant context error:', error);

@@ -9,14 +9,10 @@ export async function getNextSequenceNumber(
   sequenceId: string
 ): Promise<string> {
   const client = createAdminClient();
-  const { data, error } = await client.rpc('exec_sql', {
-    query: `
-      UPDATE "${schemaName}".sequence_counters
-      SET current_value = current_value + 1
-      WHERE id = '${sequenceId}'
-      RETURNING prefix || '-' || LPAD(current_value::TEXT, 6, '0') AS formatted_number;
-    `
+  const { data, error } = await client.rpc('get_next_sequence', {
+    p_schema: schemaName,
+    p_seq_id: sequenceId,
   });
   if (error) throw new Error(`Sequence error: ${error.message}`);
-  return data?.[0]?.formatted_number;
+  return data as string;
 }

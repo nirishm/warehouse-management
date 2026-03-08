@@ -43,12 +43,13 @@ export default async function TenantLayout({ children, params }: Props) {
   const tenantClient = createTenantClient(tenant.schema_name);
   const { data: profile } = await tenantClient
     .from('user_profiles')
-    .select('permissions')
+    .select('permissions, display_name')
     .eq('user_id', user.id)
     .single();
 
   const role = membership.role as TenantContext['role'];
   const permissions = (profile?.permissions ?? {}) as Record<Permission, boolean>;
+  const userName = profile?.display_name ?? user.email ?? user.id;
 
   if (role === 'tenant_admin') {
     Object.keys(permissions).forEach(k => {
@@ -72,6 +73,7 @@ export default async function TenantLayout({ children, params }: Props) {
     role,
     enabledModules: tenant.enabled_modules || [],
     userId: user.id,
+    userName,
     permissions,
     allowedLocationIds,
   };
