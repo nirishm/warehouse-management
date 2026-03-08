@@ -42,7 +42,7 @@ interface CommodityFormData {
 interface CommodityFormProps {
   commodity?: CommodityFormData | null;
   onSuccess: () => void;
-  trigger?: React.ReactNode;
+  trigger?: React.ReactElement;
 }
 
 export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormProps) {
@@ -145,16 +145,14 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          trigger ?? (
-            <Button className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)]">
-              <Plus className="size-4 mr-1" />
-              New Commodity
-            </Button>
-          )
-        }
-      />
+      <DialogTrigger asChild>
+        {trigger ?? (
+          <Button className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)]">
+            <Plus className="size-4 mr-1" />
+            New Commodity
+          </Button>
+        )}
+      </DialogTrigger>
       <DialogContent className="bg-background border border-border sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-foreground font-mono uppercase tracking-wider text-sm">
