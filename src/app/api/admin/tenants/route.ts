@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { provisionTenantSchema } from '@/core/db/tenant-provisioning';
 
 export async function GET() {
   const supabase = await createServerSupabaseClient();
@@ -55,5 +56,16 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Auto-provision the tenant schema so it's ready immediately
+  try {
+    await provisionTenantSchema(slug);
+  } catch (provisionError) {
+    // Roll back the tenant record if provisioning fails
+    await admin.from('tenants').delete().eq('id', tenant.id);
+    const message = provisionError instanceof Error ? provisionError.message : 'Schema provisioning failed';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+
   return NextResponse.json({ tenant }, { status: 201 });
 }
