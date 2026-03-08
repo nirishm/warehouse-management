@@ -4,6 +4,7 @@ import type { CommodityRow } from '../schemas/commodities-csv';
 export interface ImportResult {
   summary: { total: number; inserted: number; failed: number };
   errors: { row: number; field: string; message: string }[];
+  warnings?: { row: number; field: string; message: string }[];
 }
 
 export async function importCommodities(

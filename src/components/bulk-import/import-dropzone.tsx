@@ -7,6 +7,7 @@ import { ImportResults } from './import-results';
 interface ImportResult {
   summary: { total: number; inserted: number; failed: number };
   errors: { row: number; field: string; message: string }[];
+  warnings?: { row: number; field: string; message: string }[];
 }
 
 interface ImportDropzoneProps {
@@ -98,7 +99,7 @@ export function ImportDropzone({
 
       {result && (
         <>
-          <ImportResults summary={result.summary} errors={result.errors} />
+          <ImportResults summary={result.summary} errors={result.errors} warnings={result.warnings} />
           {result.summary.failed === 0 && (
             <Button
               variant="ghost"
