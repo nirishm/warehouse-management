@@ -43,45 +43,45 @@ export default function NewTenantPage() {
 
   return (
     <div className="max-w-lg">
-      <h1 className="text-2xl font-bold text-zinc-100 tracking-tight mb-6">New Tenant</h1>
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <h1 className="text-2xl font-bold font-serif text-foreground tracking-tight mb-6">New Tenant</h1>
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader>
-          <CardTitle className="text-zinc-200 text-base">Tenant Details</CardTitle>
+          <CardTitle className="text-foreground text-base">Tenant Details</CardTitle>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="text-sm text-red-400 bg-red-950/50 border border-red-900 rounded-md px-3 py-2">
+              <div className="text-sm text-[var(--red)] bg-[var(--red-bg)] border border-[var(--red)]/20 rounded-md px-3 py-2">
                 {error}
               </div>
             )}
             <div className="space-y-2">
-              <Label className="text-zinc-400 text-sm">Company Name</Label>
+              <Label className="text-[var(--text-muted)] text-sm">Company Name</Label>
               <Input
                 value={name}
                 onChange={(e) => { setName(e.target.value); setSlug(generateSlug(e.target.value)); }}
                 placeholder="Acme Grain Corp"
                 required
-                className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus:border-amber-500"
+                className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)]"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-zinc-400 text-sm">Slug (URL identifier)</Label>
+              <Label className="text-[var(--text-muted)] text-sm">Slug (URL identifier)</Label>
               <Input
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 placeholder="acme-grain"
                 required
                 pattern="[a-z0-9-]+"
-                className="bg-zinc-800 border-zinc-700 text-zinc-100 font-mono placeholder:text-zinc-600 focus:border-amber-500"
+                className="bg-muted border-border text-foreground font-mono placeholder:text-[var(--text-dim)] focus:border-[var(--accent)]"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-zinc-400 text-sm">Plan</Label>
+              <Label className="text-[var(--text-muted)] text-sm">Plan</Label>
               <select
                 value={plan}
                 onChange={(e) => setPlan(e.target.value)}
-                className="w-full h-10 rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 text-sm focus:border-amber-500 focus:outline-none"
+                className="w-full h-10 rounded-md border border-border bg-muted text-foreground px-3 text-sm focus:border-[var(--accent)] focus:outline-none"
               >
                 <option value="free">Free</option>
                 <option value="starter">Starter</option>
@@ -92,7 +92,7 @@ export default function NewTenantPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-amber-600 hover:bg-amber-500 text-zinc-950 font-semibold"
+              className="w-full bg-[var(--accent)] hover:bg-[var(--accent)] text-background font-semibold"
             >
               {loading ? 'Creating...' : 'Create Tenant'}
             </Button>

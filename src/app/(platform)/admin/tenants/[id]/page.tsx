@@ -8,10 +8,10 @@ import { TenantModulesManager } from './modules-manager';
 import { InviteForm } from './invite-form';
 
 const statusColors: Record<string, string> = {
-  active: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  trial: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  suspended: 'bg-red-500/10 text-red-400 border-red-500/20',
-  cancelled: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
+  active: 'bg-[var(--green-bg)] text-[var(--green)] border-[var(--green)]/20',
+  trial: 'bg-[var(--accent-tint)] text-[var(--accent)] border-[var(--accent)]/20',
+  suspended: 'bg-[var(--red-bg)] text-[var(--red)] border-[var(--red)]/20',
+  cancelled: 'bg-muted/50 text-muted-foreground border-border',
 };
 
 export default async function TenantDetailPage({
@@ -42,13 +42,13 @@ export default async function TenantDetailPage({
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
-            <Link href="/admin/tenants" className="text-zinc-500 hover:text-zinc-300 text-sm">
+            <Link href="/admin/tenants" className="text-muted-foreground hover:text-[var(--text-body)] text-sm">
               Tenants
             </Link>
-            <span className="text-zinc-700">/</span>
-            <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">{tenant.name}</h1>
+            <span className="text-[var(--text-dim)]">/</span>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">{tenant.name}</h1>
           </div>
-          <p className="text-sm text-zinc-500 font-mono">{tenant.slug}</p>
+          <p className="text-sm text-muted-foreground font-mono">{tenant.slug}</p>
         </div>
         <Badge variant="outline" className={statusColors[tenant.status] || ''}>
           {tenant.status}
@@ -56,28 +56,28 @@ export default async function TenantDetailPage({
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
-            <CardTitle className="text-zinc-500 text-xs font-mono uppercase">Plan</CardTitle>
+            <CardTitle className="text-muted-foreground text-xs font-mono uppercase">Plan</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-zinc-100 font-semibold capitalize">{tenant.plan}</p>
+            <p className="text-foreground font-semibold capitalize">{tenant.plan}</p>
           </CardContent>
         </Card>
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
-            <CardTitle className="text-zinc-500 text-xs font-mono uppercase">Schema</CardTitle>
+            <CardTitle className="text-muted-foreground text-xs font-mono uppercase">Schema</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-zinc-100 font-mono text-sm">{tenant.schema_name}</p>
+            <p className="text-foreground font-mono text-sm">{tenant.schema_name}</p>
           </CardContent>
         </Card>
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
-            <CardTitle className="text-zinc-500 text-xs font-mono uppercase">Modules</CardTitle>
+            <CardTitle className="text-muted-foreground text-xs font-mono uppercase">Modules</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-zinc-100 font-semibold">{tenant.enabled_modules?.length ?? 0} enabled</p>
+            <p className="text-foreground font-semibold">{tenant.enabled_modules?.length ?? 0} enabled</p>
           </CardContent>
         </Card>
       </div>
@@ -91,16 +91,16 @@ export default async function TenantDetailPage({
       />
 
       {members && members.length > 0 && (
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-card">
           <CardHeader>
-            <CardTitle className="text-zinc-200 text-base">Members</CardTitle>
+            <CardTitle className="text-foreground text-base">Members</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               {members.map((m) => (
-                <div key={m.user_id} className="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0">
-                  <span className="text-zinc-300 font-mono text-sm">{m.user_id}</span>
-                  <Badge variant="outline" className="border-zinc-700 text-zinc-400 text-xs">
+                <div key={m.user_id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                  <span className="text-[var(--text-body)] font-mono text-sm">{m.user_id}</span>
+                  <Badge variant="outline" className="border-border text-[var(--text-muted)] text-xs">
                     {m.role}
                   </Badge>
                 </div>

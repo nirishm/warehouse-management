@@ -49,10 +49,10 @@ export function CustomFieldDisplay({
 
   return (
     <div className="space-y-1">
-      <dt className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+      <dt className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
         {field_label}
       </dt>
-      <dd className="text-sm text-zinc-200">{renderValue()}</dd>
+      <dd className="text-sm text-foreground">{renderValue()}</dd>
     </div>
   );
 }

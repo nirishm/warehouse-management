@@ -59,24 +59,24 @@ export default async function StockLevelsPage({ params, searchParams }: Props) {
     <div className="space-y-6">
       <RealtimeListener table="dispatches" />
       <div>
-        <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
           Stock Levels
         </h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Current inventory across all locations
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {summaryStats.map((stat) => (
-          <Card key={stat.label} className="border-zinc-800 bg-zinc-900/60">
+          <Card key={stat.label} className="border-border bg-[var(--bg-off)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                 {stat.label}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-zinc-100 font-mono">
+              <p className="text-3xl font-bold text-foreground font-mono">
                 {stat.value}
               </p>
             </CardContent>

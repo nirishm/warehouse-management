@@ -66,16 +66,16 @@ interface Props {
 }
 
 function getShortageColor(shortagePercent: number): string {
-  if (shortagePercent === 0) return 'text-emerald-400';
-  if (shortagePercent > 0 && shortagePercent <= 2) return 'text-amber-400';
-  return 'text-red-400';
+  if (shortagePercent === 0) return 'text-[var(--green)]';
+  if (shortagePercent > 0 && shortagePercent <= 2) return 'text-[var(--accent)]';
+  return 'text-[var(--red)]';
 }
 
 function getShortageBgColor(shortagePercent: number): string {
-  if (shortagePercent === 0) return 'bg-emerald-500/10 border-emerald-500/20';
+  if (shortagePercent === 0) return 'bg-[var(--green-bg)] border-[var(--green)]/20';
   if (shortagePercent > 0 && shortagePercent <= 2)
-    return 'bg-amber-500/10 border-amber-500/20';
-  return 'bg-red-500/10 border-red-500/20';
+    return 'bg-[var(--accent-tint)] border-[var(--accent)]/20';
+  return 'bg-[var(--red-bg)] border-[var(--red)]/20';
 }
 
 export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
@@ -190,44 +190,44 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
   return (
     <div className="space-y-6">
       {/* Dispatch Info Card */}
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
             Dispatch Details
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <Label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
+              <Label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
                 Dispatch #
               </Label>
-              <p className="text-sm font-mono text-amber-500 mt-1">
+              <p className="text-sm font-mono text-[var(--accent)] mt-1">
                 {dispatch.dispatch_number}
               </p>
             </div>
             <div>
-              <Label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
+              <Label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
                 Route
               </Label>
-              <div className="flex items-center gap-2 mt-1 text-sm text-zinc-300">
+              <div className="flex items-center gap-2 mt-1 text-sm text-[var(--text-body)]">
                 <span>{dispatch.origin_name}</span>
-                <ArrowRight className="size-3 text-zinc-600" />
+                <ArrowRight className="size-3 text-[var(--text-dim)]" />
                 <span>{dispatch.dest_name}</span>
               </div>
             </div>
             <div>
-              <Label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
+              <Label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
                 Dispatched
               </Label>
-              <p className="text-sm text-zinc-300 mt-1">{formattedDate}</p>
+              <p className="text-sm text-[var(--text-body)] mt-1">{formattedDate}</p>
             </div>
             <div>
-              <Label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
+              <Label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
                 Transport
               </Label>
-              <div className="flex items-center gap-2 mt-1 text-sm text-zinc-300">
-                <Truck className="size-3 text-zinc-600" />
+              <div className="flex items-center gap-2 mt-1 text-sm text-[var(--text-body)]">
+                <Truck className="size-3 text-[var(--text-dim)]" />
                 <span>
                   {dispatch.transporter_name || dispatch.vehicle_number || 'N/A'}
                 </span>
@@ -238,15 +238,15 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
       </Card>
 
       {/* Items Table */}
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-card">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
               Items to Receive
             </CardTitle>
             <Badge
               variant="outline"
-              className="border-zinc-700 text-zinc-400 font-mono text-xs"
+              className="border-border text-[var(--text-muted)] font-mono text-xs"
             >
               {items.length} item{items.length !== 1 ? 's' : ''}
             </Badge>
@@ -255,26 +255,26 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
         <CardContent className="px-0">
           <Table>
             <TableHeader>
-              <TableRow className="border-zinc-800 hover:bg-transparent">
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-4">
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground pl-4">
                   Commodity
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   Unit
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
                   Sent Qty
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
                   Sent Bags
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   Received Qty
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   Received Bags
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right pr-4">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right pr-4">
                   Shortage
                 </TableHead>
               </TableRow>
@@ -295,29 +295,29 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
                 );
 
                 return (
-                  <TableRow key={item.id} className="border-zinc-800">
+                  <TableRow key={item.id} className="border-border">
                     <TableCell className="pl-4">
                       <div>
-                        <p className="text-sm font-medium text-zinc-200">
+                        <p className="text-sm font-medium text-foreground">
                           {item.commodity_name}
                         </p>
-                        <p className="text-xs font-mono text-zinc-500">
+                        <p className="text-xs font-mono text-muted-foreground">
                           {item.commodity_code}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-zinc-400">
+                      <span className="text-sm text-[var(--text-muted)]">
                         {item.unit_abbreviation || item.unit_name}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <span className="font-mono text-sm text-zinc-300">
+                      <span className="font-mono text-sm text-[var(--text-body)]">
                         {item.sent_quantity.toLocaleString()}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <span className="font-mono text-sm text-zinc-400">
+                      <span className="font-mono text-sm text-[var(--text-muted)]">
                         {item.sent_bags !== null ? item.sent_bags : '--'}
                       </span>
                     </TableCell>
@@ -330,7 +330,7 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
                         onChange={(e) =>
                           updateItem(item.id, 'received_quantity', e.target.value)
                         }
-                        className="w-28 h-8 font-mono text-sm bg-zinc-800 border-zinc-700 text-zinc-100 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                        className="w-28 h-8 font-mono text-sm bg-muted border-border text-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
                       />
                     </TableCell>
                     <TableCell>
@@ -343,10 +343,10 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
                           onChange={(e) =>
                             updateItem(item.id, 'received_bags', e.target.value)
                           }
-                          className="w-24 h-8 font-mono text-sm bg-zinc-800 border-zinc-700 text-zinc-100 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                          className="w-24 h-8 font-mono text-sm bg-muted border-border text-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
                         />
                       ) : (
-                        <span className="text-sm text-zinc-600">--</span>
+                        <span className="text-sm text-[var(--text-dim)]">--</span>
                       )}
                     </TableCell>
                     <TableCell className="text-right pr-4">
@@ -377,13 +377,13 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
 
       {/* Summary and Submit */}
       {hasAnyShortage && (
-        <div className="flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
-          <AlertTriangle className="size-5 text-amber-500 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 rounded-lg border border-[var(--accent)]/20 bg-[var(--accent-tint)] p-4">
+          <AlertTriangle className="size-5 text-[var(--accent)] shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-amber-400">
+            <p className="text-sm font-medium text-[var(--accent)]">
               Shortage Detected
             </p>
-            <p className="text-xs text-zinc-400 mt-1">
+            <p className="text-xs text-[var(--text-muted)] mt-1">
               One or more items have received quantities less than sent quantities.
               This will be recorded in the shortage tracking system.
             </p>
@@ -392,11 +392,11 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
       )}
 
       {error && (
-        <div className="flex items-start gap-3 rounded-lg border border-red-500/30 bg-red-500/5 p-4">
-          <AlertTriangle className="size-5 text-red-500 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 rounded-lg border border-[var(--red)]/20 bg-[var(--red-bg)] p-4">
+          <AlertTriangle className="size-5 text-[var(--red)] shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-red-400">Error</p>
-            <p className="text-xs text-zinc-400 mt-1">{error}</p>
+            <p className="text-sm font-medium text-[var(--red)]">Error</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">{error}</p>
           </div>
         </div>
       )}
@@ -405,7 +405,7 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
         <Button
           variant="outline"
           onClick={() => router.back()}
-          className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+          className="border-border text-[var(--text-body)] hover:bg-muted"
         >
           Cancel
         </Button>
@@ -416,21 +416,21 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
               <Button
                 size="lg"
                 disabled={hasValidationErrors || submitting}
-                className="bg-amber-600 text-zinc-950 hover:bg-amber-500 font-semibold px-8"
+                className="bg-[var(--accent)] text-white hover:bg-[var(--accent-dark)] font-semibold px-8"
               />
             }
           >
             <CheckCircle2 className="size-4 mr-2" />
             Confirm Receipt
           </DialogTrigger>
-          <DialogContent className="bg-zinc-900 border-zinc-800 sm:max-w-md">
+          <DialogContent className="bg-muted border-border sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-zinc-100">
+              <DialogTitle className="text-foreground">
                 Confirm Dispatch Receipt
               </DialogTitle>
-              <DialogDescription className="text-zinc-400">
+              <DialogDescription className="text-[var(--text-muted)]">
                 You are about to mark dispatch{' '}
-                <span className="font-mono text-amber-500">
+                <span className="font-mono text-[var(--accent)]">
                   {dispatch.dispatch_number}
                 </span>{' '}
                 as received. This action cannot be undone.
@@ -438,8 +438,8 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
             </DialogHeader>
             <div className="space-y-2 py-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-zinc-500">Items</span>
-                <span className="font-mono text-zinc-300">{items.length}</span>
+                <span className="text-muted-foreground">Items</span>
+                <span className="font-mono text-[var(--text-body)]">{items.length}</span>
               </div>
               {items.map((item) => {
                 const receivedQty = getReceivedQuantity(item.id);
@@ -451,16 +451,16 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
                 return (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between text-sm border-t border-zinc-800 pt-2"
+                    className="flex items-center justify-between text-sm border-t border-border pt-2"
                   >
-                    <span className="text-zinc-400">
+                    <span className="text-[var(--text-muted)]">
                       <Package className="size-3 inline mr-1.5" />
                       {item.commodity_name}
                     </span>
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-zinc-300">
+                      <span className="font-mono text-[var(--text-body)]">
                         {receivedQty.toLocaleString()}{' '}
-                        <span className="text-zinc-600">
+                        <span className="text-[var(--text-dim)]">
                           / {item.sent_quantity.toLocaleString()}
                         </span>
                       </span>
@@ -481,7 +481,7 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
                 render={
                   <Button
                     variant="outline"
-                    className="border-zinc-700 text-zinc-300"
+                    className="border-border text-[var(--text-body)]"
                   />
                 }
               >
@@ -490,7 +490,7 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
               <Button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="bg-amber-600 text-zinc-950 hover:bg-amber-500 font-semibold"
+                className="bg-[var(--accent)] text-white hover:bg-[var(--accent-dark)] font-semibold"
               >
                 {submitting ? 'Processing...' : 'Confirm Receipt'}
               </Button>

@@ -19,9 +19,9 @@ interface Props {
 }
 
 const roleColors: Record<string, string> = {
-  tenant_admin: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  tenant_admin: 'bg-[var(--accent)]/15 text-[var(--accent)] border-[var(--accent)]/30',
   manager: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-  employee: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
+  employee: 'bg-muted/50 text-[var(--text-muted)] border-border',
 };
 
 const roleLabels: Record<string, string> = {
@@ -72,23 +72,23 @@ export default async function UsersPage({ params }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">
           User Management
         </h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <p className="text-sm text-foreground0 mt-1">
           Manage user permissions, roles, and location assignments
         </p>
       </div>
 
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
             All Users ({users.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {users.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+            <div className="flex flex-col items-center justify-center py-16 text-foreground0">
               <p className="text-sm font-mono">No users found</p>
               <p className="text-xs mt-1">
                 Users will appear here once they join this tenant
@@ -97,20 +97,20 @@ export default async function UsersPage({ params }: Props) {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="border-zinc-800 hover:bg-transparent">
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6">
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 pl-6">
                     Name
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
                     Role
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
                     Status
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
                     Permissions
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right pr-6">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 text-right pr-6">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -121,15 +121,15 @@ export default async function UsersPage({ params }: Props) {
                   return (
                     <TableRow
                       key={user.id}
-                      className="border-zinc-800/60 hover:bg-zinc-800/30"
+                      className="border-border hover:bg-muted/50"
                     >
                       <TableCell className="pl-6">
                         <div>
-                          <span className="text-sm text-zinc-200 font-medium">
+                          <span className="text-sm text-foreground font-medium">
                             {user.display_name || 'Unnamed User'}
                           </span>
                           {user.phone && (
-                            <span className="block text-xs text-zinc-500 font-mono mt-0.5">
+                            <span className="block text-xs text-foreground0 font-mono mt-0.5">
                               {user.phone}
                             </span>
                           )}
@@ -147,15 +147,15 @@ export default async function UsersPage({ params }: Props) {
                           variant={user.is_active ? 'default' : 'secondary'}
                           className={
                             user.is_active
-                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                              : 'bg-zinc-700/50 text-zinc-400 border border-zinc-600/50'
+                              ? 'bg-[var(--green)]/15 text-[var(--green)] border border-[var(--green)]/30'
+                              : 'bg-muted text-[var(--text-muted)] border border-border'
                           }
                         >
                           {user.is_active ? 'Active' : 'Inactive'}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <span className="text-xs font-mono text-zinc-400">
+                        <span className="text-xs font-mono text-[var(--text-muted)]">
                           {user.role === 'tenant_admin'
                             ? 'All (Admin)'
                             : `${permCount} / 11`}
@@ -164,7 +164,7 @@ export default async function UsersPage({ params }: Props) {
                       <TableCell className="text-right pr-6">
                         <Link
                           href={`/t/${tenantSlug}/settings/users/${user.user_id}`}
-                          className="inline-flex items-center rounded-md border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-mono text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 transition-colors"
+                          className="inline-flex items-center rounded-md border border-border bg-muted px-3 py-1.5 text-xs font-mono text-[var(--text-body)] hover:bg-muted hover:text-foreground transition-colors"
                         >
                           Edit
                         </Link>

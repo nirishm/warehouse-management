@@ -76,7 +76,7 @@ export function CommodityActions({ commodity, onSuccess }: CommodityActionsProps
         commodity={formData}
         onSuccess={onSuccess}
         trigger={
-          <Button variant="ghost" size="icon-sm" className="text-zinc-400 hover:text-zinc-100">
+          <Button variant="ghost" size="icon-sm" className="text-[var(--text-muted)] hover:text-foreground">
             <Pencil className="size-3.5" />
           </Button>
         }
@@ -88,15 +88,15 @@ export function CommodityActions({ commodity, onSuccess }: CommodityActionsProps
               variant="ghost"
               size="icon-sm"
               disabled={deleting}
-              className="text-zinc-400 hover:text-zinc-100"
+              className="text-[var(--text-muted)] hover:text-foreground"
             />
           }
         >
           <MoreHorizontal className="size-3.5" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="bg-zinc-950 border-zinc-800">
+        <DropdownMenuContent align="end" className="bg-background border-border">
           <DropdownMenuItem
-            className="text-zinc-300 focus:text-zinc-100"
+            className="text-[var(--text-body)] focus:text-foreground"
             onSelect={() => {
               // The edit trigger button handles this
             }}
@@ -104,7 +104,7 @@ export function CommodityActions({ commodity, onSuccess }: CommodityActionsProps
             <Pencil className="size-3.5 mr-1.5" />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuSeparator className="bg-zinc-800" />
+          <DropdownMenuSeparator className="bg-muted" />
           <DropdownMenuItem
             variant="destructive"
             onSelect={handleDelete}

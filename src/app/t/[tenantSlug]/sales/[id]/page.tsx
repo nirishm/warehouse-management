@@ -22,10 +22,10 @@ interface Props {
 }
 
 const statusColors: Record<SaleStatus, string> = {
-  draft: 'bg-zinc-500/15 text-zinc-400 border border-zinc-500/30',
-  confirmed: 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
-  dispatched: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-  cancelled: 'bg-red-500/15 text-red-400 border border-red-500/30',
+  draft: 'bg-muted/50 text-[var(--text-muted)] border border-border',
+  confirmed: 'bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent)]/20',
+  dispatched: 'bg-[var(--green-bg)] text-[var(--green)] border border-[var(--green)]/20',
+  cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border border-[var(--red)]/20',
 };
 
 function formatDate(dateStr: string): string {
@@ -60,16 +60,17 @@ export default async function SaleDetailPage({ params }: Props) {
   const paymentsModuleEnabled = (tenant.enabled_modules ?? []).includes('payments');
   const canManagePayments = permissions.canManagePayments ?? false;
   const docGenEnabled = (tenant.enabled_modules ?? []).includes('document-gen');
+  const returnsModuleEnabled = (tenant.enabled_modules ?? []).includes('returns');
 
   const sale = await getSaleById(tenant.schema_name, id);
 
   if (!sale) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-zinc-500">
+      <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
         <p className="text-sm font-mono">Sale not found</p>
         <Link
           href={`/t/${tenantSlug}/sales`}
-          className="text-amber-500 hover:text-amber-400 text-xs mt-2 font-mono underline underline-offset-2"
+          className="text-[var(--accent)] hover:text-[var(--accent)] text-xs mt-2 font-mono underline underline-offset-2"
         >
           Back to sales
         </Link>
@@ -87,7 +88,7 @@ export default async function SaleDetailPage({ params }: Props) {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-zinc-100 tracking-tight font-mono">
+            <h1 className="text-2xl font-bold text-foreground tracking-tight font-mono">
               {sale.sale_number}
             </h1>
             <Badge
@@ -96,7 +97,7 @@ export default async function SaleDetailPage({ params }: Props) {
               {sale.status}
             </Badge>
           </div>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             {formatDate(sale.sold_at ?? sale.created_at)}
           </p>
         </div>
@@ -107,9 +108,17 @@ export default async function SaleDetailPage({ params }: Props) {
               label="Download Delivery Note"
             />
           )}
+          {returnsModuleEnabled && (
+            <Link
+              href={`/t/${tenantSlug}/returns/new?from=sale&id=${id}`}
+              className="inline-flex items-center gap-1.5 rounded-md bg-[var(--bg-off)] border border-border px-3 py-1.5 text-xs font-mono font-medium text-foreground hover:bg-muted transition-colors"
+            >
+              Accept Return
+            </Link>
+          )}
           <Link
             href={`/t/${tenantSlug}/sales`}
-            className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
+            className="text-xs font-mono text-[var(--accent)] hover:text-[var(--accent)] underline underline-offset-2"
           >
             Back to sales
           </Link>
@@ -118,9 +127,9 @@ export default async function SaleDetailPage({ params }: Props) {
 
       {/* Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
               Sale Details
             </CardTitle>
           </CardHeader>
@@ -128,7 +137,7 @@ export default async function SaleDetailPage({ params }: Props) {
             <DetailRow label="Location">
               {sale.location ? (
                 <>
-                  <span className="font-mono text-amber-500 text-xs mr-2">
+                  <span className="font-mono text-[var(--accent)] text-xs mr-2">
                     {sale.location.code}
                   </span>
                   {sale.location.name}
@@ -146,9 +155,9 @@ export default async function SaleDetailPage({ params }: Props) {
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
               Transport Details
             </CardTitle>
           </CardHeader>
@@ -170,32 +179,32 @@ export default async function SaleDetailPage({ params }: Props) {
       </div>
 
       {/* Items */}
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
             Items ({items.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="border-zinc-800 hover:bg-transparent">
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6">
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground pl-6">
                   Commodity
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   Unit
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
                   Quantity
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
                   Bags
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
                   Unit Price
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right pr-6">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right pr-6">
                   Total
                 </TableHead>
               </TableRow>
@@ -206,12 +215,12 @@ export default async function SaleDetailPage({ params }: Props) {
                 return (
                   <TableRow
                     key={item.id}
-                    className="border-zinc-800/60 hover:bg-zinc-800/30"
+                    className="border-border hover:bg-muted"
                   >
-                    <TableCell className="pl-6 text-sm text-zinc-200">
+                    <TableCell className="pl-6 text-sm text-foreground">
                       {item.commodity ? (
                         <>
-                          <span className="font-mono text-amber-500 text-xs mr-2">
+                          <span className="font-mono text-[var(--accent)] text-xs mr-2">
                             {item.commodity.code}
                           </span>
                           {item.commodity.name}
@@ -220,23 +229,23 @@ export default async function SaleDetailPage({ params }: Props) {
                         '--'
                       )}
                     </TableCell>
-                    <TableCell className="text-sm text-zinc-400 font-mono">
+                    <TableCell className="text-sm text-[var(--text-muted)] font-mono">
                       {item.unit?.abbreviation ?? item.unit?.name ?? '--'}
                     </TableCell>
-                    <TableCell className="text-sm text-zinc-200 font-mono text-right">
+                    <TableCell className="text-sm text-foreground font-mono text-right">
                       {item.quantity}
                     </TableCell>
-                    <TableCell className="text-sm text-zinc-400 font-mono text-right">
+                    <TableCell className="text-sm text-[var(--text-muted)] font-mono text-right">
                       {item.bags ?? '--'}
                     </TableCell>
-                    <TableCell className="text-sm text-zinc-400 font-mono text-right">
+                    <TableCell className="text-sm text-[var(--text-muted)] font-mono text-right">
                       {item.unit_price != null
                         ? item.unit_price.toLocaleString('en-IN', {
                             minimumFractionDigits: 2,
                           })
                         : '--'}
                     </TableCell>
-                    <TableCell className="text-sm text-zinc-200 font-mono text-right pr-6">
+                    <TableCell className="text-sm text-foreground font-mono text-right pr-6">
                       {lineTotal > 0
                         ? lineTotal.toLocaleString('en-IN', {
                             minimumFractionDigits: 2,
@@ -249,12 +258,12 @@ export default async function SaleDetailPage({ params }: Props) {
             </TableBody>
           </Table>
           {totalValue > 0 && (
-            <div className="flex justify-end px-6 py-3 border-t border-zinc-800">
+            <div className="flex justify-end px-6 py-3 border-t border-border">
               <div className="text-right">
-                <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 mr-4">
+                <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground mr-4">
                   Total
                 </span>
-                <span className="text-lg font-bold text-zinc-100 font-mono">
+                <span className="text-lg font-bold text-foreground font-mono">
                   {totalValue.toLocaleString('en-IN', {
                     minimumFractionDigits: 2,
                   })}
@@ -287,10 +296,10 @@ function DetailRow({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 w-28 shrink-0 pt-0.5">
+      <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground w-28 shrink-0 pt-0.5">
         {label}
       </span>
-      <span className="text-sm text-zinc-200">{children}</span>
+      <span className="text-sm text-foreground">{children}</span>
     </div>
   );
 }

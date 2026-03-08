@@ -34,11 +34,11 @@ export default async function UserDetailPage({ params }: Props) {
 
   if (!profile) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+      <div className="flex flex-col items-center justify-center py-16 text-foreground0">
         <p className="text-sm font-mono">User not found</p>
         <Link
           href={`/t/${tenantSlug}/settings/users`}
-          className="text-xs text-amber-500 hover:text-amber-400 mt-2 font-mono"
+          className="text-xs text-[var(--accent)] hover:text-[var(--accent)] mt-2 font-mono"
         >
           Back to Users
         </Link>
@@ -70,15 +70,15 @@ export default async function UserDetailPage({ params }: Props) {
       <div className="flex items-center gap-3">
         <Link
           href={`/t/${tenantSlug}/settings/users`}
-          className="inline-flex items-center rounded-md border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-mono text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 transition-colors"
+          className="inline-flex items-center rounded-md border border-border bg-muted px-3 py-1.5 text-xs font-mono text-[var(--text-muted)] hover:bg-muted hover:text-foreground transition-colors"
         >
           &larr; Back
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">
             {user.display_name || 'Unnamed User'}
           </h1>
-          <p className="text-sm text-zinc-500 mt-0.5 font-mono">
+          <p className="text-sm text-foreground0 mt-0.5 font-mono">
             User ID: {user.user_id}
           </p>
         </div>

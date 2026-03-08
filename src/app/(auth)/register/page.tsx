@@ -42,15 +42,15 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <Card className="border-zinc-800 bg-zinc-900/80 backdrop-blur shadow-2xl">
+      <Card className="border-border bg-[var(--bg-off)] backdrop-blur shadow-2xl">
         <CardContent className="pt-6 text-center space-y-3">
-          <div className="text-amber-500 text-4xl">✓</div>
-          <h2 className="text-lg text-zinc-200 font-medium">Check your email</h2>
-          <p className="text-sm text-zinc-400">
-            We sent a confirmation link to <span className="text-zinc-200">{email}</span>
+          <div className="text-[var(--accent)] text-4xl">✓</div>
+          <h2 className="text-lg text-foreground font-medium">Check your email</h2>
+          <p className="text-sm text-[var(--text-muted)]">
+            We sent a confirmation link to <span className="text-foreground">{email}</span>
           </p>
           <Link href="/login">
-            <Button variant="outline" className="mt-4 border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+            <Button variant="outline" className="mt-4 border-border text-[var(--text-body)] hover:bg-muted">
               Back to sign in
             </Button>
           </Link>
@@ -60,19 +60,19 @@ export default function RegisterPage() {
   }
 
   return (
-    <Card className="border-zinc-800 bg-zinc-900/80 backdrop-blur shadow-2xl">
+    <Card className="border-border bg-[var(--bg-off)] backdrop-blur shadow-2xl">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg text-zinc-200 font-medium">Create account</CardTitle>
+        <CardTitle className="text-lg text-foreground font-medium">Create account</CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="text-sm text-red-400 bg-red-950/50 border border-red-900 rounded-md px-3 py-2">
+            <div className="text-sm text-[var(--red)] bg-[var(--red-bg)] border border-[var(--red)]/20 rounded-md px-3 py-2">
               {error}
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="fullName" className="text-zinc-400 text-sm">Full name</Label>
+            <Label htmlFor="fullName" className="text-[var(--text-muted)] text-sm">Full name</Label>
             <Input
               id="fullName"
               type="text"
@@ -80,11 +80,11 @@ export default function RegisterPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus:border-amber-500 focus:ring-amber-500/20"
+              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)] focus:ring-[var(--accent)]/20"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-zinc-400 text-sm">Email</Label>
+            <Label htmlFor="email" className="text-[var(--text-muted)] text-sm">Email</Label>
             <Input
               id="email"
               type="email"
@@ -92,11 +92,11 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus:border-amber-500 focus:ring-amber-500/20"
+              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)] focus:ring-[var(--accent)]/20"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-zinc-400 text-sm">Password</Label>
+            <Label htmlFor="password" className="text-[var(--text-muted)] text-sm">Password</Label>
             <Input
               id="password"
               type="password"
@@ -105,7 +105,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus:border-amber-500 focus:ring-amber-500/20"
+              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)] focus:ring-[var(--accent)]/20"
             />
           </div>
         </CardContent>
@@ -113,13 +113,13 @@ export default function RegisterPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-amber-600 hover:bg-amber-500 text-zinc-950 font-semibold tracking-wide"
+            className="w-full bg-[var(--accent)] hover:bg-[var(--accent)] text-background font-semibold tracking-wide"
           >
             {loading ? 'Creating account...' : 'Create account'}
           </Button>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-muted-foreground">
             Already have an account?{' '}
-            <Link href="/login" className="text-amber-500 hover:text-amber-400 transition-colors">
+            <Link href="/login" className="text-[var(--accent)] hover:text-[var(--accent)] transition-colors">
               Sign in
             </Link>
           </p>

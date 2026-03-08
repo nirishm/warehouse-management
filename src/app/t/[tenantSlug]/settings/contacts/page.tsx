@@ -33,10 +33,10 @@ export default async function ContactsPage({ params }: Props) {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">
             Contacts
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-foreground0 mt-1">
             Manage suppliers, customers, and contact information
           </p>
         </div>
@@ -47,9 +47,9 @@ export default async function ContactsPage({ params }: Props) {
         />
       </div>
 
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
             All Contacts ({items.length})
           </CardTitle>
         </CardHeader>

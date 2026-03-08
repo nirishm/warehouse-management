@@ -83,7 +83,7 @@ export default async function TenantLayout({ children, params }: Props) {
 
   return (
     <TenantProvider value={ctx}>
-      <div className="flex min-h-screen bg-zinc-950">
+      <div className="flex min-h-screen bg-[var(--bg-off)]">
         <Sidebar
           tenantSlug={tenantSlug}
           tenantName={tenant.name}

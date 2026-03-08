@@ -193,19 +193,19 @@ export function CustomFieldForm({
       <DialogTrigger
         render={
           trigger ?? (
-            <Button className="bg-amber-600 text-zinc-950 hover:bg-amber-500 font-medium">
+            <Button className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)] font-medium">
               <Plus className="size-4 mr-1" />
               New Custom Field
             </Button>
           )
         }
       />
-      <DialogContent className="bg-zinc-900 border border-zinc-800 text-zinc-100 sm:max-w-md">
+      <DialogContent className="bg-[var(--bg-off)] border border-border text-foreground sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-zinc-100 font-semibold">
+          <DialogTitle className="text-foreground font-semibold">
             {isEditing ? 'Edit Custom Field' : 'New Custom Field'}
           </DialogTitle>
-          <DialogDescription className="text-zinc-500">
+          <DialogDescription className="text-foreground0">
             {isEditing
               ? 'Update the custom field definition.'
               : 'Define a new custom field for an entity type.'}
@@ -214,28 +214,28 @@ export function CustomFieldForm({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+            <div className="rounded-md border border-[var(--red)]/30 bg-[var(--red)]/10 px-3 py-2 text-sm text-[var(--red)]">
               {error}
             </div>
           )}
 
           <div className="space-y-2">
-            <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+            <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
               Entity Type
             </Label>
             <Select
               value={entityType}
               onValueChange={(val) => setEntityType(val as EntityType)}
             >
-              <SelectTrigger className="w-full bg-zinc-950 border-zinc-700 text-zinc-100">
+              <SelectTrigger className="w-full bg-background border-border text-foreground">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-700">
+              <SelectContent className="bg-[var(--bg-off)] border-border">
                 {ENTITY_TYPES.map((et) => (
                   <SelectItem
                     key={et}
                     value={et}
-                    className="text-zinc-200 focus:bg-zinc-800"
+                    className="text-foreground focus:bg-muted"
                   >
                     {ENTITY_LABELS[et] ?? et}
                   </SelectItem>
@@ -247,7 +247,7 @@ export function CustomFieldForm({
           <div className="space-y-2">
             <Label
               htmlFor="cf-label"
-              className="text-xs font-mono uppercase tracking-wider text-zinc-400"
+              className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]"
             >
               Field Label
             </Label>
@@ -257,14 +257,14 @@ export function CustomFieldForm({
               onChange={(e) => setFieldLabel(e.target.value)}
               placeholder="e.g. Batch Number"
               required
-              className="bg-zinc-950 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
             />
           </div>
 
           <div className="space-y-2">
             <Label
               htmlFor="cf-key"
-              className="text-xs font-mono uppercase tracking-wider text-zinc-400"
+              className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]"
             >
               Field Key
             </Label>
@@ -278,30 +278,30 @@ export function CustomFieldForm({
               placeholder="e.g. batch_number"
               required
               pattern="^[a-z0-9_]+$"
-              className="bg-zinc-950 border-zinc-700 text-amber-500 font-mono placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+              className="bg-background border-border text-[var(--accent)] font-mono placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
             />
-            <p className="text-xs text-zinc-600">
+            <p className="text-xs text-[var(--text-dim)]">
               Lowercase letters, numbers, and underscores only
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+            <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
               Field Type
             </Label>
             <Select
               value={fieldType}
               onValueChange={(val) => setFieldType(val as FieldType)}
             >
-              <SelectTrigger className="w-full bg-zinc-950 border-zinc-700 text-zinc-100">
+              <SelectTrigger className="w-full bg-background border-border text-foreground">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-700">
+              <SelectContent className="bg-[var(--bg-off)] border-border">
                 {FIELD_TYPES.map((ft) => (
                   <SelectItem
                     key={ft}
                     value={ft}
-                    className="text-zinc-200 focus:bg-zinc-800"
+                    className="text-foreground focus:bg-muted"
                   >
                     {FIELD_TYPE_LABELS[ft] ?? ft}
                   </SelectItem>
@@ -314,7 +314,7 @@ export function CustomFieldForm({
             <div className="space-y-2">
               <Label
                 htmlFor="cf-options"
-                className="text-xs font-mono uppercase tracking-wider text-zinc-400"
+                className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]"
               >
                 Options
               </Label>
@@ -324,9 +324,9 @@ export function CustomFieldForm({
                 onChange={(e) => setOptionsText(e.target.value)}
                 placeholder="Option A, Option B, Option C"
                 required
-                className="bg-zinc-950 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
               />
-              <p className="text-xs text-zinc-600">
+              <p className="text-xs text-[var(--text-dim)]">
                 Comma-separated list of options
               </p>
             </div>
@@ -339,11 +339,11 @@ export function CustomFieldForm({
                 id="cf-required"
                 checked={isRequired}
                 onChange={(e) => setIsRequired(e.target.checked)}
-                className="size-4 rounded border-zinc-700 bg-zinc-950 text-amber-600 focus:ring-amber-500/20 accent-amber-600"
+                className="size-4 rounded border-border bg-background text-[var(--accent)] focus:ring-[var(--accent)]/20 accent-[var(--accent)]"
               />
               <Label
                 htmlFor="cf-required"
-                className="text-xs font-mono uppercase tracking-wider text-zinc-400 cursor-pointer"
+                className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)] cursor-pointer"
               >
                 Required
               </Label>
@@ -352,7 +352,7 @@ export function CustomFieldForm({
             <div className="flex items-center gap-2 ml-auto">
               <Label
                 htmlFor="cf-sort"
-                className="text-xs font-mono uppercase tracking-wider text-zinc-400"
+                className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]"
               >
                 Sort Order
               </Label>
@@ -362,16 +362,16 @@ export function CustomFieldForm({
                 min={0}
                 value={sortOrder}
                 onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)}
-                className="w-20 bg-zinc-950 border-zinc-700 text-zinc-100 font-mono focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                className="w-20 bg-background border-border text-foreground font-mono focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
               />
             </div>
           </div>
 
-          <DialogFooter className="bg-zinc-950/50 border-zinc-800">
+          <DialogFooter className="bg-background/50 border-border">
             <Button
               type="submit"
               disabled={loading}
-              className="bg-amber-600 text-zinc-950 hover:bg-amber-500 font-medium"
+              className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)] font-medium"
             >
               {loading && <Loader2 className="size-4 mr-1 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Field'}

@@ -28,11 +28,11 @@ const ENTITY_TYPES = [
 const ACTIONS = ['create', 'update', 'delete', 'receive', 'cancel'] as const;
 
 const actionBadgeColors: Record<string, string> = {
-  create: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  update: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  delete: 'bg-red-500/15 text-red-400 border-red-500/30',
+  create: 'bg-[var(--green)]/15 text-[var(--green)] border-[var(--green)]/30',
+  update: 'bg-[var(--accent)]/15 text-[var(--accent)] border-[var(--accent)]/30',
+  delete: 'bg-[var(--red)]/15 text-[var(--red)] border-[var(--red)]/30',
   receive: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-  cancel: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
+  cancel: 'bg-muted/50 text-[var(--text-muted)] border-border',
 };
 
 const entityTypeLabels: Record<string, string> = {
@@ -140,16 +140,16 @@ export function AuditTable({
 
   return (
     <>
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-0">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
             Activity Log ({totalCount})
           </CardTitle>
         </CardHeader>
 
         {/* Filter Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 px-6 py-4 border-b border-zinc-800">
-          <span className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 px-6 py-4 border-b border-border">
+          <span className="text-xs font-mono uppercase tracking-wider text-foreground0">
             Filters
           </span>
 
@@ -157,7 +157,7 @@ export function AuditTable({
             <select
               value={filters.entity_type ?? ''}
               onChange={(e) => updateFilter('entity_type', e.target.value)}
-              className="h-8 rounded-lg border border-zinc-700 bg-zinc-800 px-3 text-sm text-zinc-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50"
+              className="h-8 rounded-lg border border-border bg-muted px-3 text-sm text-foreground outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/50"
             >
               <option value="">All Entity Types</option>
               {ENTITY_TYPES.map((type) => (
@@ -170,7 +170,7 @@ export function AuditTable({
             <select
               value={filters.action ?? ''}
               onChange={(e) => updateFilter('action', e.target.value)}
-              className="h-8 rounded-lg border border-zinc-700 bg-zinc-800 px-3 text-sm text-zinc-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50"
+              className="h-8 rounded-lg border border-border bg-muted px-3 text-sm text-foreground outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/50"
             >
               <option value="">All Actions</option>
               {ACTIONS.map((action) => (
@@ -185,7 +185,7 @@ export function AuditTable({
               value={filters.from ?? ''}
               onChange={(e) => updateFilter('from', e.target.value)}
               placeholder="From"
-              className="h-8 rounded-lg border border-zinc-700 bg-zinc-800 px-3 text-sm text-zinc-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50"
+              className="h-8 rounded-lg border border-border bg-muted px-3 text-sm text-foreground outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/50"
             />
 
             <input
@@ -193,14 +193,14 @@ export function AuditTable({
               value={filters.to ?? ''}
               onChange={(e) => updateFilter('to', e.target.value)}
               placeholder="To"
-              className="h-8 rounded-lg border border-zinc-700 bg-zinc-800 px-3 text-sm text-zinc-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50"
+              className="h-8 rounded-lg border border-border bg-muted px-3 text-sm text-foreground outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/50"
             />
           </div>
 
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
+              className="text-xs font-mono text-[var(--accent)] hover:text-[var(--accent)] underline underline-offset-2"
             >
               Clear filters
             </button>
@@ -209,7 +209,7 @@ export function AuditTable({
 
         <CardContent className="p-0">
           {entries.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+            <div className="flex flex-col items-center justify-center py-16 text-foreground0">
               <p className="text-sm font-mono">No audit entries found</p>
               <p className="text-xs mt-1">
                 {hasActiveFilters
@@ -220,24 +220,24 @@ export function AuditTable({
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="border-zinc-800 hover:bg-transparent">
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6 w-8" />
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 pl-6 w-8" />
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
                     Timestamp
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
                     User
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
                     Action
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
                     Entity Type
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
                     Entity ID
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pr-6">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 pr-6">
                     Changes
                   </TableHead>
                 </TableRow>
@@ -262,8 +262,8 @@ export function AuditTable({
 
         {/* Pagination */}
         {totalCount > 0 && (
-          <div className="flex items-center justify-between px-6 py-3 border-t border-zinc-800">
-            <p className="text-xs font-mono text-zinc-600">
+          <div className="flex items-center justify-between px-6 py-3 border-t border-border">
+            <p className="text-xs font-mono text-[var(--text-dim)]">
               Showing {offset + 1}-{Math.min(offset + limit, totalCount)} of{' '}
               {totalCount}
             </p>
@@ -273,12 +273,12 @@ export function AuditTable({
                 size="sm"
                 disabled={offset === 0}
                 onClick={() => goToPage(Math.max(0, offset - limit))}
-                className="h-7 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 disabled:opacity-30"
+                className="h-7 border-border bg-muted text-[var(--text-body)] hover:bg-muted hover:text-foreground disabled:opacity-30"
               >
                 <ChevronLeft className="size-4 mr-1" />
                 Previous
               </Button>
-              <span className="text-xs font-mono text-zinc-500">
+              <span className="text-xs font-mono text-foreground0">
                 Page {currentPage} of {totalPages}
               </span>
               <Button
@@ -286,7 +286,7 @@ export function AuditTable({
                 size="sm"
                 disabled={offset + limit >= totalCount}
                 onClick={() => goToPage(offset + limit)}
-                className="h-7 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 disabled:opacity-30"
+                className="h-7 border-border bg-muted text-[var(--text-body)] hover:bg-muted hover:text-foreground disabled:opacity-30"
               >
                 Next
                 <ChevronRight className="size-4 ml-1" />
@@ -324,49 +324,49 @@ function TableRowExpandable({
   return (
     <>
       <TableRow
-        className="border-zinc-800/60 hover:bg-zinc-800/30 cursor-pointer"
+        className="border-border hover:bg-muted/50 cursor-pointer"
         onClick={onToggle}
       >
         <TableCell className="pl-6 w-8">
           {isExpanded ? (
-            <ChevronUp className="size-4 text-zinc-500" />
+            <ChevronUp className="size-4 text-foreground0" />
           ) : (
-            <ChevronDown className="size-4 text-zinc-500" />
+            <ChevronDown className="size-4 text-foreground0" />
           )}
         </TableCell>
-        <TableCell className="text-sm text-zinc-400 font-mono">
+        <TableCell className="text-sm text-[var(--text-muted)] font-mono">
           {formatTimestamp(entry.created_at)}
         </TableCell>
-        <TableCell className="text-sm text-zinc-200">
+        <TableCell className="text-sm text-foreground">
           {entry.user_name}
         </TableCell>
         <TableCell>
           <span
             className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-mono font-medium ${
               actionBadgeColors[entry.action] ??
-              'bg-zinc-500/15 text-zinc-400 border-zinc-500/30'
+              'bg-muted/50 text-[var(--text-muted)] border-border'
             }`}
           >
             {entry.action}
           </span>
         </TableCell>
-        <TableCell className="text-sm text-zinc-300">
+        <TableCell className="text-sm text-[var(--text-body)]">
           {entityTypeLabels[entry.entity_type] ?? entry.entity_type}
         </TableCell>
-        <TableCell className="font-mono text-xs text-zinc-500" title={entry.entity_id}>
+        <TableCell className="font-mono text-xs text-foreground0" title={entry.entity_id}>
           {truncateUuid(entry.entity_id)}
         </TableCell>
-        <TableCell className="text-sm text-zinc-400 pr-6">
+        <TableCell className="text-sm text-[var(--text-muted)] pr-6">
           {summarizeChanges(entry)}
         </TableCell>
       </TableRow>
 
       {isExpanded && (
-        <TableRow className="border-zinc-800/60 bg-zinc-900/80">
+        <TableRow className="border-border bg-[var(--bg-off)]">
           <TableCell colSpan={7} className="px-6 py-4">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                <span className="text-xs font-mono uppercase tracking-wider text-foreground0">
                   Change Detail
                 </span>
                 <button
@@ -374,7 +374,7 @@ function TableRowExpandable({
                     e.stopPropagation();
                     onViewDetail();
                   }}
-                  className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
+                  className="text-xs font-mono text-[var(--accent)] hover:text-[var(--accent)] underline underline-offset-2"
                 >
                   View full detail
                 </button>
@@ -382,14 +382,14 @@ function TableRowExpandable({
 
               {entry.metadata && Object.keys(entry.metadata).length > 0 && (
                 <div>
-                  <p className="text-xs font-mono text-zinc-500 mb-1">Metadata</p>
-                  <pre className="text-xs font-mono text-zinc-400 bg-zinc-950 border border-zinc-800 rounded-lg p-3 overflow-x-auto max-h-40">
+                  <p className="text-xs font-mono text-foreground0 mb-1">Metadata</p>
+                  <pre className="text-xs font-mono text-[var(--text-muted)] bg-background border border-border rounded-lg p-3 overflow-x-auto max-h-40">
                     {JSON.stringify(entry.metadata, null, 2)}
                   </pre>
                 </div>
               )}
 
-              <div className="text-xs font-mono text-zinc-600">
+              <div className="text-xs font-mono text-[var(--text-dim)]">
                 Entry ID: {entry.id}
               </div>
             </div>

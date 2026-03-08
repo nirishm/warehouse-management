@@ -52,12 +52,12 @@ function formatDate(dateStr: string): string {
 }
 
 const statusColors: Record<string, string> = {
-  draft: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
-  dispatched: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  draft: 'bg-muted/50 text-[var(--text-muted)] border-border',
+  dispatched: 'bg-[var(--accent)]/15 text-[var(--accent)] border-[var(--accent)]/30',
   in_transit: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-  received: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  cancelled: 'bg-red-500/15 text-red-400 border-red-500/30',
-  confirmed: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  received: 'bg-[var(--green)]/15 text-[var(--green)] border-[var(--green)]/30',
+  cancelled: 'bg-[var(--red)]/15 text-[var(--red)] border-[var(--red)]/30',
+  confirmed: 'bg-[var(--green)]/15 text-[var(--green)] border-[var(--green)]/30',
 };
 
 const statusLabels: Record<string, string> = {
@@ -70,15 +70,15 @@ const statusLabels: Record<string, string> = {
 };
 
 function shortageColorClass(pct: number): string {
-  if (pct < 1) return 'text-emerald-400';
-  if (pct <= 3) return 'text-amber-400';
-  return 'text-red-400';
+  if (pct < 1) return 'text-[var(--green)]';
+  if (pct <= 3) return 'text-[var(--accent)]';
+  return 'text-[var(--red)]';
 }
 
 function shortageBarColor(pct: number): string {
-  if (pct < 1) return 'bg-emerald-500';
-  if (pct <= 3) return 'bg-amber-500';
-  return 'bg-red-500';
+  if (pct < 1) return 'bg-[var(--green)]';
+  if (pct <= 3) return 'bg-[var(--accent)]';
+  return 'bg-[var(--red)]';
 }
 
 const typeIcons: Record<string, typeof Truck> = {
@@ -148,16 +148,16 @@ export function AnalyticsDashboard({
           return (
             <Card
               key={card.label}
-              className="border-zinc-800 bg-zinc-900/60"
+              className="border-border bg-[var(--bg-off)]"
             >
               <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
                   {card.label}
                 </CardTitle>
-                <Icon className="size-4 text-zinc-600" />
+                <Icon className="size-4 text-[var(--text-dim)]" />
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold text-zinc-100 font-mono">
+                <p className="text-3xl font-bold text-foreground font-mono">
                   {formatNumber(card.value)}
                 </p>
               </CardContent>
@@ -169,9 +169,9 @@ export function AnalyticsDashboard({
       {/* ── Dispatch Performance ────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Status Breakdown + Shortage */}
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-[var(--bg-off)]">
           <CardHeader>
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500 flex items-center gap-2">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0 flex items-center gap-2">
               <BarChart3 className="size-4" />
               Dispatch Status Breakdown
             </CardTitle>
@@ -180,7 +180,7 @@ export function AnalyticsDashboard({
             {/* Status bars */}
             <div className="space-y-3">
               {dispatches.statusBreakdown.length === 0 ? (
-                <p className="text-sm text-zinc-500 font-mono">
+                <p className="text-sm text-foreground0 font-mono">
                   No dispatches yet
                 </p>
               ) : (
@@ -190,7 +190,7 @@ export function AnalyticsDashboard({
                     const widthPct = (s.count / maxStatusCount) * 100;
                     const colorClass =
                       statusColors[s.status] ??
-                      'bg-zinc-500/15 text-zinc-400 border-zinc-500/30';
+                      'bg-muted/50 text-[var(--text-muted)] border-border';
                     return (
                       <div key={s.status} className="space-y-1">
                         <div className="flex items-center justify-between">
@@ -199,13 +199,13 @@ export function AnalyticsDashboard({
                           >
                             {statusLabels[s.status] ?? s.status}
                           </span>
-                          <span className="text-sm font-mono text-zinc-300">
+                          <span className="text-sm font-mono text-[var(--text-body)]">
                             {s.count}
                           </span>
                         </div>
-                        <div className="h-2 w-full rounded-full bg-zinc-800">
+                        <div className="h-2 w-full rounded-full bg-muted">
                           <div
-                            className="h-2 rounded-full bg-amber-500/60 transition-all"
+                            className="h-2 rounded-full bg-[var(--accent)]/60 transition-all"
                             style={{ width: `${widthPct}%` }}
                           />
                         </div>
@@ -216,19 +216,19 @@ export function AnalyticsDashboard({
             </div>
 
             {/* Shortage Summary */}
-            <div className="border-t border-zinc-800 pt-4">
+            <div className="border-t border-border pt-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-1">
+                  <p className="text-xs font-mono uppercase tracking-wider text-foreground0 mb-1">
                     Overall Shortage
                   </p>
-                  <p className="text-sm text-zinc-400 font-mono">
+                  <p className="text-sm text-[var(--text-muted)] font-mono">
                     Sent:{' '}
-                    <span className="text-zinc-200">
+                    <span className="text-foreground">
                       {formatNumber(dispatches.totalSentQuantity)}
                     </span>{' '}
                     | Received:{' '}
-                    <span className="text-zinc-200">
+                    <span className="text-foreground">
                       {formatNumber(dispatches.totalReceivedQuantity)}
                     </span>
                   </p>
@@ -239,7 +239,7 @@ export function AnalyticsDashboard({
                   >
                     {formatPercent(dispatches.overallShortagePercent)}
                   </p>
-                  <p className="text-xs text-zinc-500 font-mono">shortage</p>
+                  <p className="text-xs text-foreground0 font-mono">shortage</p>
                 </div>
               </div>
             </div>
@@ -247,32 +247,32 @@ export function AnalyticsDashboard({
         </Card>
 
         {/* Top Routes Table */}
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-[var(--bg-off)]">
           <CardHeader>
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500 flex items-center gap-2">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0 flex items-center gap-2">
               <ArrowRight className="size-4" />
               Top 5 Routes
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {dispatches.topRoutes.length === 0 ? (
-              <div className="flex items-center justify-center py-12 text-zinc-500">
+              <div className="flex items-center justify-center py-12 text-foreground0">
                 <p className="text-sm font-mono">No dispatch routes yet</p>
               </div>
             ) : (
               <Table>
                 <TableHeader>
-                  <TableRow className="border-zinc-800 hover:bg-transparent">
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6">
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 pl-6">
                       Origin
                     </TableHead>
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
                       Destination
                     </TableHead>
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 text-right">
                       Count
                     </TableHead>
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right pr-6">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 text-right pr-6">
                       Avg Shortage
                     </TableHead>
                   </TableRow>
@@ -281,20 +281,20 @@ export function AnalyticsDashboard({
                   {dispatches.topRoutes.map((route, idx) => (
                     <TableRow
                       key={idx}
-                      className="border-zinc-800/60 hover:bg-zinc-800/30"
+                      className="border-border hover:bg-muted/50"
                     >
-                      <TableCell className="pl-6 text-sm text-zinc-300 font-mono">
+                      <TableCell className="pl-6 text-sm text-[var(--text-body)] font-mono">
                         {route.originName}
                       </TableCell>
-                      <TableCell className="text-sm text-zinc-300 font-mono">
+                      <TableCell className="text-sm text-[var(--text-body)] font-mono">
                         {route.destName}
                       </TableCell>
-                      <TableCell className="text-sm text-zinc-200 font-mono text-right font-medium">
+                      <TableCell className="text-sm text-foreground font-mono text-right font-medium">
                         {route.dispatchCount}
                       </TableCell>
                       <TableCell className="text-right pr-6">
                         <div className="flex items-center justify-end gap-2">
-                          <div className="w-16 h-2 rounded-full bg-zinc-800">
+                          <div className="w-16 h-2 rounded-full bg-muted">
                             <div
                               className={`h-2 rounded-full ${shortageBarColor(route.avgShortagePercent)} transition-all`}
                               style={{
@@ -319,35 +319,35 @@ export function AnalyticsDashboard({
       </div>
 
       {/* ── Recent Activity ─────────────────────────────────────── */}
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader>
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
             Recent Activity
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {movements.length === 0 ? (
-            <div className="flex items-center justify-center py-12 text-zinc-500">
+            <div className="flex items-center justify-center py-12 text-foreground0">
               <p className="text-sm font-mono">No recent activity</p>
             </div>
           ) : (
-            <div className="divide-y divide-zinc-800/60">
+            <div className="divide-y divide-border">
               {movements.map((m) => {
                 const Icon = typeIcons[m.type] ?? Package;
                 const typeBg =
                   m.type === 'dispatch'
-                    ? 'bg-amber-500/10 text-amber-500'
+                    ? 'bg-[var(--accent)]/10 text-[var(--accent)]'
                     : m.type === 'purchase'
                       ? 'bg-sky-500/10 text-sky-500'
-                      : 'bg-emerald-500/10 text-emerald-500';
+                      : 'bg-[var(--green)]/10 text-[var(--green)]';
                 const badgeColor =
                   statusColors[m.status] ??
-                  'bg-zinc-500/15 text-zinc-400 border-zinc-500/30';
+                  'bg-muted/50 text-[var(--text-muted)] border-border';
 
                 return (
                   <div
                     key={`${m.type}-${m.id}`}
-                    className="flex items-center gap-4 px-6 py-3 hover:bg-zinc-800/20 transition-colors"
+                    className="flex items-center gap-4 px-6 py-3 hover:bg-muted/50 transition-colors"
                   >
                     {/* Type icon */}
                     <div
@@ -359,14 +359,14 @@ export function AnalyticsDashboard({
                     {/* Main info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-mono font-medium text-zinc-200">
+                        <span className="text-sm font-mono font-medium text-foreground">
                           {m.number}
                         </span>
-                        <span className="text-xs font-mono text-zinc-600">
+                        <span className="text-xs font-mono text-[var(--text-dim)]">
                           {typeLabels[m.type] ?? m.type}
                         </span>
                       </div>
-                      <p className="text-xs text-zinc-500 font-mono truncate">
+                      <p className="text-xs text-foreground0 font-mono truncate">
                         {m.description}
                       </p>
                     </div>
@@ -379,7 +379,7 @@ export function AnalyticsDashboard({
                     </span>
 
                     {/* Date */}
-                    <span className="text-xs font-mono text-zinc-500 flex-shrink-0 w-24 text-right">
+                    <span className="text-xs font-mono text-foreground0 flex-shrink-0 w-24 text-right">
                       {formatDate(m.date)}
                     </span>
                   </div>

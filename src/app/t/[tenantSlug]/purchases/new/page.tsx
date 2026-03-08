@@ -138,37 +138,37 @@ export default function NewPurchasePage() {
   }
 
   const selectClass =
-    'h-8 w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 text-sm text-zinc-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50';
+    'h-8 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/50';
 
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
           New Purchase
         </h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Record an incoming purchase from a supplier
         </p>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+        <div className="rounded-lg border border-[var(--red)]/30 bg-[var(--red-bg)] px-4 py-3 text-sm text-[var(--red)]">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Header details */}
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-[var(--bg-off)]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
               Purchase Details
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                <Label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   Location *
                 </Label>
                 <select
@@ -191,61 +191,61 @@ export default function NewPurchasePage() {
         </Card>
 
         {/* Transport details */}
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-[var(--bg-off)]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
               Transport Details
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                <Label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   Transporter Name
                 </Label>
                 <Input
                   value={transporterName}
                   onChange={(e) => setTransporterName(e.target.value)}
                   placeholder="Enter transporter name"
-                  className="border-zinc-700 bg-zinc-800 text-zinc-200 placeholder:text-zinc-600"
+                  className="border-border bg-background text-foreground placeholder:text-[var(--text-dim)]"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                <Label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   Vehicle Number
                 </Label>
                 <Input
                   value={vehicleNumber}
                   onChange={(e) => setVehicleNumber(e.target.value)}
                   placeholder="e.g. MH-12-AB-1234"
-                  className="border-zinc-700 bg-zinc-800 text-zinc-200 placeholder:text-zinc-600"
+                  className="border-border bg-background text-foreground placeholder:text-[var(--text-dim)]"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                <Label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   Driver Name
                 </Label>
                 <Input
                   value={driverName}
                   onChange={(e) => setDriverName(e.target.value)}
                   placeholder="Enter driver name"
-                  className="border-zinc-700 bg-zinc-800 text-zinc-200 placeholder:text-zinc-600"
+                  className="border-border bg-background text-foreground placeholder:text-[var(--text-dim)]"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                <Label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   Driver Phone
                 </Label>
                 <Input
                   value={driverPhone}
                   onChange={(e) => setDriverPhone(e.target.value)}
                   placeholder="Enter phone number"
-                  className="border-zinc-700 bg-zinc-800 text-zinc-200 placeholder:text-zinc-600"
+                  className="border-border bg-background text-foreground placeholder:text-[var(--text-dim)]"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+              <Label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                 Notes
               </Label>
               <Textarea
@@ -253,23 +253,23 @@ export default function NewPurchasePage() {
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Optional notes..."
                 rows={3}
-                className="border-zinc-700 bg-zinc-800 text-zinc-200 placeholder:text-zinc-600"
+                className="border-border bg-background text-foreground placeholder:text-[var(--text-dim)]"
               />
             </div>
           </CardContent>
         </Card>
 
         {/* Items */}
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-[var(--bg-off)]">
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
               Items *
             </CardTitle>
             <Button
               type="button"
               variant="outline"
               onClick={addItem}
-              className="h-7 text-xs font-mono border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+              className="h-7 text-xs font-mono border-border text-[var(--text-body)] hover:bg-muted hover:text-foreground"
             >
               + Add Row
             </Button>
@@ -278,20 +278,20 @@ export default function NewPurchasePage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-zinc-800">
-                    <th className="text-left text-xs font-mono uppercase tracking-wider text-zinc-500 px-4 py-2">
+                  <tr className="border-b border-border">
+                    <th className="text-left text-xs font-mono uppercase tracking-wider text-muted-foreground px-4 py-2">
                       Commodity
                     </th>
-                    <th className="text-left text-xs font-mono uppercase tracking-wider text-zinc-500 px-4 py-2">
+                    <th className="text-left text-xs font-mono uppercase tracking-wider text-muted-foreground px-4 py-2">
                       Unit
                     </th>
-                    <th className="text-left text-xs font-mono uppercase tracking-wider text-zinc-500 px-4 py-2 w-28">
+                    <th className="text-left text-xs font-mono uppercase tracking-wider text-muted-foreground px-4 py-2 w-28">
                       Quantity
                     </th>
-                    <th className="text-left text-xs font-mono uppercase tracking-wider text-zinc-500 px-4 py-2 w-24">
+                    <th className="text-left text-xs font-mono uppercase tracking-wider text-muted-foreground px-4 py-2 w-24">
                       Bags
                     </th>
-                    <th className="text-left text-xs font-mono uppercase tracking-wider text-zinc-500 px-4 py-2 w-28">
+                    <th className="text-left text-xs font-mono uppercase tracking-wider text-muted-foreground px-4 py-2 w-28">
                       Unit Price
                     </th>
                     <th className="w-12 px-4 py-2" />
@@ -301,7 +301,7 @@ export default function NewPurchasePage() {
                   {items.map((item) => (
                     <tr
                       key={item.key}
-                      className="border-b border-zinc-800/60"
+                      className="border-b border-border"
                     >
                       <td className="px-4 py-2">
                         <select
@@ -349,7 +349,7 @@ export default function NewPurchasePage() {
                             updateItem(item.key, 'quantity', e.target.value)
                           }
                           placeholder="0"
-                          className="border-zinc-700 bg-zinc-800 text-zinc-200 font-mono"
+                          className="border-border bg-background text-foreground font-mono"
                         />
                       </td>
                       <td className="px-4 py-2">
@@ -362,7 +362,7 @@ export default function NewPurchasePage() {
                             updateItem(item.key, 'bags', e.target.value)
                           }
                           placeholder="0"
-                          className="border-zinc-700 bg-zinc-800 text-zinc-200 font-mono"
+                          className="border-border bg-background text-foreground font-mono"
                         />
                       </td>
                       <td className="px-4 py-2">
@@ -375,14 +375,14 @@ export default function NewPurchasePage() {
                             updateItem(item.key, 'unit_price', e.target.value)
                           }
                           placeholder="0.00"
-                          className="border-zinc-700 bg-zinc-800 text-zinc-200 font-mono"
+                          className="border-border bg-background text-foreground font-mono"
                         />
                       </td>
                       <td className="px-4 py-2">
                         <button
                           type="button"
                           onClick={() => removeItem(item.key)}
-                          className="text-zinc-600 hover:text-red-400 text-sm font-mono"
+                          className="text-[var(--text-dim)] hover:text-[var(--red)] text-sm font-mono"
                           title="Remove row"
                         >
                           x
@@ -400,7 +400,7 @@ export default function NewPurchasePage() {
           <Button
             type="submit"
             disabled={submitting}
-            className="bg-amber-600 hover:bg-amber-500 text-zinc-950 font-medium"
+            className="bg-[var(--accent)] hover:bg-[var(--accent)]/90 text-white font-medium"
           >
             {submitting ? 'Creating...' : 'Create Purchase'}
           </Button>
@@ -408,7 +408,7 @@ export default function NewPurchasePage() {
             type="button"
             variant="outline"
             onClick={() => router.push(`/t/${tenantSlug}/purchases`)}
-            className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+            className="border-border text-[var(--text-body)] hover:bg-muted hover:text-foreground"
           >
             Cancel
           </Button>

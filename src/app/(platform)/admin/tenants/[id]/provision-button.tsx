@@ -25,19 +25,19 @@ export function TenantProvisionButton({ tenantId, schemaName }: { tenantId: stri
   }
 
   return (
-    <Card className="border-zinc-800 bg-zinc-900/60">
+    <Card className="border-border bg-card">
       <CardHeader>
-        <CardTitle className="text-zinc-200 text-base">Schema Provisioning</CardTitle>
+        <CardTitle className="text-foreground text-base">Schema Provisioning</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <p className="text-sm text-zinc-400">
-          Schema: <code className="text-amber-500 font-mono">{schemaName}</code>
+        <p className="text-sm text-[var(--text-muted)]">
+          Schema: <code className="text-[var(--accent)] font-mono">{schemaName}</code>
         </p>
         {result && (
           <div className={`text-sm px-3 py-2 rounded-md border ${
             result === 'success'
-              ? 'text-emerald-400 bg-emerald-950/50 border-emerald-900'
-              : 'text-red-400 bg-red-950/50 border-red-900'
+              ? 'text-[var(--green)] bg-[var(--green-bg)] border-[var(--green)]/20'
+              : 'text-[var(--red)] bg-[var(--red-bg)] border-[var(--red)]/20'
           }`}>
             {message}
           </div>
@@ -45,7 +45,7 @@ export function TenantProvisionButton({ tenantId, schemaName }: { tenantId: stri
         <Button
           onClick={handleProvision}
           disabled={loading}
-          className="bg-amber-600 hover:bg-amber-500 text-zinc-950 font-semibold"
+          className="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white font-semibold"
         >
           {loading ? 'Provisioning...' : 'Provision Schema'}
         </Button>

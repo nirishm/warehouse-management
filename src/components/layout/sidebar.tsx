@@ -32,16 +32,16 @@ function SidebarContent({ tenantSlug, tenantName, navItems }: SidebarProps) {
   return (
     <>
       {/* Brand */}
-      <div className="px-4 h-14 flex items-center border-b border-zinc-800">
-        <span className="text-sm font-bold tracking-tight text-zinc-100 font-mono uppercase">
-          Warehouse<span className="text-amber-500">.</span>mgmt
+      <div className="px-4 h-14 flex items-center border-b border-border">
+        <span className="text-sm font-bold tracking-tight text-foreground font-mono uppercase">
+          <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent)] mr-1.5"></span>WareOS
         </span>
       </div>
 
       {/* Tenant name */}
-      <div className="px-4 py-3 border-b border-zinc-800">
-        <p className="text-xs font-mono uppercase tracking-wider text-zinc-500">Organization</p>
-        <p className="text-sm text-zinc-200 font-medium truncate mt-0.5">{tenantName}</p>
+      <div className="px-4 py-3 border-b border-border">
+        <p className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">Organization</p>
+        <p className="text-sm text-foreground font-medium truncate mt-0.5">{tenantName}</p>
       </div>
 
       {/* Navigation */}
@@ -54,7 +54,7 @@ function SidebarContent({ tenantSlug, tenantName, navItems }: SidebarProps) {
         />
 
         <div className="pt-3 pb-1 px-2">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-600">Modules</p>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--text-dim)]">Modules</p>
         </div>
 
         {navItems.map((item) => {
@@ -75,7 +75,7 @@ function SidebarContent({ tenantSlug, tenantName, navItems }: SidebarProps) {
         {tenant.role === 'tenant_admin' && (
           <>
             <div className="pt-3 pb-1 px-2">
-              <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-600">Settings</p>
+              <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--text-dim)]">Settings</p>
             </div>
             <NavLink
               href={`${basePath}/settings`}
@@ -88,10 +88,10 @@ function SidebarContent({ tenantSlug, tenantName, navItems }: SidebarProps) {
       </nav>
 
       {/* Sign out */}
-      <div className="p-2 border-t border-zinc-800">
+      <div className="p-2 border-t border-border">
         <button
           onClick={handleSignOut}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-[var(--text-muted)] hover:text-[var(--text-body)] hover:bg-[var(--bg-off)] transition-colors"
         >
           <LogOut size={16} />
           Sign out
@@ -103,7 +103,7 @@ function SidebarContent({ tenantSlug, tenantName, navItems }: SidebarProps) {
 
 export function Sidebar({ tenantSlug, tenantName, navItems }: SidebarProps) {
   return (
-    <aside className="hidden md:flex w-60 bg-zinc-900 border-r border-zinc-800 flex-col h-screen sticky top-0">
+    <aside className="hidden md:flex w-60 bg-white border-r border-border flex-col h-screen sticky top-0">
       <SidebarContent tenantSlug={tenantSlug} tenantName={tenantName} navItems={navItems} />
     </aside>
   );
@@ -121,12 +121,12 @@ export function MobileSidebar({ tenantSlug, tenantName, navItems }: SidebarProps
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
-        render={<button className="md:hidden p-2 text-zinc-400 hover:text-zinc-200 transition-colors" />}
+        render={<button className="md:hidden p-2 text-[var(--text-muted)] hover:text-[var(--text-body)] transition-colors" />}
       >
         <Menu size={20} />
         <span className="sr-only">Open menu</span>
       </SheetTrigger>
-      <SheetContent side="left" className="p-0 w-60 bg-zinc-900 border-zinc-800 flex flex-col" showCloseButton={false}>
+      <SheetContent side="left" className="p-0 w-60 bg-white border-border flex flex-col" showCloseButton={false}>
         <SidebarContent tenantSlug={tenantSlug} tenantName={tenantName} navItems={navItems} />
       </SheetContent>
     </Sheet>
@@ -143,8 +143,8 @@ function NavLink({
       href={href}
       className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-all ${
         active
-          ? 'bg-amber-500/10 text-amber-500 border-l-2 border-amber-500 -ml-px pl-[11px]'
-          : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+          ? 'bg-[var(--accent-tint)] text-[var(--accent)] border-l-2 border-[var(--accent)] -ml-px pl-[11px]'
+          : 'text-[var(--text-muted)] hover:text-[var(--text-body)] hover:bg-[var(--bg-off)]'
       }`}
     >
       {icon}

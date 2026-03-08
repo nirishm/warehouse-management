@@ -38,47 +38,47 @@ export function InviteForm({ tenantId }: { tenantId: string }) {
   }
 
   return (
-    <Card className="border-zinc-800 bg-zinc-900/60">
+    <Card className="border-border bg-card">
       <CardHeader>
-        <CardTitle className="text-zinc-200 text-base">Invite Tenant Admin</CardTitle>
+        <CardTitle className="text-foreground text-base">Invite Tenant Admin</CardTitle>
       </CardHeader>
       <form onSubmit={handleInvite}>
         <CardContent className="space-y-4">
           {result && (
             <div className={`text-sm px-3 py-2 rounded-md border ${
               result.type === 'success'
-                ? 'text-emerald-400 bg-emerald-950/50 border-emerald-900'
-                : 'text-red-400 bg-red-950/50 border-red-900'
+                ? 'text-[var(--green)] bg-[var(--green-bg)] border-[var(--green)]/20'
+                : 'text-[var(--red)] bg-[var(--red-bg)] border-[var(--red)]/20'
             }`}>
               {result.message}
             </div>
           )}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label className="text-zinc-400 text-sm">Full Name</Label>
+              <Label className="text-[var(--text-muted)] text-sm">Full Name</Label>
               <Input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Jane Doe"
-                className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus:border-amber-500"
+                className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)]"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-zinc-400 text-sm">Email</Label>
+              <Label className="text-[var(--text-muted)] text-sm">Email</Label>
               <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@company.com"
                 required
-                className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus:border-amber-500"
+                className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)]"
               />
             </div>
           </div>
           <Button
             type="submit"
             disabled={loading}
-            className="bg-amber-600 hover:bg-amber-500 text-zinc-950 font-semibold"
+            className="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white font-semibold"
           >
             {loading ? 'Sending...' : 'Send Invite'}
           </Button>

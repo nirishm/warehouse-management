@@ -201,7 +201,7 @@ export default function NewDispatchPage() {
   if (loadingData) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="size-6 animate-spin text-zinc-500" />
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -210,15 +210,15 @@ export default function NewDispatchPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link href={`/t/${tenantSlug}/dispatches`}>
-          <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-zinc-100">
+          <Button variant="ghost" size="icon" className="text-[var(--text-muted)] hover:text-foreground">
             <ArrowLeft className="size-5" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">
             New Dispatch
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Create a new commodity dispatch between locations
           </p>
         </div>
@@ -226,32 +226,32 @@ export default function NewDispatchPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          <div className="rounded-md border border-[var(--red)]/30 bg-[var(--red-bg)] px-4 py-3 text-sm text-[var(--red)]">
             {error}
           </div>
         )}
 
         {/* Locations */}
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-[var(--bg-off)]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
               Locations
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                   Origin Location
                 </Label>
                 <Select value={originLocationId} onValueChange={(val) => setOriginLocationId(val ?? '')}>
-                  <SelectTrigger className="w-full bg-zinc-950 border-zinc-700 text-zinc-100">
+                  <SelectTrigger className="w-full bg-background border-border text-foreground">
                     <SelectValue placeholder="Select origin" />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-900 border-zinc-700">
+                  <SelectContent className="bg-[var(--bg-off)] border-border">
                     {locations.map((loc) => (
-                      <SelectItem key={loc.id} value={loc.id} className="text-zinc-200 focus:bg-zinc-800">
-                        <span className="font-mono text-amber-500 mr-2">{loc.code}</span>
+                      <SelectItem key={loc.id} value={loc.id} className="text-foreground focus:bg-muted">
+                        <span className="font-mono text-[var(--accent)] mr-2">{loc.code}</span>
                         {loc.name}
                       </SelectItem>
                     ))}
@@ -260,17 +260,17 @@ export default function NewDispatchPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                   Destination Location
                 </Label>
                 <Select value={destLocationId} onValueChange={(val) => setDestLocationId(val ?? '')}>
-                  <SelectTrigger className="w-full bg-zinc-950 border-zinc-700 text-zinc-100">
+                  <SelectTrigger className="w-full bg-background border-border text-foreground">
                     <SelectValue placeholder="Select destination" />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-900 border-zinc-700">
+                  <SelectContent className="bg-[var(--bg-off)] border-border">
                     {locations.map((loc) => (
-                      <SelectItem key={loc.id} value={loc.id} className="text-zinc-200 focus:bg-zinc-800">
-                        <span className="font-mono text-amber-500 mr-2">{loc.code}</span>
+                      <SelectItem key={loc.id} value={loc.id} className="text-foreground focus:bg-muted">
+                        <span className="font-mono text-[var(--accent)] mr-2">{loc.code}</span>
                         {loc.name}
                       </SelectItem>
                     ))}
@@ -282,17 +282,17 @@ export default function NewDispatchPage() {
         </Card>
 
         {/* Transport Details */}
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-[var(--bg-off)]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
               Transport Details
-              <span className="text-zinc-600 normal-case font-sans ml-2">(optional)</span>
+              <span className="text-[var(--text-dim)] normal-case font-sans ml-2">(optional)</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="transporter" className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                <Label htmlFor="transporter" className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                   Transporter Name
                 </Label>
                 <Input
@@ -300,11 +300,11 @@ export default function NewDispatchPage() {
                   value={transporterName}
                   onChange={(e) => setTransporterName(e.target.value)}
                   placeholder="Transport company name"
-                  className="bg-zinc-950 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="vehicle" className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                <Label htmlFor="vehicle" className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                   Vehicle Number
                 </Label>
                 <Input
@@ -312,11 +312,11 @@ export default function NewDispatchPage() {
                   value={vehicleNumber}
                   onChange={(e) => setVehicleNumber(e.target.value)}
                   placeholder="e.g. KA-01-AB-1234"
-                  className="bg-zinc-950 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="driver" className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                <Label htmlFor="driver" className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                   Driver Name
                 </Label>
                 <Input
@@ -324,11 +324,11 @@ export default function NewDispatchPage() {
                   value={driverName}
                   onChange={(e) => setDriverName(e.target.value)}
                   placeholder="Driver full name"
-                  className="bg-zinc-950 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone" className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                <Label htmlFor="phone" className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                   Driver Phone
                 </Label>
                 <Input
@@ -336,12 +336,12 @@ export default function NewDispatchPage() {
                   value={driverPhone}
                   onChange={(e) => setDriverPhone(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="bg-zinc-950 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
                 />
               </div>
             </div>
             <div className="mt-4 space-y-2">
-              <Label htmlFor="notes" className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+              <Label htmlFor="notes" className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                 Notes
               </Label>
               <Textarea
@@ -350,17 +350,17 @@ export default function NewDispatchPage() {
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Any additional notes for this dispatch..."
                 rows={3}
-                className="bg-zinc-950 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
               />
             </div>
           </CardContent>
         </Card>
 
         {/* Items */}
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="border-border bg-[var(--bg-off)]">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                 Dispatch Items ({items.length})
               </CardTitle>
               <Button
@@ -368,7 +368,7 @@ export default function NewDispatchPage() {
                 variant="outline"
                 size="sm"
                 onClick={addItem}
-                className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+                className="border-border text-[var(--text-body)] hover:bg-muted hover:text-foreground"
               >
                 <Plus className="size-3.5 mr-1" />
                 Add Item
@@ -378,37 +378,37 @@ export default function NewDispatchPage() {
           <CardContent className="p-0">
             <Table>
               <TableHeader>
-                <TableRow className="border-zinc-800 hover:bg-transparent">
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6">
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground pl-6">
                     Commodity
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                     Unit
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                     Quantity
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                     Bags
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 w-12 pr-6" />
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground w-12 pr-6" />
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {items.map((item) => (
-                  <TableRow key={item.key} className="border-zinc-800/60 hover:bg-zinc-800/30">
+                  <TableRow key={item.key} className="border-border hover:bg-muted/30">
                     <TableCell className="pl-6">
                       <Select
                         value={item.commodity_id}
                         onValueChange={(val) => updateItem(item.key, 'commodity_id', val ?? '')}
                       >
-                        <SelectTrigger className="w-full min-w-[180px] bg-zinc-950 border-zinc-700 text-zinc-100">
+                        <SelectTrigger className="w-full min-w-[180px] bg-background border-border text-foreground">
                           <SelectValue placeholder="Select commodity" />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-900 border-zinc-700">
+                        <SelectContent className="bg-[var(--bg-off)] border-border">
                           {commodities.map((c) => (
-                            <SelectItem key={c.id} value={c.id} className="text-zinc-200 focus:bg-zinc-800">
-                              <span className="font-mono text-amber-500 mr-2">{c.code}</span>
+                            <SelectItem key={c.id} value={c.id} className="text-foreground focus:bg-muted">
+                              <span className="font-mono text-[var(--accent)] mr-2">{c.code}</span>
                               {c.name}
                             </SelectItem>
                           ))}
@@ -420,14 +420,14 @@ export default function NewDispatchPage() {
                         value={item.unit_id}
                         onValueChange={(val) => updateItem(item.key, 'unit_id', val ?? '')}
                       >
-                        <SelectTrigger className="w-full min-w-[120px] bg-zinc-950 border-zinc-700 text-zinc-100">
+                        <SelectTrigger className="w-full min-w-[120px] bg-background border-border text-foreground">
                           <SelectValue placeholder="Select unit" />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-900 border-zinc-700">
+                        <SelectContent className="bg-[var(--bg-off)] border-border">
                           {units.map((u) => (
-                            <SelectItem key={u.id} value={u.id} className="text-zinc-200 focus:bg-zinc-800">
+                            <SelectItem key={u.id} value={u.id} className="text-foreground focus:bg-muted">
                               {u.name}
-                              <span className="text-zinc-500 ml-1">({u.abbreviation})</span>
+                              <span className="text-muted-foreground ml-1">({u.abbreviation})</span>
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -441,7 +441,7 @@ export default function NewDispatchPage() {
                         value={item.sent_quantity}
                         onChange={(e) => updateItem(item.key, 'sent_quantity', e.target.value)}
                         placeholder="0.00"
-                        className="w-28 bg-zinc-950 border-zinc-700 text-zinc-100 font-mono placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                        className="w-28 bg-background border-border text-foreground font-mono placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
                       />
                     </TableCell>
                     <TableCell>
@@ -452,7 +452,7 @@ export default function NewDispatchPage() {
                         value={item.sent_bags}
                         onChange={(e) => updateItem(item.key, 'sent_bags', e.target.value)}
                         placeholder="0"
-                        className="w-20 bg-zinc-950 border-zinc-700 text-zinc-100 font-mono placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                        className="w-20 bg-background border-border text-foreground font-mono placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
                       />
                     </TableCell>
                     <TableCell className="pr-6">
@@ -462,7 +462,7 @@ export default function NewDispatchPage() {
                         size="icon-sm"
                         onClick={() => removeItem(item.key)}
                         disabled={items.length <= 1}
-                        className="text-zinc-500 hover:text-red-400 disabled:opacity-30"
+                        className="text-muted-foreground hover:text-[var(--red)] disabled:opacity-30"
                       >
                         <Trash2 className="size-3.5" />
                       </Button>
@@ -480,7 +480,7 @@ export default function NewDispatchPage() {
             <Button
               type="button"
               variant="outline"
-              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+              className="border-border text-[var(--text-body)] hover:bg-muted"
             >
               Cancel
             </Button>
@@ -488,7 +488,7 @@ export default function NewDispatchPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="bg-amber-600 text-zinc-950 hover:bg-amber-500 font-medium"
+            className="bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 font-medium"
           >
             {loading && <Loader2 className="size-4 mr-1 animate-spin" />}
             Create Dispatch

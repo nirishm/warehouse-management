@@ -59,7 +59,7 @@ export function LocationActions({ location, tenantSlug }: LocationActionsProps) 
           <Button
             variant="ghost"
             size="icon-sm"
-            className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+            className="text-[var(--text-muted)] hover:text-foreground hover:bg-muted"
           >
             <Pencil className="size-3.5" />
           </Button>
@@ -73,7 +73,7 @@ export function LocationActions({ location, tenantSlug }: LocationActionsProps) 
               variant="ghost"
               size="icon-sm"
               disabled={loading}
-              className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+              className="text-[var(--text-muted)] hover:text-foreground hover:bg-muted"
             >
               <MoreHorizontal className="size-3.5" />
             </Button>
@@ -81,11 +81,11 @@ export function LocationActions({ location, tenantSlug }: LocationActionsProps) 
         />
         <DropdownMenuContent
           align="end"
-          className="bg-zinc-900 border-zinc-700 min-w-[160px]"
+          className="bg-[var(--bg-off)] border-border min-w-[160px]"
         >
           <DropdownMenuItem
             onClick={toggleActive}
-            className="text-zinc-300 focus:bg-zinc-800 focus:text-zinc-100 gap-2"
+            className="text-[var(--text-body)] focus:bg-muted focus:text-foreground gap-2"
           >
             {location.is_active ? (
               <>
@@ -99,7 +99,7 @@ export function LocationActions({ location, tenantSlug }: LocationActionsProps) 
               </>
             )}
           </DropdownMenuItem>
-          <DropdownMenuSeparator className="bg-zinc-700" />
+          <DropdownMenuSeparator className="bg-muted" />
           <DropdownMenuItem
             onClick={handleDelete}
             variant="destructive"

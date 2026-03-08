@@ -22,14 +22,14 @@ interface StockTableProps {
 }
 
 function StockValue({ value, variant }: { value: number; variant: 'stock' | 'transit' | 'neutral' }) {
-  let colorClass = 'text-zinc-400';
+  let colorClass = 'text-[var(--text-muted)]';
 
   if (variant === 'stock') {
-    if (value > 0) colorClass = 'text-emerald-400';
-    else if (value < 0) colorClass = 'text-red-400';
-    else colorClass = 'text-zinc-500';
+    if (value > 0) colorClass = 'text-[var(--green)]';
+    else if (value < 0) colorClass = 'text-[var(--red)]';
+    else colorClass = 'text-muted-foreground';
   } else if (variant === 'transit') {
-    colorClass = value > 0 ? 'text-amber-400' : 'text-zinc-500';
+    colorClass = value > 0 ? 'text-[var(--accent)]' : 'text-muted-foreground';
   }
 
   return (
@@ -64,9 +64,9 @@ export function StockTable({
   );
 
   return (
-    <Card className="border-zinc-800 bg-zinc-900/60">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 border-b border-zinc-800">
-        <span className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+    <Card className="border-border bg-[var(--bg-off)]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 border-b border-border">
+        <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
           Filters
         </span>
 
@@ -74,7 +74,7 @@ export function StockTable({
           <select
             value={activeLocationId ?? ''}
             onChange={(e) => updateFilter('locationId', e.target.value)}
-            className="h-8 rounded-lg border border-zinc-700 bg-zinc-800 px-3 text-sm text-zinc-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50"
+            className="h-8 rounded-lg border border-border bg-muted px-3 text-sm text-foreground outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/50"
           >
             <option value="">All Locations</option>
             {locations.map((loc) => (
@@ -87,7 +87,7 @@ export function StockTable({
           <select
             value={activeCommodityId ?? ''}
             onChange={(e) => updateFilter('commodityId', e.target.value)}
-            className="h-8 rounded-lg border border-zinc-700 bg-zinc-800 px-3 text-sm text-zinc-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50"
+            className="h-8 rounded-lg border border-border bg-muted px-3 text-sm text-foreground outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/50"
           >
             <option value="">All Commodities</option>
             {commodities.map((com) => (
@@ -101,7 +101,7 @@ export function StockTable({
         {(activeLocationId || activeCommodityId) && (
           <button
             onClick={() => router.push(pathname)}
-            className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
+            className="text-xs font-mono text-[var(--accent)] hover:text-[var(--accent)] underline underline-offset-2"
           >
             Clear filters
           </button>
@@ -110,33 +110,33 @@ export function StockTable({
 
       <Table>
         <TableHeader>
-          <TableRow className="border-zinc-800 hover:bg-transparent">
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <TableRow className="border-border hover:bg-transparent">
+            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
               Location
             </TableHead>
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
               Commodity
             </TableHead>
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
               Current Stock
             </TableHead>
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
               In Transit
             </TableHead>
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
               Total In
             </TableHead>
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
               Total Out
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {stockLevels.length === 0 ? (
-            <TableRow className="border-zinc-800">
+            <TableRow className="border-border">
               <TableCell
                 colSpan={6}
-                className="h-24 text-center text-zinc-500 font-mono text-sm"
+                className="h-24 text-center text-muted-foreground font-mono text-sm"
               >
                 No stock data found
               </TableCell>
@@ -145,41 +145,41 @@ export function StockTable({
             stockLevels.map((row) => (
               <TableRow
                 key={`${row.location_id}-${row.commodity_id}-${row.unit_id}`}
-                className="border-zinc-800 hover:bg-zinc-800/50"
+                className="border-border hover:bg-muted/50"
               >
-                <TableCell className="text-zinc-200 text-sm">
-                  <span className="font-mono text-amber-500 text-xs mr-2">
+                <TableCell className="text-foreground text-sm">
+                  <span className="font-mono text-[var(--accent)] text-xs mr-2">
                     {row.location?.code ?? '---'}
                   </span>
                   {row.location?.name ?? 'Unknown'}
                 </TableCell>
-                <TableCell className="text-zinc-200 text-sm">
-                  <span className="font-mono text-amber-500 text-xs mr-2">
+                <TableCell className="text-foreground text-sm">
+                  <span className="font-mono text-[var(--accent)] text-xs mr-2">
                     {row.commodity?.code ?? '---'}
                   </span>
                   {row.commodity?.name ?? 'Unknown'}
                 </TableCell>
                 <TableCell className="text-right">
                   <StockValue value={row.current_stock} variant="stock" />
-                  <span className="text-zinc-600 text-xs font-mono ml-1">
+                  <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
                     {row.unit?.abbreviation ?? ''}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <StockValue value={row.in_transit} variant="transit" />
-                  <span className="text-zinc-600 text-xs font-mono ml-1">
+                  <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
                     {row.unit?.abbreviation ?? ''}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <StockValue value={row.total_in} variant="neutral" />
-                  <span className="text-zinc-600 text-xs font-mono ml-1">
+                  <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
                     {row.unit?.abbreviation ?? ''}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <StockValue value={row.total_out} variant="neutral" />
-                  <span className="text-zinc-600 text-xs font-mono ml-1">
+                  <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
                     {row.unit?.abbreviation ?? ''}
                   </span>
                 </TableCell>
@@ -190,8 +190,8 @@ export function StockTable({
       </Table>
 
       {stockLevels.length > 0 && (
-        <div className="px-4 py-3 border-t border-zinc-800">
-          <p className="text-xs font-mono text-zinc-600">
+        <div className="px-4 py-3 border-t border-border">
+          <p className="text-xs font-mono text-[var(--text-dim)]">
             {stockLevels.length} {stockLevels.length === 1 ? 'row' : 'rows'}
           </p>
         </div>

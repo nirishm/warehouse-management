@@ -150,19 +150,19 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
           trigger ? (
             <span>{trigger}</span>
           ) : (
-            <Button className="bg-amber-500 text-zinc-950 hover:bg-amber-400">
+            <Button className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)]">
               <Plus className="size-4 mr-1" />
               New Commodity
             </Button>
           )
         }
       />
-      <DialogContent className="bg-zinc-950 border border-zinc-800 sm:max-w-md">
+      <DialogContent className="bg-background border border-border sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-zinc-100 font-mono uppercase tracking-wider text-sm">
+          <DialogTitle className="text-foreground font-mono uppercase tracking-wider text-sm">
             {isEdit ? 'Edit Commodity' : 'New Commodity'}
           </DialogTitle>
-          <DialogDescription className="text-zinc-500 text-xs">
+          <DialogDescription className="text-foreground0 text-xs">
             {isEdit
               ? 'Update the commodity details below.'
               : 'Add a new commodity to your inventory.'}
@@ -171,14 +171,14 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="rounded-md border border-red-900/50 bg-red-950/30 px-3 py-2 text-sm text-red-400">
+            <div className="rounded-md border border-[var(--red)]/50 bg-[var(--red-bg)] px-3 py-2 text-sm text-[var(--red)]">
               {error}
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="commodity-name" className="text-zinc-400 font-mono text-xs uppercase tracking-wider">
+              <Label htmlFor="commodity-name" className="text-[var(--text-muted)] font-mono text-xs uppercase tracking-wider">
                 Name
               </Label>
               <Input
@@ -187,11 +187,11 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Wheat Grain"
                 required
-                className="border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-600"
+                className="border-border bg-[var(--bg-off)] text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="commodity-code" className="text-zinc-400 font-mono text-xs uppercase tracking-wider">
+              <Label htmlFor="commodity-code" className="text-[var(--text-muted)] font-mono text-xs uppercase tracking-wider">
                 Code
               </Label>
               <Input
@@ -201,13 +201,13 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
                 placeholder="WHT-001"
                 required
                 pattern="^[A-Z0-9-]+$"
-                className="border-zinc-800 bg-zinc-900 text-zinc-100 font-mono placeholder:text-zinc-600"
+                className="border-border bg-[var(--bg-off)] text-foreground font-mono placeholder:text-muted-foreground"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="commodity-category" className="text-zinc-400 font-mono text-xs uppercase tracking-wider">
+            <Label htmlFor="commodity-category" className="text-[var(--text-muted)] font-mono text-xs uppercase tracking-wider">
               Category
             </Label>
             <Input
@@ -215,24 +215,24 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
               placeholder="Grains"
-              className="border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-600"
+              className="border-border bg-[var(--bg-off)] text-foreground placeholder:text-muted-foreground"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="commodity-unit" className="text-zinc-400 font-mono text-xs uppercase tracking-wider">
+            <Label htmlFor="commodity-unit" className="text-[var(--text-muted)] font-mono text-xs uppercase tracking-wider">
               Default Unit
             </Label>
             <Select
               value={form.default_unit_id || undefined}
               onValueChange={(val) => setForm({ ...form, default_unit_id: val as string })}
             >
-              <SelectTrigger className="w-full border-zinc-800 bg-zinc-900 text-zinc-100">
+              <SelectTrigger className="w-full border-border bg-[var(--bg-off)] text-foreground">
                 <SelectValue placeholder="Select a unit" />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-950 border-zinc-800">
+              <SelectContent className="bg-background border-border">
                 {units.map((unit) => (
-                  <SelectItem key={unit.id} value={unit.id} className="text-zinc-200">
+                  <SelectItem key={unit.id} value={unit.id} className="text-foreground">
                     {unit.name} ({unit.abbreviation})
                   </SelectItem>
                 ))}
@@ -241,7 +241,7 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="commodity-description" className="text-zinc-400 font-mono text-xs uppercase tracking-wider">
+            <Label htmlFor="commodity-description" className="text-[var(--text-muted)] font-mono text-xs uppercase tracking-wider">
               Description
             </Label>
             <Textarea
@@ -250,15 +250,15 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="Optional description..."
               rows={2}
-              className="border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-600 min-h-[60px]"
+              className="border-border bg-[var(--bg-off)] text-foreground placeholder:text-muted-foreground min-h-[60px]"
             />
           </div>
 
-          <DialogFooter className="border-zinc-800 bg-zinc-900/50">
+          <DialogFooter className="border-border bg-[var(--bg-off)]">
             <Button
               type="submit"
               disabled={loading}
-              className="bg-amber-500 text-zinc-950 hover:bg-amber-400 disabled:opacity-50"
+              className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)] disabled:opacity-50"
             >
               {loading ? 'Saving...' : isEdit ? 'Update' : 'Create'}
             </Button>

@@ -12,7 +12,7 @@ export function ModuleGate({ moduleId, children, fallback }: ModuleGateProps) {
   const tenant = useTenant();
   if (!tenant.enabledModules.includes(moduleId)) {
     return fallback ?? (
-      <div className="flex items-center justify-center h-64 text-zinc-500">
+      <div className="flex items-center justify-center h-64 text-muted-foreground">
         <p>This module is not enabled for your organization.</p>
       </div>
     );

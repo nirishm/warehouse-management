@@ -44,14 +44,14 @@ export function TenantModulesManager({ tenantId, enabledModules, modules }: Prop
   }
 
   return (
-    <Card className="border-zinc-800 bg-zinc-900/60">
+    <Card className="border-border bg-card">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-zinc-200 text-base">Enabled Modules</CardTitle>
+        <CardTitle className="text-foreground text-base">Enabled Modules</CardTitle>
         <Button
           onClick={handleSave}
           disabled={saving}
           size="sm"
-          className="bg-amber-600 hover:bg-amber-500 text-zinc-950 font-semibold"
+          className="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white font-semibold"
         >
           {saving ? 'Saving...' : 'Save Changes'}
         </Button>
@@ -64,15 +64,15 @@ export function TenantModulesManager({ tenantId, enabledModules, modules }: Prop
               onClick={() => toggleModule(mod)}
               className={`p-3 rounded-lg border text-left text-sm transition-all ${
                 enabled.includes(mod)
-                  ? 'border-amber-500/40 bg-amber-500/5 text-zinc-200'
-                  : 'border-zinc-800 bg-zinc-900/30 text-zinc-500 hover:border-zinc-700'
+                  ? 'border-[var(--accent)]/30 bg-[var(--accent-tint)] text-foreground'
+                  : 'border-border bg-muted/50 text-muted-foreground hover:border-border'
               }`}
             >
               <span className="font-mono text-xs uppercase tracking-wider">
                 {mod.replace(/_/g, ' ')}
               </span>
               {enabled.includes(mod) && (
-                <Badge className="mt-2 bg-amber-500/10 text-amber-500 border-amber-500/20 text-[10px]">
+                <Badge className="mt-2 bg-[var(--accent-tint)] text-[var(--accent)] border-[var(--accent)]/20 text-[10px]">
                   Active
                 </Badge>
               )}

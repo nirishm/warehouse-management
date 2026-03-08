@@ -63,17 +63,17 @@ const DATE_FORMAT_OPTIONS = [
 ];
 
 const STATUS_STYLES: Record<string, string> = {
-  active: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  trial: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  suspended: 'bg-red-500/10 text-red-400 border-red-500/20',
-  inactive: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
+  active: 'bg-[var(--green)]/10 text-[var(--green)] border-[var(--green)]/20',
+  trial: 'bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/20',
+  suspended: 'bg-[var(--red)]/10 text-[var(--red)] border-[var(--red)]/20',
+  inactive: 'bg-muted/50 text-[var(--text-muted)] border-border',
 };
 
 const PLAN_STYLES: Record<string, string> = {
-  free: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
-  starter: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  pro: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  enterprise: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  free: 'bg-muted/50 text-[var(--text-muted)] border-border',
+  starter: 'bg-[var(--blue-bg)] text-[var(--blue)] border-[var(--blue)]/20',
+  pro: 'bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/20',
+  enterprise: 'bg-[var(--green)]/10 text-[var(--green)] border-[var(--green)]/20',
 };
 
 function getPreference(key: string, fallback: string): string {
@@ -156,9 +156,9 @@ export function SettingsClient({
   return (
     <div className="space-y-6">
       {/* Section 1: Organization Info */}
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
             Organization Info
           </CardTitle>
         </CardHeader>
@@ -166,7 +166,7 @@ export function SettingsClient({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Tenant Name */}
             <div className="space-y-2">
-              <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+              <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                 Organization Name
               </Label>
               {isAdmin ? (
@@ -174,35 +174,35 @@ export function SettingsClient({
                   <Input
                     value={tenantName}
                     onChange={(e) => setTenantName(e.target.value)}
-                    className="bg-zinc-950 border-zinc-800 text-zinc-100 focus:border-amber-600"
+                    className="bg-background border-border text-foreground focus:border-[var(--accent)]"
                     placeholder="Organization name"
                   />
                   <Button
                     onClick={handleSaveName}
                     disabled={saving || tenantName === tenant.name || !tenantName.trim()}
-                    className="bg-amber-600 hover:bg-amber-700 text-white shrink-0"
+                    className="bg-[var(--accent)] hover:bg-[var(--accent)] text-white shrink-0"
                   >
                     {saving ? 'Saving...' : 'Save'}
                   </Button>
                 </div>
               ) : (
-                <p className="text-sm text-zinc-200 py-2">{tenant.name}</p>
+                <p className="text-sm text-foreground py-2">{tenant.name}</p>
               )}
             </div>
 
             {/* Slug */}
             <div className="space-y-2">
-              <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+              <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                 Slug
               </Label>
-              <p className="text-sm text-zinc-400 font-mono py-2 bg-zinc-950 border border-zinc-800 rounded-md px-3">
+              <p className="text-sm text-[var(--text-muted)] font-mono py-2 bg-background border border-border rounded-md px-3">
                 {tenant.slug}
               </p>
             </div>
 
             {/* Plan */}
             <div className="space-y-2">
-              <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+              <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                 Plan
               </Label>
               <div className="py-2">
@@ -218,7 +218,7 @@ export function SettingsClient({
 
             {/* Status */}
             <div className="space-y-2">
-              <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+              <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                 Status
               </Label>
               <div className="py-2">
@@ -237,7 +237,7 @@ export function SettingsClient({
           {saveMessage && (
             <p
               className={`text-sm font-mono ${
-                saveMessage.type === 'success' ? 'text-emerald-400' : 'text-red-400'
+                saveMessage.type === 'success' ? 'text-[var(--green)]' : 'text-[var(--red)]'
               }`}
             >
               {saveMessage.text}
@@ -247,12 +247,12 @@ export function SettingsClient({
       </Card>
 
       {/* Section 2: Enabled Modules */}
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
             Enabled Modules
           </CardTitle>
-          <p className="text-xs text-zinc-600 mt-1">
+          <p className="text-xs text-[var(--text-dim)] mt-1">
             Module access is managed by the platform administrator.
           </p>
         </CardHeader>
@@ -265,8 +265,8 @@ export function SettingsClient({
                   key={mod.id}
                   className={`rounded-lg border p-4 transition-colors ${
                     isEnabled
-                      ? 'border-amber-500/30 bg-amber-500/5'
-                      : 'border-zinc-800 bg-zinc-950/50 opacity-50'
+                      ? 'border-[var(--accent)]/30 bg-[var(--accent)]/5'
+                      : 'border-border bg-background/50 opacity-50'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-2">
@@ -276,22 +276,22 @@ export function SettingsClient({
                     <Badge
                       className={`text-[10px] font-mono ${
                         isEnabled
-                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                          : 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20'
+                          ? 'bg-[var(--green)]/10 text-[var(--green)] border-[var(--green)]/20'
+                          : 'bg-muted/50 text-foreground0 border-border'
                       }`}
                     >
                       {isEnabled ? 'Enabled' : 'Disabled'}
                     </Badge>
                   </div>
-                  <h3 className="text-sm font-medium text-zinc-200">{mod.name}</h3>
-                  <p className="text-xs text-zinc-500 mt-1 line-clamp-2">{mod.description}</p>
+                  <h3 className="text-sm font-medium text-foreground">{mod.name}</h3>
+                  <p className="text-xs text-foreground0 mt-1 line-clamp-2">{mod.description}</p>
                 </div>
               );
             })}
           </div>
 
           {allModules.length === 0 && (
-            <p className="text-sm text-zinc-500 font-mono text-center py-8">
+            <p className="text-sm text-foreground0 font-mono text-center py-8">
               No modules registered
             </p>
           )}
@@ -299,12 +299,12 @@ export function SettingsClient({
       </Card>
 
       {/* Section 3: Preferences (client-side) */}
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
             Preferences
           </CardTitle>
-          <p className="text-xs text-zinc-600 mt-1">
+          <p className="text-xs text-[var(--text-dim)] mt-1">
             These preferences are stored locally in your browser.
           </p>
         </CardHeader>
@@ -312,19 +312,19 @@ export function SettingsClient({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Currency */}
             <div className="space-y-2">
-              <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+              <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                 Currency
               </Label>
               <Select value={currency} onValueChange={handleCurrencyChange}>
-                <SelectTrigger className="bg-zinc-950 border-zinc-800 text-zinc-100 focus:border-amber-600">
+                <SelectTrigger className="bg-background border-border text-foreground focus:border-[var(--accent)]">
                   <SelectValue placeholder="Select currency" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-900 border-zinc-800">
+                <SelectContent className="bg-[var(--bg-off)] border-border">
                   {CURRENCY_OPTIONS.map((opt) => (
                     <SelectItem
                       key={opt.value}
                       value={opt.value}
-                      className="text-zinc-200 focus:bg-zinc-800 focus:text-zinc-100"
+                      className="text-foreground focus:bg-muted focus:text-foreground"
                     >
                       {opt.label}
                     </SelectItem>
@@ -335,19 +335,19 @@ export function SettingsClient({
 
             {/* Date Format */}
             <div className="space-y-2">
-              <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+              <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                 Date Format
               </Label>
               <Select value={dateFormat} onValueChange={handleDateFormatChange}>
-                <SelectTrigger className="bg-zinc-950 border-zinc-800 text-zinc-100 focus:border-amber-600">
+                <SelectTrigger className="bg-background border-border text-foreground focus:border-[var(--accent)]">
                   <SelectValue placeholder="Select date format" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-900 border-zinc-800">
+                <SelectContent className="bg-[var(--bg-off)] border-border">
                   {DATE_FORMAT_OPTIONS.map((opt) => (
                     <SelectItem
                       key={opt.value}
                       value={opt.value}
-                      className="text-zinc-200 focus:bg-zinc-800 focus:text-zinc-100"
+                      className="text-foreground focus:bg-muted focus:text-foreground"
                     >
                       {opt.label}
                     </SelectItem>
@@ -358,13 +358,13 @@ export function SettingsClient({
 
             {/* Timezone */}
             <div className="space-y-2">
-              <Label className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+              <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
                 Timezone
               </Label>
-              <p className="text-sm text-zinc-400 font-mono py-2 bg-zinc-950 border border-zinc-800 rounded-md px-3">
+              <p className="text-sm text-[var(--text-muted)] font-mono py-2 bg-background border border-border rounded-md px-3">
                 {timezone || 'Detecting...'}
               </p>
-              <p className="text-[10px] text-zinc-600 font-mono">
+              <p className="text-[10px] text-[var(--text-dim)] font-mono">
                 Auto-detected from your browser
               </p>
             </div>

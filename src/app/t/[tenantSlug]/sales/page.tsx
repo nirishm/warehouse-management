@@ -20,10 +20,10 @@ interface Props {
 }
 
 const statusColors: Record<SaleStatus, string> = {
-  draft: 'bg-zinc-500/15 text-zinc-400 border border-zinc-500/30',
-  confirmed: 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
-  dispatched: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-  cancelled: 'bg-red-500/15 text-red-400 border border-red-500/30',
+  draft: 'bg-muted/50 text-[var(--text-muted)] border border-border',
+  confirmed: 'bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent)]/20',
+  dispatched: 'bg-[var(--green-bg)] text-[var(--green)] border border-[var(--green)]/20',
+  cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border border-[var(--red)]/20',
 };
 
 function formatDate(dateStr: string): string {
@@ -69,15 +69,15 @@ export default async function SalesPage({ params }: Props) {
       <RealtimeListener table="sales" />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">
             Sales
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Record outgoing goods to customers
           </p>
         </div>
         <Link href={`/t/${tenantSlug}/sales/new`}>
-          <Button className="bg-amber-600 hover:bg-amber-500 text-zinc-950 font-medium">
+          <Button className="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white font-medium">
             New Sale
           </Button>
         </Link>
@@ -89,14 +89,14 @@ export default async function SalesPage({ params }: Props) {
           { label: 'Confirmed', value: totalConfirmed },
           { label: 'Dispatched', value: totalDispatched },
         ].map((stat) => (
-          <Card key={stat.label} className="border-zinc-800 bg-zinc-900/60">
+          <Card key={stat.label} className="border-border bg-card">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                 {stat.label}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-zinc-100 font-mono">
+              <p className="text-3xl font-bold text-foreground font-mono">
                 {stat.value}
               </p>
             </CardContent>
@@ -104,15 +104,15 @@ export default async function SalesPage({ params }: Props) {
         ))}
       </div>
 
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
             All Sales ({sales.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {sales.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <p className="text-sm font-mono">No sales found</p>
               <p className="text-xs mt-1">
                 Create your first sale to get started
@@ -122,23 +122,23 @@ export default async function SalesPage({ params }: Props) {
             <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-zinc-800 hover:bg-transparent">
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6">
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground pl-6">
                     Sale #
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                     Location
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                     Status
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                     Date
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
                     Items
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right pr-6">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right pr-6">
                     Total Value
                   </TableHead>
                 </TableRow>
@@ -150,26 +150,26 @@ export default async function SalesPage({ params }: Props) {
                   return (
                     <TableRow
                       key={sale.id}
-                      className="border-zinc-800/60 hover:bg-zinc-800/30"
+                      className="border-border hover:bg-muted"
                     >
                       <TableCell className="pl-6">
                         <Link
                           href={`/t/${tenantSlug}/sales/${sale.id}`}
-                          className="font-mono text-sm text-amber-500 hover:text-amber-400 font-medium"
+                          className="font-mono text-sm text-[var(--accent)] hover:text-[var(--accent)] font-medium"
                         >
                           {sale.sale_number}
                         </Link>
                       </TableCell>
-                      <TableCell className="text-sm text-zinc-200">
+                      <TableCell className="text-sm text-foreground">
                         {sale.location ? (
                           <>
-                            <span className="font-mono text-amber-500 text-xs mr-2">
+                            <span className="font-mono text-[var(--accent)] text-xs mr-2">
                               {sale.location.code}
                             </span>
                             {sale.location.name}
                           </>
                         ) : (
-                          <span className="text-zinc-500">--</span>
+                          <span className="text-muted-foreground">--</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -179,13 +179,13 @@ export default async function SalesPage({ params }: Props) {
                           {sale.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-sm text-zinc-400 font-mono">
+                      <TableCell className="text-sm text-[var(--text-muted)] font-mono">
                         {formatDate(sale.sold_at ?? sale.created_at)}
                       </TableCell>
-                      <TableCell className="text-sm text-zinc-300 font-mono text-right">
+                      <TableCell className="text-sm text-[var(--text-body)] font-mono text-right">
                         {itemCount}
                       </TableCell>
-                      <TableCell className="text-sm text-zinc-300 font-mono text-right pr-6">
+                      <TableCell className="text-sm text-[var(--text-body)] font-mono text-right pr-6">
                         {total > 0
                           ? total.toLocaleString('en-IN', {
                               minimumFractionDigits: 2,

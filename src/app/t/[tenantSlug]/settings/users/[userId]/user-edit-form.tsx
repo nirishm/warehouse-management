@@ -129,9 +129,9 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
   const isAdmin = user.role === 'tenant_admin';
 
   const roleColors: Record<string, string> = {
-    tenant_admin: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+    tenant_admin: 'bg-[var(--accent)]/15 text-[var(--accent)] border-[var(--accent)]/30',
     manager: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-    employee: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
+    employee: 'bg-muted/50 text-[var(--text-muted)] border-border',
   };
 
   const roleLabels: Record<string, string> = {
@@ -143,10 +143,10 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
   return (
     <div className="space-y-6">
       {/* Profile Info */}
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
               Profile Information
             </CardTitle>
             <span
@@ -161,7 +161,7 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
             <div className="space-y-2">
               <Label
                 htmlFor="display_name"
-                className="text-xs font-mono uppercase tracking-wider text-zinc-500"
+                className="text-xs font-mono uppercase tracking-wider text-foreground0"
               >
                 Display Name
               </Label>
@@ -169,14 +169,14 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
                 id="display_name"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="bg-zinc-950 border-zinc-800 text-zinc-200 font-mono"
+                className="bg-background border-border text-foreground font-mono"
                 placeholder="Enter display name"
               />
             </div>
             <div className="space-y-2">
               <Label
                 htmlFor="phone"
-                className="text-xs font-mono uppercase tracking-wider text-zinc-500"
+                className="text-xs font-mono uppercase tracking-wider text-foreground0"
               >
                 Phone
               </Label>
@@ -184,7 +184,7 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
                 id="phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="bg-zinc-950 border-zinc-800 text-zinc-200 font-mono"
+                className="bg-background border-border text-foreground font-mono"
                 placeholder="Enter phone number"
               />
             </div>
@@ -196,8 +196,8 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
               role="switch"
               aria-checked={isActive}
               onClick={() => setIsActive(!isActive)}
-              className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border border-zinc-700 transition-colors ${
-                isActive ? 'bg-emerald-600' : 'bg-zinc-800'
+              className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border border-border transition-colors ${
+                isActive ? 'bg-[var(--green)]' : 'bg-muted'
               }`}
             >
               <span
@@ -206,7 +206,7 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
                 }`}
               />
             </button>
-            <Label className="text-sm text-zinc-300">
+            <Label className="text-sm text-[var(--text-body)]">
               {isActive ? 'Active' : 'Inactive'}
             </Label>
           </div>
@@ -214,13 +214,13 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
       </Card>
 
       {/* Permissions */}
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
             Permissions
           </CardTitle>
           {isAdmin && (
-            <p className="text-xs text-amber-500/80 font-mono mt-1">
+            <p className="text-xs text-[var(--accent)]/80 font-mono mt-1">
               Admins have all permissions enabled by default
             </p>
           )}
@@ -238,8 +238,8 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
                     onClick={() => togglePermission(key)}
                     className={`flex items-center gap-3 rounded-lg border p-3 text-left transition-colors ${
                       enabled
-                        ? 'border-amber-500/30 bg-amber-500/5'
-                        : 'border-zinc-800 bg-zinc-950 hover:border-zinc-700'
+                        ? 'border-[var(--accent)]/30 bg-[var(--accent)]/5'
+                        : 'border-border bg-background hover:border-border'
                     } ${isAdmin ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
                   >
                     <div
@@ -247,8 +247,8 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
                       aria-checked={enabled}
                       className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border transition-colors ${
                         enabled
-                          ? 'bg-amber-600 border-amber-500'
-                          : 'bg-zinc-800 border-zinc-700'
+                          ? 'bg-[var(--accent)] border-[var(--accent)]'
+                          : 'bg-muted border-border'
                       }`}
                     >
                       <span
@@ -257,7 +257,7 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
                         }`}
                       />
                     </div>
-                    <span className="text-xs font-mono text-zinc-300">
+                    <span className="text-xs font-mono text-[var(--text-body)]">
                       {PERMISSION_LABELS[key]}
                     </span>
                   </button>
@@ -269,15 +269,15 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
       </Card>
 
       {/* Location Assignments */}
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
             Location Assignments
           </CardTitle>
         </CardHeader>
         <CardContent>
           {availableLocations.length === 0 ? (
-            <p className="text-sm text-zinc-500 font-mono">
+            <p className="text-sm text-foreground0 font-mono">
               No locations available. Create locations in the inventory module first.
             </p>
           ) : (
@@ -291,15 +291,15 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
                     onClick={() => toggleLocation(location.id)}
                     className={`flex items-center gap-3 rounded-lg border p-3 text-left transition-colors cursor-pointer ${
                       isSelected
-                        ? 'border-amber-500/30 bg-amber-500/5'
-                        : 'border-zinc-800 bg-zinc-950 hover:border-zinc-700'
+                        ? 'border-[var(--accent)]/30 bg-[var(--accent)]/5'
+                        : 'border-border bg-background hover:border-border'
                     }`}
                   >
                     <div
                       className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors ${
                         isSelected
-                          ? 'border-amber-500 bg-amber-600'
-                          : 'border-zinc-600 bg-zinc-900'
+                          ? 'border-[var(--accent)] bg-[var(--accent)]'
+                          : 'border-border bg-[var(--bg-off)]'
                       }`}
                     >
                       {isSelected && (
@@ -319,17 +319,17 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <span className="text-xs font-mono text-amber-500 font-medium">
+                      <span className="text-xs font-mono text-[var(--accent)] font-medium">
                         {location.code}
                       </span>
-                      <span className="block text-xs text-zinc-400 truncate">
+                      <span className="block text-xs text-[var(--text-muted)] truncate">
                         {location.name}
                       </span>
                     </div>
                     {!location.is_active && (
                       <Badge
                         variant="secondary"
-                        className="ml-auto bg-zinc-700/50 text-zinc-500 border border-zinc-600/50 text-[10px]"
+                        className="ml-auto bg-muted text-foreground0 border border-border text-[10px]"
                       >
                         Inactive
                       </Badge>
@@ -347,7 +347,7 @@ export function UserEditForm({ user, tenantSlug }: UserEditFormProps) {
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="bg-amber-600 hover:bg-amber-500 text-zinc-950 font-mono font-semibold px-8"
+          className="bg-[var(--accent)] hover:bg-[var(--accent)] text-foreground font-mono font-semibold px-8"
         >
           {saving ? 'Saving...' : 'Save Changes'}
         </Button>

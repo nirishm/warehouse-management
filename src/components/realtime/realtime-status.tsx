@@ -20,11 +20,11 @@ export function RealtimeStatus() {
   return (
     <div className="flex items-center gap-1.5" title={connected ? 'Live updates active' : 'Connecting...'}>
       {connected ? (
-        <Wifi className="size-3.5 text-emerald-500" />
+        <Wifi className="size-3.5 text-[var(--green)]" />
       ) : (
-        <WifiOff className="size-3.5 text-zinc-600" />
+        <WifiOff className="size-3.5 text-[var(--text-dim)]" />
       )}
-      <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">
+      <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-dim)]">
         {connected ? 'Live' : '...'}
       </span>
     </div>

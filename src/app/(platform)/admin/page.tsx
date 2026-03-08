@@ -23,11 +23,11 @@ export default async function AdminDashboard() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">Platform Overview</h1>
-          <p className="text-sm text-zinc-500 mt-1">Manage tenants and monitor platform health</p>
+          <h1 className="text-2xl font-bold font-serif text-foreground tracking-tight">Platform Overview</h1>
+          <p className="text-sm text-muted-foreground mt-1">Manage tenants and monitor platform health</p>
         </div>
         <Link href="/admin/tenants/new">
-          <Button className="bg-amber-600 hover:bg-amber-500 text-zinc-950 font-semibold">
+          <Button className="bg-[var(--accent)] hover:bg-[var(--accent)] text-background font-semibold">
             + New Tenant
           </Button>
         </Link>
@@ -35,14 +35,14 @@ export default async function AdminDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.label} className="border-zinc-800 bg-zinc-900/60">
+          <Card key={stat.label} className="border-border bg-[var(--bg-off)]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                 {stat.label}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-zinc-100 font-mono">{stat.value}</p>
+              <p className="text-3xl font-bold text-foreground font-mono">{stat.value}</p>
             </CardContent>
           </Card>
         ))}

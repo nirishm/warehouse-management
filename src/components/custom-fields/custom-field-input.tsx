@@ -31,10 +31,10 @@ export function CustomFieldInput({
     <div className="space-y-2">
       <Label
         htmlFor={inputId}
-        className="text-xs font-mono uppercase tracking-wider text-zinc-400"
+        className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]"
       >
         {field_label}
-        {is_required && <span className="text-amber-500 ml-1">*</span>}
+        {is_required && <span className="text-[var(--accent)] ml-1">*</span>}
       </Label>
 
       {field_type === 'text' && (
@@ -44,7 +44,7 @@ export function CustomFieldInput({
           value={(value as string) ?? ''}
           onChange={(e) => onChange(e.target.value)}
           required={is_required}
-          className="bg-zinc-950 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+          className=""
         />
       )}
 
@@ -57,7 +57,7 @@ export function CustomFieldInput({
             onChange(e.target.value === '' ? null : Number(e.target.value))
           }
           required={is_required}
-          className="bg-zinc-950 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+          className=""
         />
       )}
 
@@ -68,7 +68,7 @@ export function CustomFieldInput({
           value={(value as string) ?? ''}
           onChange={(e) => onChange(e.target.value || null)}
           required={is_required}
-          className="bg-zinc-950 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+          className=""
         />
       )}
 
@@ -79,11 +79,11 @@ export function CustomFieldInput({
             type="checkbox"
             checked={!!value}
             onChange={(e) => onChange(e.target.checked)}
-            className="size-4 rounded border-zinc-700 bg-zinc-950 text-amber-600 focus:ring-amber-500/20 accent-amber-600"
+            className="size-4 rounded border-border bg-white text-[var(--accent)] focus:ring-[var(--accent)]/20 accent-[var(--accent)]"
           />
           <Label
             htmlFor={inputId}
-            className="text-sm text-zinc-300 cursor-pointer font-normal normal-case tracking-normal"
+            className="text-sm text-[var(--text-body)] cursor-pointer font-normal normal-case tracking-normal"
           >
             {field_label}
           </Label>
@@ -95,15 +95,15 @@ export function CustomFieldInput({
           value={(value as string) ?? ''}
           onValueChange={(val) => onChange(val)}
         >
-          <SelectTrigger className="w-full bg-zinc-950 border-zinc-700 text-zinc-100">
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={`Select ${field_label.toLowerCase()}`} />
           </SelectTrigger>
-          <SelectContent className="bg-zinc-900 border-zinc-700">
+          <SelectContent>
             {(options ?? []).map((opt) => (
               <SelectItem
                 key={opt}
                 value={opt}
-                className="text-zinc-200 focus:bg-zinc-800"
+                className=""
               >
                 {opt}
               </SelectItem>
@@ -134,9 +134,9 @@ export function CustomFieldInput({
                     }
                     onChange(current);
                   }}
-                  className="size-4 rounded border-zinc-700 bg-zinc-950 text-amber-600 focus:ring-amber-500/20 accent-amber-600"
+                  className="size-4 rounded border-border bg-white text-[var(--accent)] focus:ring-[var(--accent)]/20 accent-[var(--accent)]"
                 />
-                <span className="text-sm text-zinc-300">{opt}</span>
+                <span className="text-sm text-[var(--text-body)]">{opt}</span>
               </label>
             );
           })}

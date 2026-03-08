@@ -20,11 +20,11 @@ interface Props {
 }
 
 const statusColors: Record<string, string> = {
-  draft: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
-  dispatched: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  in_transit: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-  received: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  cancelled: 'bg-red-500/15 text-red-400 border-red-500/30',
+  draft: 'bg-muted text-muted-foreground border-border',
+  dispatched: 'bg-[var(--accent-tint)] text-[var(--accent)] border-[var(--accent)]/20',
+  in_transit: 'bg-[var(--blue-bg)] text-[var(--blue)] border-[var(--blue)]/20',
+  received: 'bg-[var(--green-bg)] text-[var(--green)] border-[var(--green)]/20',
+  cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border-[var(--red)]/20',
 };
 
 const statusLabels: Record<string, string> = {
@@ -78,30 +78,30 @@ export default async function DispatchesPage({ params }: Props) {
       <RealtimeListener table="dispatches" />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
             Dispatches
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Track commodity dispatches between locations
           </p>
         </div>
         <Link href={`/t/${tenantSlug}/dispatches/new`}>
-          <Button className="bg-amber-600 text-zinc-950 hover:bg-amber-500 font-medium">
+          <Button className="bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 font-medium">
             <Plus className="size-4 mr-1" />
             New Dispatch
           </Button>
         </Link>
       </div>
 
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
             All Dispatches ({items.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <p className="text-sm font-mono">No dispatches found</p>
               <p className="text-xs mt-1">
                 Create your first dispatch to get started
@@ -111,20 +111,20 @@ export default async function DispatchesPage({ params }: Props) {
             <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-zinc-800 hover:bg-transparent">
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6">
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground pl-6">
                     Dispatch #
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                     Origin &rarr; Destination
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                     Status
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                     Date
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right pr-6">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right pr-6">
                     Items
                   </TableHead>
                 </TableRow>
@@ -133,36 +133,36 @@ export default async function DispatchesPage({ params }: Props) {
                 {items.map((dispatch) => (
                   <TableRow
                     key={dispatch.id}
-                    className="border-zinc-800/60 hover:bg-zinc-800/30"
+                    className="border-border hover:bg-muted/30"
                   >
                     <TableCell className="pl-6">
                       <Link
                         href={`/t/${tenantSlug}/dispatches/${dispatch.id}`}
-                        className="font-mono text-sm text-amber-500 font-medium hover:text-amber-400 underline-offset-4 hover:underline"
+                        className="font-mono text-sm text-[var(--accent)] font-medium hover:text-[var(--accent)] underline-offset-4 hover:underline"
                       >
                         {dispatch.dispatch_number}
                       </Link>
                     </TableCell>
-                    <TableCell className="text-sm text-zinc-200">
-                      <span className="text-zinc-300">
+                    <TableCell className="text-sm text-foreground">
+                      <span className="text-[var(--text-body)]">
                         {dispatch.origin_location?.name ?? 'Unknown'}
                       </span>
-                      <span className="text-zinc-600 mx-2">&rarr;</span>
-                      <span className="text-zinc-300">
+                      <span className="text-[var(--text-dim)] mx-2">&rarr;</span>
+                      <span className="text-[var(--text-body)]">
                         {dispatch.dest_location?.name ?? 'Unknown'}
                       </span>
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-mono font-medium ${statusColors[dispatch.status] ?? 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30'}`}
+                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-mono font-medium ${statusColors[dispatch.status] ?? 'bg-muted text-muted-foreground border-border'}`}
                       >
                         {statusLabels[dispatch.status] ?? dispatch.status}
                       </span>
                     </TableCell>
-                    <TableCell className="text-sm text-zinc-400 font-mono">
+                    <TableCell className="text-sm text-[var(--text-muted)] font-mono">
                       {formatDate(dispatch.dispatched_at ?? dispatch.created_at)}
                     </TableCell>
-                    <TableCell className="text-sm text-zinc-400 font-mono text-right pr-6">
+                    <TableCell className="text-sm text-[var(--text-muted)] font-mono text-right pr-6">
                       {dispatch.item_count ?? 0}
                     </TableCell>
                   </TableRow>
