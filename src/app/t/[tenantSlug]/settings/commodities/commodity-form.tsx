@@ -145,14 +145,16 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger ?? (
-          <Button className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)]">
-            <Plus className="size-4 mr-1" />
-            New Commodity
-          </Button>
-        )}
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          trigger ?? (
+            <Button className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)]">
+              <Plus className="size-4 mr-1" />
+              New Commodity
+            </Button>
+          )
+        }
+      />
       <DialogContent className="bg-background border border-border sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-foreground font-mono uppercase tracking-wider text-sm">
