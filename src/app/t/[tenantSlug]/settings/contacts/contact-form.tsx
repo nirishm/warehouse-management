@@ -116,7 +116,7 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
       <DialogTrigger
         render={
           trigger ?? (
-            <Button className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)] font-medium">
+            <Button className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] font-medium">
               <Plus className="size-4 mr-1" />
               New Contact
             </Button>
@@ -128,7 +128,7 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
           <DialogTitle className="text-foreground font-semibold">
             {isEditing ? 'Edit Contact' : 'New Contact'}
           </DialogTitle>
-          <DialogDescription className="text-foreground0">
+          <DialogDescription className="text-[var(--text-dim)]">
             {isEditing
               ? 'Update the contact details below.'
               : 'Add a new supplier, customer, or combined contact.'}
@@ -152,7 +152,7 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
               onChange={(e) => setName(e.target.value)}
               placeholder="Acme Supplies Inc."
               required
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
             />
           </div>
 
@@ -185,7 +185,7 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="contact@example.com"
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
             />
           </div>
 
@@ -200,7 +200,7 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+1 (555) 123-4567"
-              className="bg-background border-border text-foreground font-mono placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+              className="bg-background border-border text-foreground font-mono placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
             />
           </div>
 
@@ -215,7 +215,7 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
               onChange={(e) => setAddress(e.target.value)}
               placeholder="123 Business St, City, State"
               rows={2}
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
             />
           </div>
 
@@ -223,7 +223,7 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
             <Button
               type="submit"
               disabled={loading}
-              className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)] font-medium"
+              className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] font-medium"
             >
               {loading && <Loader2 className="size-4 mr-1 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Contact'}

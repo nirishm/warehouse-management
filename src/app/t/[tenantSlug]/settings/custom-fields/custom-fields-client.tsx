@@ -35,12 +35,12 @@ const ENTITY_LABELS: Record<string, string> = {
 };
 
 const FIELD_TYPE_COLORS: Record<string, string> = {
-  text: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-  number: 'bg-violet-500/15 text-violet-400 border-violet-500/30',
-  date: 'bg-[var(--green)]/15 text-[var(--green)] border-[var(--green)]/30',
-  boolean: 'bg-[var(--accent)]/15 text-[var(--accent)] border-[var(--accent)]/30',
-  select: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
-  multiselect: 'bg-pink-500/15 text-pink-400 border-pink-500/30',
+  text: 'bg-[var(--blue-bg)] text-[var(--blue)] border-[rgba(37,99,235,0.2)]',
+  number: 'bg-[var(--orange-bg)] text-[var(--accent-color)] border-[rgba(244,95,0,0.2)]',
+  date: 'bg-[var(--green-bg)] text-[var(--green)] border-[rgba(22,163,74,0.2)]',
+  boolean: 'bg-[var(--orange-bg)] text-[var(--accent-color)] border-[rgba(244,95,0,0.2)]',
+  select: 'bg-[var(--red-bg)] text-[var(--red)] border-[rgba(220,38,38,0.2)]',
+  multiselect: 'bg-[var(--red-bg)] text-[var(--red)] border-[rgba(220,38,38,0.2)]',
 };
 
 export function CustomFieldsClient({
@@ -95,7 +95,7 @@ export function CustomFieldsClient({
           <h1 className="text-2xl font-bold text-foreground tracking-tight">
             Custom Fields
           </h1>
-          <p className="text-sm text-foreground0 mt-1">
+          <p className="text-sm text-[var(--text-dim)] mt-1">
             Define custom fields for your entities to capture additional data
           </p>
         </div>
@@ -105,7 +105,7 @@ export function CustomFieldsClient({
       {definitions.length === 0 ? (
         <Card className="border-border bg-[var(--bg-off)]">
           <CardContent className="py-16">
-            <div className="flex flex-col items-center justify-center text-foreground0">
+            <div className="flex flex-col items-center justify-center text-[var(--text-dim)]">
               <p className="text-sm font-mono">No custom fields defined</p>
               <p className="text-xs mt-1">
                 Create your first custom field to extend your entities
@@ -117,7 +117,7 @@ export function CustomFieldsClient({
         entityTypes.map((entityType) => (
           <Card key={entityType} className="border-border bg-[var(--bg-off)]">
             <CardHeader className="pb-3">
-              <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                 {ENTITY_LABELS[entityType] ?? entityType} (
                 {grouped[entityType].length})
               </CardTitle>
@@ -126,22 +126,22 @@ export function CustomFieldsClient({
               <Table>
                 <TableHeader>
                   <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 pl-6">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
                       Label
                     </TableHead>
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                       Key
                     </TableHead>
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                       Type
                     </TableHead>
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                       Required
                     </TableHead>
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                       Order
                     </TableHead>
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 text-right pr-6">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right pr-6">
                       Actions
                     </TableHead>
                   </TableRow>
@@ -155,7 +155,7 @@ export function CustomFieldsClient({
                       <TableCell className="pl-6 text-sm text-foreground font-medium">
                         {definition.field_label}
                       </TableCell>
-                      <TableCell className="font-mono text-sm text-[var(--accent)]">
+                      <TableCell className="font-mono text-sm text-[var(--accent-color)]">
                         {definition.field_key}
                       </TableCell>
                       <TableCell>
@@ -175,7 +175,7 @@ export function CustomFieldsClient({
                           }
                           className={
                             definition.is_required
-                              ? 'bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/30'
+                              ? 'bg-[var(--accent-color)]/15 text-[var(--accent-color)] border border-[var(--accent-color)]/30'
                               : 'bg-muted text-[var(--text-muted)] border border-border'
                           }
                         >

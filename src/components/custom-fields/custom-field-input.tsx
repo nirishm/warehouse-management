@@ -34,7 +34,7 @@ export function CustomFieldInput({
         className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]"
       >
         {field_label}
-        {is_required && <span className="text-[var(--accent)] ml-1">*</span>}
+        {is_required && <span className="text-[var(--accent-color)] ml-1">*</span>}
       </Label>
 
       {field_type === 'text' && (
@@ -79,7 +79,7 @@ export function CustomFieldInput({
             type="checkbox"
             checked={!!value}
             onChange={(e) => onChange(e.target.checked)}
-            className="size-4 rounded border-border bg-white text-[var(--accent)] focus:ring-[var(--accent)]/20 accent-[var(--accent)]"
+            className="size-4 rounded border-border bg-white text-[var(--accent-color)] focus:ring-[var(--accent-color)]/20 accent-[var(--accent-color)]"
           />
           <Label
             htmlFor={inputId}
@@ -134,7 +134,7 @@ export function CustomFieldInput({
                     }
                     onChange(current);
                   }}
-                  className="size-4 rounded border-border bg-white text-[var(--accent)] focus:ring-[var(--accent)]/20 accent-[var(--accent)]"
+                  className="size-4 rounded border-border bg-white text-[var(--accent-color)] focus:ring-[var(--accent-color)]/20 accent-[var(--accent-color)]"
                 />
                 <span className="text-sm text-[var(--text-body)]">{opt}</span>
               </label>

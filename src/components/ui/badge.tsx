@@ -22,7 +22,7 @@ const badgeVariants = cva(
         received:
           "bg-[var(--green-bg)] text-[var(--green)] font-mono text-[10px] uppercase tracking-wider font-bold",
         dispatched:
-          "bg-[var(--orange-bg)] text-[var(--accent)] font-mono text-[10px] uppercase tracking-wider font-bold",
+          "bg-[var(--orange-bg)] text-[var(--accent-color)] font-mono text-[10px] uppercase tracking-wider font-bold",
         confirmed:
           "bg-[var(--blue-bg)] text-[var(--blue)] font-mono text-[10px] uppercase tracking-wider font-bold",
         cancelled:

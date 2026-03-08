@@ -21,15 +21,15 @@ export function BulkImportTabs({ tenantSlug }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-1 border-b border-zinc-800">
+      <div className="flex gap-1 border-b border-[var(--border)]">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActive(tab.id)}
             className={`px-4 py-2 text-sm font-mono transition-colors border-b-2 -mb-px ${
               active === tab.id
-                ? 'border-amber-500 text-amber-400'
-                : 'border-transparent text-zinc-500 hover:text-zinc-300'
+                ? 'border-[var(--accent-color)] text-[var(--accent-color)]'
+                : 'border-transparent text-[var(--text-dim)] hover:text-[var(--text-body)]'
             }`}
           >
             {tab.label}

@@ -52,7 +52,7 @@ export function CommoditiesClient({
   if (initialData.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-sm text-foreground0 font-mono">No commodities found</p>
+        <p className="text-sm text-[var(--text-dim)] font-mono">No commodities found</p>
         <p className="text-xs text-[var(--text-dim)] mt-1">
           Create your first commodity to get started.
         </p>
@@ -65,22 +65,22 @@ export function CommoditiesClient({
     <Table>
       <TableHeader>
         <TableRow className="border-border hover:bg-transparent">
-          <TableHead className="text-foreground0 font-mono text-xs uppercase tracking-wider">
+          <TableHead className="text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider">
             Code
           </TableHead>
-          <TableHead className="text-foreground0 font-mono text-xs uppercase tracking-wider">
+          <TableHead className="text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider">
             Name
           </TableHead>
-          <TableHead className="text-foreground0 font-mono text-xs uppercase tracking-wider">
+          <TableHead className="text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider">
             Category
           </TableHead>
-          <TableHead className="text-foreground0 font-mono text-xs uppercase tracking-wider">
+          <TableHead className="text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider">
             Default Unit
           </TableHead>
-          <TableHead className="text-foreground0 font-mono text-xs uppercase tracking-wider">
+          <TableHead className="text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider">
             Status
           </TableHead>
-          <TableHead className="text-foreground0 font-mono text-xs uppercase tracking-wider text-right">
+          <TableHead className="text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider text-right">
             Actions
           </TableHead>
         </TableRow>
@@ -88,7 +88,7 @@ export function CommoditiesClient({
       <TableBody>
         {initialData.map((commodity) => (
           <TableRow key={commodity.id} className="border-border hover:bg-[var(--bg-off)]">
-            <TableCell className="font-mono text-[var(--accent)] text-sm">
+            <TableCell className="font-mono text-[var(--accent-color)] text-sm">
               {commodity.code}
             </TableCell>
             <TableCell className="text-foreground text-sm font-medium">
@@ -113,7 +113,7 @@ export function CommoditiesClient({
                   Active
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="text-xs font-mono text-foreground0">
+                <Badge variant="secondary" className="text-xs font-mono text-[var(--text-dim)]">
                   Inactive
                 </Badge>
               )}
@@ -125,7 +125,7 @@ export function CommoditiesClient({
                     href={`/api/t/${tenantSlug}/barcodes/${commodity.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
+                    className="text-xs font-mono text-[var(--accent-color)] hover:text-[var(--accent-dark)] underline underline-offset-2"
                   >
                     QR
                   </a>

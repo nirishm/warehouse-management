@@ -14,19 +14,19 @@ export function LotAgeBadge({ receivedDate, className = '' }: LotAgeBadgeProps) 
 
   if (ageDays < 30) {
     label = `${ageDays}d`;
-    colorClass = 'text-emerald-400 bg-emerald-500/10';
+    colorClass = 'text-[var(--green)] bg-[var(--green-bg)]';
   } else if (ageDays < 90) {
     label = `${Math.floor(ageDays / 7)}w`;
-    colorClass = 'text-amber-400 bg-amber-500/10';
+    colorClass = 'text-[var(--accent-color)] bg-[var(--orange-bg)]';
   } else {
     const months = Math.floor(ageDays / 30);
     label = `${months}mo`;
-    colorClass = 'text-red-400 bg-red-500/10';
+    colorClass = 'text-[var(--red)] bg-[var(--red-bg)]';
   }
 
   return (
     <span
-      className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-mono ${colorClass} ${className}`}
+      className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-mono ${colorClass} ${className}`}
       title={`${ageDays} days since receipt`}
     >
       {label}

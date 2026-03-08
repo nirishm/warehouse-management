@@ -40,7 +40,7 @@ export default async function ShortageTrackingPage({ params }: Props) {
         <h1 className="text-2xl font-bold text-foreground tracking-tight">
           Shortage Tracking
         </h1>
-        <p className="text-sm text-foreground0 mt-1">
+        <p className="text-sm text-[var(--text-dim)] mt-1">
           Analyze dispatch shortages across routes, transporters, and
           commodities
         </p>

@@ -32,7 +32,7 @@ interface ShortageDashboardProps {
 function pctColor(pct: number): string {
   if (pct <= 0) return 'text-[var(--text-muted)]';
   if (pct < 1) return 'text-[var(--green)]';
-  if (pct <= 3) return 'text-[var(--accent)]';
+  if (pct <= 3) return 'text-[var(--accent-color)]';
   return 'text-[var(--red)]';
 }
 
@@ -42,14 +42,14 @@ function pctBadgeColor(pct: number): string {
   if (pct < 1)
     return 'bg-[var(--green)]/15 text-[var(--green)] border-[var(--green)]/30';
   if (pct <= 3)
-    return 'bg-[var(--accent)]/15 text-[var(--accent)] border-[var(--accent)]/30';
+    return 'bg-[var(--accent-color)]/15 text-[var(--accent-color)] border-[var(--accent-color)]/30';
   return 'bg-[var(--red)]/15 text-[var(--red)] border-[var(--red)]/30';
 }
 
 function pctBarColor(pct: number): string {
   if (pct <= 0) return 'bg-muted';
   if (pct < 1) return 'bg-[var(--green)]';
-  if (pct <= 3) return 'bg-[var(--accent)]';
+  if (pct <= 3) return 'bg-[var(--accent-color)]';
   return 'bg-[var(--red)]';
 }
 
@@ -70,7 +70,7 @@ function formatDate(dateStr: string | null): string {
 }
 
 const thClass =
-  'text-xs font-mono uppercase tracking-wider text-foreground0';
+  'text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]';
 
 // ---------------------------------------------------------------------------
 // Component
@@ -114,7 +114,7 @@ export function ShortageDashboard({
             className="border-border bg-[var(--bg-off)]"
           >
             <CardHeader className="pb-1 pt-4 px-5">
-              <CardTitle className="text-[10px] font-mono uppercase tracking-wider text-foreground0">
+              <CardTitle className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-dim)]">
                 {card.label}
               </CardTitle>
             </CardHeader>
@@ -132,7 +132,7 @@ export function ShortageDashboard({
       {/* --- By Route --- */}
       <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             Shortage by Route ({byRoute.length})
           </CardTitle>
         </CardHeader>
@@ -223,7 +223,7 @@ export function ShortageDashboard({
         {/* By Transporter */}
         <Card className="border-border bg-[var(--bg-off)]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
               Shortage by Transporter ({byTransporter.length})
             </CardTitle>
           </CardHeader>
@@ -281,7 +281,7 @@ export function ShortageDashboard({
         {/* By Commodity */}
         <Card className="border-border bg-[var(--bg-off)]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
               Shortage by Commodity ({byCommodity.length})
             </CardTitle>
           </CardHeader>
@@ -346,7 +346,7 @@ export function ShortageDashboard({
       {/* --- Recent Shortages --- */}
       <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             Recent Shortages ({recent.length})
           </CardTitle>
         </CardHeader>
@@ -385,7 +385,7 @@ export function ShortageDashboard({
                     key={item.id}
                     className="border-border hover:bg-muted/50"
                   >
-                    <TableCell className="pl-6 font-mono text-sm text-[var(--accent)] font-medium">
+                    <TableCell className="pl-6 font-mono text-sm text-[var(--accent-color)] font-medium">
                       {item.dispatch_number}
                     </TableCell>
                     <TableCell className="text-sm text-foreground">
@@ -414,7 +414,7 @@ export function ShortageDashboard({
                         {item.shortage_percent}%
                       </span>
                     </TableCell>
-                    <TableCell className="text-sm font-mono text-foreground0 text-right pr-6">
+                    <TableCell className="text-sm font-mono text-[var(--text-dim)] text-right pr-6">
                       {formatDate(item.received_at)}
                     </TableCell>
                   </TableRow>
@@ -434,7 +434,7 @@ export function ShortageDashboard({
 
 function EmptyState({ label }: { label: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-foreground0">
+    <div className="flex flex-col items-center justify-center py-12 text-[var(--text-dim)]">
       <p className="text-sm font-mono">{label}</p>
     </div>
   );

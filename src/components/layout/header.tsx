@@ -21,7 +21,7 @@ export function Header({ tenantSlug, tenantName, navItems }: HeaderProps) {
         <MobileSidebar tenantSlug={tenantSlug} tenantName={tenantName} navItems={navItems} />
         {/* Mobile brand */}
         <span className="md:hidden text-sm font-bold tracking-tight text-foreground font-mono uppercase">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--accent)] mr-1"></span>WareOS
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--accent-color)] mr-1"></span>WareOS
         </span>
       </div>
       <div className="flex items-center gap-3">

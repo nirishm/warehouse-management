@@ -23,7 +23,7 @@ interface Props {
 
 const statusColors: Record<PurchaseStatus, string> = {
   draft: 'bg-muted/50 text-[var(--text-muted)] border border-[var(--text-muted)]/20',
-  ordered: 'bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent)]/20',
+  ordered: 'bg-[var(--accent-tint)] text-[var(--accent-color)] border border-[var(--accent-color)]/20',
   received: 'bg-[var(--green-bg)] text-[var(--green)] border border-[var(--green)]/20',
   cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border border-[var(--red)]/20',
 };
@@ -70,7 +70,7 @@ export default async function PurchaseDetailPage({ params }: Props) {
         <p className="text-sm font-mono">Purchase not found</p>
         <Link
           href={`/t/${tenantSlug}/purchases`}
-          className="text-[var(--accent)] hover:text-[var(--accent-dark)] text-xs mt-2 font-mono underline underline-offset-2"
+          className="text-[var(--accent-color)] hover:text-[var(--accent-dark)] text-xs mt-2 font-mono underline underline-offset-2"
         >
           Back to purchases
         </Link>
@@ -118,7 +118,7 @@ export default async function PurchaseDetailPage({ params }: Props) {
           )}
           <Link
             href={`/t/${tenantSlug}/purchases`}
-            className="text-xs font-mono text-[var(--accent)] hover:text-[var(--accent-dark)] underline underline-offset-2"
+            className="text-xs font-mono text-[var(--accent-color)] hover:text-[var(--accent-dark)] underline underline-offset-2"
           >
             Back to purchases
           </Link>
@@ -137,7 +137,7 @@ export default async function PurchaseDetailPage({ params }: Props) {
             <DetailRow label="Location">
               {purchase.location ? (
                 <>
-                  <span className="font-mono text-[var(--accent)] text-xs mr-2">
+                  <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
                     {purchase.location.code}
                   </span>
                   {purchase.location.name}
@@ -220,7 +220,7 @@ export default async function PurchaseDetailPage({ params }: Props) {
                     <TableCell className="pl-6 text-sm text-foreground">
                       {item.commodity ? (
                         <>
-                          <span className="font-mono text-[var(--accent)] text-xs mr-2">
+                          <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
                             {item.commodity.code}
                           </span>
                           {item.commodity.name}

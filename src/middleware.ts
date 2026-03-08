@@ -2,12 +2,40 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createMiddlewareClient } from '@/lib/supabase/middleware';
 
 const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password', '/auth/callback'];
+const LANDING_ROUTES = ['/'];
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
   const supabase = createMiddlewareClient(request, response);
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
+
+  // Landing page — always accessible (no auth required)
+  if (LANDING_ROUTES.includes(path)) {
+    // Authenticated users: redirect to their default tenant dashboard
+    if (user) {
+      const { data: memberships } = await supabase
+        .from('user_tenants')
+        .select('tenant_id, is_default, tenants(slug)')
+        .eq('user_id', user.id);
+
+      const { data: superAdmin } = await supabase
+        .from('super_admins')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (superAdmin) return NextResponse.redirect(new URL('/admin', request.url));
+
+      if (memberships?.length) {
+        const defaultTenant = memberships.find(m => m.is_default) || memberships[0];
+        const tenantData = defaultTenant.tenants as unknown as { slug: string };
+        return NextResponse.redirect(new URL(`/t/${tenantData.slug}`, request.url));
+      }
+    }
+    // Unauthenticated (or no memberships): show landing page
+    return response;
+  }
 
   // Public routes
   if (PUBLIC_ROUTES.some(r => path.startsWith(r))) {
@@ -60,27 +88,6 @@ export async function middleware(request: NextRequest) {
     requestHeaders.set('x-tenant-role', membership.role);
     requestHeaders.set('x-tenant-modules', JSON.stringify(tenant.enabled_modules));
     return NextResponse.next({ request: { headers: requestHeaders } });
-  }
-
-  // Root: redirect to default tenant
-  if (path === '/') {
-    const { data: memberships } = await supabase
-      .from('user_tenants')
-      .select('tenant_id, is_default, tenants(slug)')
-      .eq('user_id', user.id);
-
-    const { data: superAdmin } = await supabase
-      .from('super_admins')
-      .select('id')
-      .eq('user_id', user.id)
-      .single();
-
-    if (superAdmin) return NextResponse.redirect(new URL('/admin', request.url));
-
-    if (!memberships?.length) return NextResponse.redirect(new URL('/no-tenant', request.url));
-    const defaultTenant = memberships.find(m => m.is_default) || memberships[0];
-    const tenantData = defaultTenant.tenants as unknown as { slug: string };
-    return NextResponse.redirect(new URL(`/t/${tenantData.slug}`, request.url));
   }
 
   return response;

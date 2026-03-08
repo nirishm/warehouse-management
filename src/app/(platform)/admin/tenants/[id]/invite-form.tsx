@@ -60,7 +60,7 @@ export function InviteForm({ tenantId }: { tenantId: string }) {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Jane Doe"
-                className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)]"
+                className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent-color)]"
               />
             </div>
             <div className="space-y-2">
@@ -71,14 +71,14 @@ export function InviteForm({ tenantId }: { tenantId: string }) {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@company.com"
                 required
-                className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)]"
+                className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent-color)]"
               />
             </div>
           </div>
           <Button
             type="submit"
             disabled={loading}
-            className="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white font-semibold"
+            className="bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold"
           >
             {loading ? 'Sending...' : 'Send Invite'}
           </Button>

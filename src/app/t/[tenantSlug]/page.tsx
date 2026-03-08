@@ -1,75 +1,105 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertSummaryWidget } from '@/components/stock-alerts/alert-summary-widget';
-import { getAlertSummary } from '@/modules/stock-alerts/queries/alerts';
+import {
+  getDashboardKpis,
+  getRecentTransactions,
+  getStockByLocation,
+  getShortageAlerts,
+  getRecentActivity,
+} from '@/modules/analytics/queries/dashboard';
+import {
+  getLocationsForFilter,
+  getCommoditiesForFilter,
+} from '@/modules/inventory/queries/stock';
+import { DashboardHome } from './dashboard-home';
+import type { DashboardFilters } from '@/modules/analytics/queries/dashboard';
 
 interface Props {
   params: Promise<{ tenantSlug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function TenantDashboard({ params }: Props) {
+export default async function TenantDashboard({ params, searchParams }: Props) {
   const { tenantSlug } = await params;
+  const sp = await searchParams;
+
   const supabase = await createServerSupabaseClient();
 
+  // Resolve tenant
   const { data: tenant } = await supabase
     .from('tenants')
-    .select('schema_name, name, enabled_modules')
+    .select('id, schema_name, name, slug, enabled_modules')
     .eq('slug', tenantSlug)
     .single();
 
   if (!tenant) return null;
 
+  // Resolve current user + location scope
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
   const tenantClient = createTenantClient(tenant.schema_name);
 
-  const stockAlertsEnabled = tenant.enabled_modules?.includes('stock-alerts') ?? false;
+  const { data: membership } = await supabase
+    .from('user_tenants')
+    .select('role')
+    .eq('user_id', user.id)
+    .eq('tenant_id', tenant.id)
+    .single();
 
-  const [locationResult, commodityResult, alertSummary] = await Promise.all([
-    tenantClient
-      .from('locations')
-      .select('*', { count: 'exact', head: true })
-      .is('deleted_at', null),
-    tenantClient
-      .from('commodities')
-      .select('*', { count: 'exact', head: true })
-      .is('deleted_at', null),
-    stockAlertsEnabled ? getAlertSummary(tenant.schema_name) : null,
-  ]);
+  let allowedLocationIds: string[] | null = null;
+  if (membership?.role !== 'tenant_admin') {
+    const { data: locs } = await tenantClient
+      .from('user_locations')
+      .select('location_id')
+      .eq('user_id', user.id);
+    const ids = (locs ?? []).map((l: { location_id: string }) => l.location_id);
+    allowedLocationIds = ids.length > 0 ? ids : null;
+  }
 
-  const locationCount = locationResult.count;
-  const commodityCount = commodityResult.count;
+  // Build filters from searchParams
+  const filters: DashboardFilters = {
+    dateFrom: typeof sp.dateFrom === 'string' ? sp.dateFrom : undefined,
+    dateTo: typeof sp.dateTo === 'string' ? sp.dateTo : undefined,
+    locationId: typeof sp.locationId === 'string' ? sp.locationId : undefined,
+    commodityId: typeof sp.commodityId === 'string' ? sp.commodityId : undefined,
+    allowedLocationIds,
+  };
 
-  const stats = [
-    { label: 'Locations', value: locationCount ?? 0 },
-    { label: 'Commodities', value: commodityCount ?? 0 },
-    { label: 'Active Modules', value: tenant.enabled_modules?.length ?? 0 },
-  ];
+  // Fetch all dashboard data in parallel
+  const [kpis, recentTransactions, stockByLocation, shortageAlerts, recentActivity, locations, commodities] =
+    await Promise.all([
+      getDashboardKpis(tenant.schema_name, filters),
+      getRecentTransactions(tenant.schema_name, filters),
+      getStockByLocation(tenant.schema_name, filters),
+      getShortageAlerts(tenant.schema_name, filters),
+      getRecentActivity(tenant.schema_name, filters),
+      getLocationsForFilter(tenant.schema_name),
+      getCommoditiesForFilter(tenant.schema_name),
+    ]);
+
+  // If user has location restrictions, filter the locations dropdown
+  const filteredLocations = allowedLocationIds
+    ? locations.filter((l) => allowedLocationIds!.includes(l.id))
+    : locations;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">Welcome to {tenant.name}</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {stats.map((stat) => (
-          <Card key={stat.label} className="border-border bg-[var(--bg-off)]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                {stat.label}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-foreground font-mono">{stat.value}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {alertSummary && alertSummary.total > 0 && (
-        <AlertSummaryWidget summary={alertSummary} tenantSlug={tenantSlug} />
-      )}
-    </div>
+    <DashboardHome
+      tenantSlug={tenantSlug}
+      tenantName={tenant.name}
+      kpis={kpis}
+      recentTransactions={recentTransactions}
+      stockByLocation={stockByLocation}
+      shortageAlerts={shortageAlerts}
+      recentActivity={recentActivity}
+      locations={filteredLocations as { id: string; name: string; code: string }[]}
+      commodities={commodities as { id: string; name: string; code: string }[]}
+      activeFilters={{
+        dateFrom: filters.dateFrom,
+        dateTo: filters.dateTo,
+        locationId: filters.locationId,
+        commodityId: filters.commodityId,
+      }}
+    />
   );
 }

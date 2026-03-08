@@ -101,7 +101,7 @@ export default async function ReceiveDispatchPage({ params }: Props) {
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
           Record received quantities for{' '}
-          <span className="font-mono text-[var(--accent)]">
+          <span className="font-mono text-[var(--accent-color)]">
             {dispatchInfo.dispatch_number}
           </span>
         </p>

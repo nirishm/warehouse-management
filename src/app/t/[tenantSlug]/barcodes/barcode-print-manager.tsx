@@ -73,26 +73,26 @@ export function BarcodePrintManager({ commodities, tenantSlug: _tenantSlug }: Pr
         {/* Controls */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative max-w-xs w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--text-dim)]" />
             <Input
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               placeholder="Filter commodities…"
-              className="pl-9 bg-zinc-900 border-zinc-700 text-zinc-200"
+              className="pl-9"
             />
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={selectAll}
-              className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
+              className="text-xs font-mono text-[var(--accent-color)] hover:text-[var(--accent-dark)] underline underline-offset-2"
             >
               Select all ({filtered.length})
             </button>
-            <span className="text-zinc-700">·</span>
+            <span className="text-[var(--border-mid)]">·</span>
             <button
               onClick={clearAll}
-              className="text-xs font-mono text-zinc-500 hover:text-zinc-300 underline underline-offset-2"
+              className="text-xs font-mono text-[var(--text-dim)] hover:text-[var(--text-body)] underline underline-offset-2"
             >
               Clear
             </button>
@@ -100,7 +100,7 @@ export function BarcodePrintManager({ commodities, tenantSlug: _tenantSlug }: Pr
             <Button
               onClick={handlePrint}
               disabled={selected.size === 0 || printing}
-              className="ml-2 bg-amber-600 text-zinc-950 hover:bg-amber-500 font-semibold"
+              className="ml-2 bg-[var(--accent-color)] text-white hover:bg-[var(--accent-dark)] font-semibold"
             >
               <Printer className="size-4 mr-2" />
               Print Labels ({selected.size})
@@ -109,32 +109,32 @@ export function BarcodePrintManager({ commodities, tenantSlug: _tenantSlug }: Pr
         </div>
 
         {/* Commodity list */}
-        <div className="border border-zinc-800 rounded-lg overflow-hidden">
+        <div className="border border-[var(--border)] rounded-lg overflow-hidden">
           {filtered.length === 0 ? (
-            <div className="py-12 text-center text-sm text-zinc-500 font-mono">
+            <div className="py-12 text-center text-sm text-[var(--text-dim)] font-mono">
               No commodities found
             </div>
           ) : (
-            <div className="divide-y divide-zinc-800/60">
+            <div className="divide-y divide-[var(--border)]">
               {filtered.map((c) => (
                 <label
                   key={c.id}
-                  className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-zinc-900/60 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[var(--bg-off)] transition-colors"
                 >
                   <input
                     type="checkbox"
                     checked={selected.has(c.id)}
                     onChange={() => toggle(c.id)}
-                    className="h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-amber-500 focus:ring-amber-500/30"
+                    className="h-4 w-4 rounded border-[var(--border-mid)] bg-[var(--bg-off)] text-[var(--accent-color)] focus:ring-[var(--accent-color)]/30"
                   />
-                  <span className="font-mono text-sm text-amber-500 w-28 shrink-0">
+                  <span className="font-mono text-sm text-[var(--accent-color)] w-28 shrink-0">
                     {c.code}
                   </span>
-                  <span className="text-sm text-zinc-200 flex-1">{c.name}</span>
+                  <span className="text-sm text-[var(--text-body)] flex-1">{c.name}</span>
                   {c.category && (
                     <Badge
                       variant="outline"
-                      className="border-zinc-700 text-zinc-500 text-xs font-mono"
+                      className="border-[var(--border)] text-[var(--text-dim)] text-xs font-mono"
                     >
                       {c.category}
                     </Badge>
@@ -147,8 +147,8 @@ export function BarcodePrintManager({ commodities, tenantSlug: _tenantSlug }: Pr
 
         {/* Preview strip */}
         {selectedCommodities.length > 0 && (
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-            <p className="text-xs font-mono uppercase text-zinc-500 mb-3 tracking-wider">
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-off)] p-4">
+            <p className="text-xs font-mono uppercase text-[var(--text-dim)] mb-3 tracking-wider">
               Preview ({selectedCommodities.length} label{selectedCommodities.length !== 1 ? 's' : ''})
             </p>
             <BarcodePrintSheet commodities={selectedCommodities} />

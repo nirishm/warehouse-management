@@ -102,26 +102,26 @@ export default function NewReturnPage() {
     }
   }
 
-  const selectCls = 'w-full bg-zinc-800 border border-zinc-700 text-zinc-100 text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-amber-500';
+  const selectCls = 'w-full bg-[var(--bg-off)] border border-[var(--border)] text-[var(--text-body)] text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[var(--accent-color)]';
 
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">New Return</h1>
-        <p className="text-sm text-zinc-500 mt-1">Record a purchase or sale return</p>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">New Return</h1>
+        <p className="text-sm text-[var(--text-dim)] mt-1">Record a purchase or sale return</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="bg-[var(--bg-base)] border-[var(--border)]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
               Return Details
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-zinc-400 text-xs">Return Type *</Label>
+                <Label className="text-[var(--text-muted)] text-xs">Return Type *</Label>
                 <select
                   value={returnType}
                   onChange={(e) => setReturnType(e.target.value as typeof returnType)}
@@ -132,7 +132,7 @@ export default function NewReturnPage() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-zinc-400 text-xs">Location *</Label>
+                <Label className="text-[var(--text-muted)] text-xs">Location *</Label>
                 <select
                   value={locationId}
                   onChange={(e) => setLocationId(e.target.value)}
@@ -147,42 +147,41 @@ export default function NewReturnPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-zinc-400 text-xs">
+              <Label className="text-[var(--text-muted)] text-xs">
                 Original {returnType === 'purchase_return' ? 'Purchase' : 'Sale'} ID *
               </Label>
               <Input
                 value={originalTxnId}
                 onChange={(e) => setOriginalTxnId(e.target.value)}
                 placeholder="UUID of the original transaction"
-                className="bg-zinc-800 border-zinc-700 text-zinc-100 font-mono text-xs"
+                className="font-mono text-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-zinc-400 text-xs">Reason</Label>
+              <Label className="text-[var(--text-muted)] text-xs">Reason</Label>
               <Input
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Reason for return"
-                className="bg-zinc-800 border-zinc-700 text-zinc-100"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-zinc-400 text-xs">Notes</Label>
+              <Label className="text-[var(--text-muted)] text-xs">Notes</Label>
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
-                className="bg-zinc-800 border-zinc-700 text-zinc-100 resize-none"
+                className="resize-none"
               />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="bg-[var(--bg-base)] border-[var(--border)]">
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
               Items
             </CardTitle>
             <Button
@@ -190,7 +189,7 @@ export default function NewReturnPage() {
               variant="ghost"
               size="sm"
               onClick={() => setItems((r) => [...r, emptyRow()])}
-              className="text-amber-500 hover:text-amber-400 text-xs h-auto py-1"
+              className="text-[var(--accent-color)] hover:text-[var(--accent-dark)] text-xs h-auto py-1"
             >
               + Add Row
             </Button>
@@ -230,7 +229,6 @@ export default function NewReturnPage() {
                     value={row.quantity}
                     onChange={(e) => updateItem(row.key, 'quantity', e.target.value)}
                     placeholder="Qty"
-                    className="bg-zinc-800 border-zinc-700 text-zinc-100"
                   />
                 </div>
                 <div className="col-span-3">
@@ -238,7 +236,6 @@ export default function NewReturnPage() {
                     value={row.notes}
                     onChange={(e) => updateItem(row.key, 'notes', e.target.value)}
                     placeholder="Notes"
-                    className="bg-zinc-800 border-zinc-700 text-zinc-100"
                   />
                 </div>
                 <div className="col-span-1 flex justify-end">
@@ -248,7 +245,7 @@ export default function NewReturnPage() {
                     size="sm"
                     onClick={() => removeItem(row.key)}
                     disabled={items.length === 1}
-                    className="text-zinc-600 hover:text-red-400 h-9 w-9 p-0"
+                    className="text-[var(--text-dim)] hover:text-[var(--red)] h-9 w-9 p-0"
                   >
                     ×
                   </Button>
@@ -258,7 +255,7 @@ export default function NewReturnPage() {
           </CardContent>
         </Card>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className="text-sm text-[var(--red)]">{error}</p>}
 
         <div className="flex gap-3">
           <Button type="submit" disabled={submitting}>
@@ -268,7 +265,6 @@ export default function NewReturnPage() {
             type="button"
             variant="ghost"
             onClick={() => router.push(`/t/${tenantSlug}/returns`)}
-            className="text-zinc-400"
           >
             Cancel
           </Button>

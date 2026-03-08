@@ -20,9 +20,9 @@ interface Props {
 }
 
 const statusColors: Record<ReturnStatus, string> = {
-  draft: 'bg-zinc-500/15 text-zinc-400 border border-zinc-500/30',
-  confirmed: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-  cancelled: 'bg-red-500/15 text-red-400 border border-red-500/30',
+  draft: 'bg-[var(--bg-off)] text-[var(--text-muted)] border border-[var(--border)]',
+  confirmed: 'bg-[var(--green-bg)] text-[var(--green)] border border-[rgba(22,163,74,0.2)]',
+  cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border border-[rgba(220,38,38,0.2)]',
 };
 
 function formatDate(dateStr: string) {
@@ -52,11 +52,11 @@ export default async function ReturnDetailPage({ params }: Props) {
 
   if (!ret) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-zinc-500">
+      <div className="flex flex-col items-center justify-center py-24 text-[var(--text-dim)]">
         <p className="text-sm font-mono">Return not found</p>
         <Link
           href={`/t/${tenantSlug}/returns`}
-          className="text-amber-500 hover:text-amber-400 text-xs mt-2 font-mono underline underline-offset-2"
+          className="text-[var(--accent-color)] hover:text-[var(--accent-dark)] text-xs mt-2 font-mono underline underline-offset-2"
         >
           Back to returns
         </Link>
@@ -71,12 +71,12 @@ export default async function ReturnDetailPage({ params }: Props) {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-zinc-100 tracking-tight font-mono">
+            <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight font-mono">
               {ret.return_number}
             </h1>
             <Badge className={statusColors[ret.status]}>{ret.status}</Badge>
           </div>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-[var(--text-dim)] mt-1">
             {typeLabel} · {formatDate(ret.return_date)}
           </p>
         </div>
@@ -86,7 +86,7 @@ export default async function ReturnDetailPage({ params }: Props) {
           )}
           <Link
             href={`/t/${tenantSlug}/returns`}
-            className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
+            className="text-xs font-mono text-[var(--accent-color)] hover:text-[var(--accent-dark)] underline underline-offset-2"
           >
             Back to returns
           </Link>
@@ -94,9 +94,9 @@ export default async function ReturnDetailPage({ params }: Props) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="bg-[var(--bg-base)] border-[var(--border)]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
               Return Details
             </CardTitle>
           </CardHeader>
@@ -110,44 +110,44 @@ export default async function ReturnDetailPage({ params }: Props) {
         </Card>
       </div>
 
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="bg-[var(--bg-base)] border-[var(--border)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             Items ({ret.items.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="border-zinc-800 hover:bg-transparent">
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6">
+              <TableRow className="border-[var(--border)] hover:bg-transparent">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
                   Commodity
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                   Unit
                 </TableHead>
-                <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right pr-6">
+                <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right pr-6">
                   Quantity
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {ret.items.map((item) => (
-                <TableRow key={item.id} className="border-zinc-800/60 hover:bg-zinc-800/30">
-                  <TableCell className="pl-6 text-sm text-zinc-200">
+                <TableRow key={item.id} className="border-[var(--border)] hover:bg-[var(--bg-off)]">
+                  <TableCell className="pl-6 text-sm text-[var(--text-body)]">
                     {item.commodity ? (
                       <>
-                        <span className="font-mono text-amber-500 text-xs mr-2">
+                        <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
                           {item.commodity.code}
                         </span>
                         {item.commodity.name}
                       </>
                     ) : '--'}
                   </TableCell>
-                  <TableCell className="text-sm text-zinc-400 font-mono">
+                  <TableCell className="text-sm text-[var(--text-muted)] font-mono">
                     {item.unit?.abbreviation ?? item.unit?.name ?? '--'}
                   </TableCell>
-                  <TableCell className="text-sm text-zinc-200 font-mono text-right pr-6">
+                  <TableCell className="text-sm text-[var(--text-body)] font-mono text-right pr-6">
                     {item.quantity}
                   </TableCell>
                 </TableRow>
@@ -163,10 +163,10 @@ export default async function ReturnDetailPage({ params }: Props) {
 function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 w-28 shrink-0 pt-0.5">
+      <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] w-28 shrink-0 pt-0.5">
         {label}
       </span>
-      <span className="text-sm text-zinc-200">{children}</span>
+      <span className="text-sm text-[var(--text-body)]">{children}</span>
     </div>
   );
 }

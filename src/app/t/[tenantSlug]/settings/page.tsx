@@ -47,7 +47,7 @@ export default async function TenantSettingsPage({ params }: Props) {
         <h1 className="text-2xl font-bold text-foreground tracking-tight">
           Tenant Settings
         </h1>
-        <p className="text-sm text-foreground0 mt-1">
+        <p className="text-sm text-[var(--text-dim)] mt-1">
           Manage your organization info, modules, and preferences
         </p>
       </div>

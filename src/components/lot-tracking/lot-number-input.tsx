@@ -24,14 +24,14 @@ export function LotNumberInput({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <Label className="text-zinc-400 text-xs">{label}</Label>
+        <Label className="text-[var(--text-muted)] text-xs">{label}</Label>
         <button
           type="button"
           onClick={() => {
             setManual((m) => !m);
             if (manual) onChange('');
           }}
-          className="text-xs font-mono text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="text-xs font-mono text-[var(--text-dim)] hover:text-[var(--text-body)] transition-colors"
         >
           {manual ? 'Auto-generate' : 'Enter manually'}
         </button>
@@ -41,10 +41,10 @@ export function LotNumberInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder={manual ? 'LOT-000001' : placeholder}
         disabled={!manual || disabled}
-        className="bg-zinc-800 border-zinc-700 text-zinc-100 font-mono disabled:opacity-50"
+        className="font-mono disabled:opacity-50"
       />
       {!manual && (
-        <p className="text-xs text-zinc-600 font-mono">
+        <p className="text-xs text-[var(--text-dim)] font-mono">
           Lot number will be assigned automatically
         </p>
       )}

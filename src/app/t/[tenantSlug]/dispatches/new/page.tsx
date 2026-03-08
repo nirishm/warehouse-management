@@ -251,7 +251,7 @@ export default function NewDispatchPage() {
                   <SelectContent className="bg-[var(--bg-off)] border-border">
                     {locations.map((loc) => (
                       <SelectItem key={loc.id} value={loc.id} className="text-foreground focus:bg-muted">
-                        <span className="font-mono text-[var(--accent)] mr-2">{loc.code}</span>
+                        <span className="font-mono text-[var(--accent-color)] mr-2">{loc.code}</span>
                         {loc.name}
                       </SelectItem>
                     ))}
@@ -270,7 +270,7 @@ export default function NewDispatchPage() {
                   <SelectContent className="bg-[var(--bg-off)] border-border">
                     {locations.map((loc) => (
                       <SelectItem key={loc.id} value={loc.id} className="text-foreground focus:bg-muted">
-                        <span className="font-mono text-[var(--accent)] mr-2">{loc.code}</span>
+                        <span className="font-mono text-[var(--accent-color)] mr-2">{loc.code}</span>
                         {loc.name}
                       </SelectItem>
                     ))}
@@ -300,7 +300,7 @@ export default function NewDispatchPage() {
                   value={transporterName}
                   onChange={(e) => setTransporterName(e.target.value)}
                   placeholder="Transport company name"
-                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
                 />
               </div>
               <div className="space-y-2">
@@ -312,7 +312,7 @@ export default function NewDispatchPage() {
                   value={vehicleNumber}
                   onChange={(e) => setVehicleNumber(e.target.value)}
                   placeholder="e.g. KA-01-AB-1234"
-                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
                 />
               </div>
               <div className="space-y-2">
@@ -324,7 +324,7 @@ export default function NewDispatchPage() {
                   value={driverName}
                   onChange={(e) => setDriverName(e.target.value)}
                   placeholder="Driver full name"
-                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
                 />
               </div>
               <div className="space-y-2">
@@ -336,7 +336,7 @@ export default function NewDispatchPage() {
                   value={driverPhone}
                   onChange={(e) => setDriverPhone(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+                  className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
                 />
               </div>
             </div>
@@ -350,7 +350,7 @@ export default function NewDispatchPage() {
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Any additional notes for this dispatch..."
                 rows={3}
-                className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+                className="bg-background border-border text-foreground placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
               />
             </div>
           </CardContent>
@@ -408,7 +408,7 @@ export default function NewDispatchPage() {
                         <SelectContent className="bg-[var(--bg-off)] border-border">
                           {commodities.map((c) => (
                             <SelectItem key={c.id} value={c.id} className="text-foreground focus:bg-muted">
-                              <span className="font-mono text-[var(--accent)] mr-2">{c.code}</span>
+                              <span className="font-mono text-[var(--accent-color)] mr-2">{c.code}</span>
                               {c.name}
                             </SelectItem>
                           ))}
@@ -441,7 +441,7 @@ export default function NewDispatchPage() {
                         value={item.sent_quantity}
                         onChange={(e) => updateItem(item.key, 'sent_quantity', e.target.value)}
                         placeholder="0.00"
-                        className="w-28 bg-background border-border text-foreground font-mono placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+                        className="w-28 bg-background border-border text-foreground font-mono placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
                       />
                     </TableCell>
                     <TableCell>
@@ -452,7 +452,7 @@ export default function NewDispatchPage() {
                         value={item.sent_bags}
                         onChange={(e) => updateItem(item.key, 'sent_bags', e.target.value)}
                         placeholder="0"
-                        className="w-20 bg-background border-border text-foreground font-mono placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+                        className="w-20 bg-background border-border text-foreground font-mono placeholder:text-[var(--text-dim)] focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
                       />
                     </TableCell>
                     <TableCell className="pr-6">
@@ -488,7 +488,7 @@ export default function NewDispatchPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 font-medium"
+            className="bg-[var(--accent-color)] text-white hover:bg-[var(--accent-color)]/90 font-medium"
           >
             {loading && <Loader2 className="size-4 mr-1 animate-spin" />}
             Create Dispatch

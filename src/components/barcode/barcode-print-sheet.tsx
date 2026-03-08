@@ -15,7 +15,7 @@ interface BarcodePrintSheetProps {
 export function BarcodePrintSheet({ commodities }: BarcodePrintSheetProps) {
   if (commodities.length === 0) {
     return (
-      <p className="text-sm text-zinc-500 text-center py-8">
+      <p className="text-sm text-[var(--text-dim)] text-center py-8">
         No commodities selected for printing.
       </p>
     );

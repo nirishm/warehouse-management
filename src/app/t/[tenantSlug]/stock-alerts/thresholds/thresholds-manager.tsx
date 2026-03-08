@@ -103,10 +103,10 @@ export function ThresholdsManager({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
             Alert Thresholds
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-[var(--text-dim)] mt-1">
             Configure min stock and reorder points per commodity and location
           </p>
         </div>
@@ -121,19 +121,19 @@ export function ThresholdsManager({
       </div>
 
       {thresholds.length === 0 ? (
-        <div className="border border-zinc-800 rounded-lg p-8 text-center text-zinc-500">
+        <div className="border border-[var(--border)] rounded-lg p-8 text-center text-[var(--text-dim)]">
           No thresholds configured yet.
         </div>
       ) : (
-        <div className="border border-zinc-800 rounded-lg overflow-hidden">
+        <div className="border border-[var(--border)] rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-zinc-800 bg-zinc-900/40">
+              <tr className="border-b border-[var(--border)] bg-[var(--bg-off)]">
                 {['Commodity', 'Location', 'Unit', 'Min Stock', 'Reorder Point', 'Active', ''].map(
                   (h) => (
                     <th
                       key={h}
-                      className="text-left px-4 py-3 text-zinc-500 font-mono text-xs uppercase tracking-wider"
+                      className="text-left px-4 py-3 text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider"
                     >
                       {h}
                     </th>
@@ -141,25 +141,25 @@ export function ThresholdsManager({
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/50">
+            <tbody className="divide-y divide-[var(--border)]">
               {thresholds.map((t) => {
                 const commodity = commodities.find((c) => c.id === t.commodity_id);
                 const location = locations.find((l) => l.id === t.location_id);
                 const unit = units.find((u) => u.id === t.unit_id);
                 return (
-                  <tr key={t.id} className="hover:bg-zinc-800/30 transition-colors">
-                    <td className="px-4 py-3 text-zinc-100">
+                  <tr key={t.id} className="hover:bg-[var(--bg-off)] transition-colors">
+                    <td className="px-4 py-3 text-[var(--text-primary)]">
                       {commodity ? `${commodity.name} (${commodity.code})` : t.commodity_id}
                     </td>
-                    <td className="px-4 py-3 text-zinc-300">{location?.name ?? t.location_id}</td>
-                    <td className="px-4 py-3 text-zinc-300 font-mono">
+                    <td className="px-4 py-3 text-[var(--text-body)]">{location?.name ?? t.location_id}</td>
+                    <td className="px-4 py-3 text-[var(--text-body)] font-mono">
                       {unit?.abbreviation ?? t.unit_id}
                     </td>
-                    <td className="px-4 py-3 font-mono text-zinc-100">{t.min_stock}</td>
-                    <td className="px-4 py-3 font-mono text-zinc-100">{t.reorder_point}</td>
+                    <td className="px-4 py-3 font-mono text-[var(--text-primary)]">{t.min_stock}</td>
+                    <td className="px-4 py-3 font-mono text-[var(--text-primary)]">{t.reorder_point}</td>
                     <td className="px-4 py-3">
                       <span
-                        className={`text-xs font-mono ${t.is_active ? 'text-green-400' : 'text-zinc-500'}`}
+                        className={`text-xs font-mono ${t.is_active ? 'text-[var(--green)]' : 'text-[var(--text-dim)]'}`}
                       >
                         {t.is_active ? 'Yes' : 'No'}
                       </span>
@@ -167,7 +167,7 @@ export function ThresholdsManager({
                     <td className="px-4 py-3">
                       <button
                         onClick={() => handleDelete(t.id)}
-                        className="text-xs text-zinc-500 hover:text-red-400 transition-colors"
+                        className="text-xs text-[var(--text-dim)] hover:text-[var(--red)] transition-colors"
                       >
                         Delete
                       </button>
@@ -181,23 +181,23 @@ export function ThresholdsManager({
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-zinc-900 border-zinc-700">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-zinc-100">Add Threshold</DialogTitle>
+            <DialogTitle>Add Threshold</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-zinc-400 text-xs">Commodity</Label>
+              <Label className="text-[var(--text-muted)] text-xs">Commodity</Label>
               <Select
                 value={form.commodity_id}
                 onValueChange={(v) => setForm((f) => ({ ...f, commodity_id: v ?? '' }))}
               >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100">
+                <SelectTrigger>
                   <SelectValue placeholder="Select commodity" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
+                <SelectContent>
                   {commodities.map((c) => (
-                    <SelectItem key={c.id} value={c.id} className="text-zinc-100">
+                    <SelectItem key={c.id} value={c.id}>
                       {c.name} ({c.code})
                     </SelectItem>
                   ))}
@@ -206,17 +206,17 @@ export function ThresholdsManager({
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-zinc-400 text-xs">Location</Label>
+              <Label className="text-[var(--text-muted)] text-xs">Location</Label>
               <Select
                 value={form.location_id}
                 onValueChange={(v) => setForm((f) => ({ ...f, location_id: v ?? '' }))}
               >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100">
+                <SelectTrigger>
                   <SelectValue placeholder="Select location" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
+                <SelectContent>
                   {locations.map((l) => (
-                    <SelectItem key={l.id} value={l.id} className="text-zinc-100">
+                    <SelectItem key={l.id} value={l.id}>
                       {l.name}
                     </SelectItem>
                   ))}
@@ -225,17 +225,17 @@ export function ThresholdsManager({
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-zinc-400 text-xs">Unit</Label>
+              <Label className="text-[var(--text-muted)] text-xs">Unit</Label>
               <Select
                 value={form.unit_id}
                 onValueChange={(v) => setForm((f) => ({ ...f, unit_id: v ?? '' }))}
               >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100">
+                <SelectTrigger>
                   <SelectValue placeholder="Select unit" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
+                <SelectContent>
                   {units.map((u) => (
-                    <SelectItem key={u.id} value={u.id} className="text-zinc-100">
+                    <SelectItem key={u.id} value={u.id}>
                       {u.name} ({u.abbreviation})
                     </SelectItem>
                   ))}
@@ -245,30 +245,28 @@ export function ThresholdsManager({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-zinc-400 text-xs">Min Stock</Label>
+                <Label className="text-[var(--text-muted)] text-xs">Min Stock</Label>
                 <Input
                   type="number"
                   min="0"
                   step="any"
                   value={form.min_stock}
                   onChange={(e) => setForm((f) => ({ ...f, min_stock: e.target.value }))}
-                  className="bg-zinc-800 border-zinc-700 text-zinc-100"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-zinc-400 text-xs">Reorder Point</Label>
+                <Label className="text-[var(--text-muted)] text-xs">Reorder Point</Label>
                 <Input
                   type="number"
                   min="0"
                   step="any"
                   value={form.reorder_point}
                   onChange={(e) => setForm((f) => ({ ...f, reorder_point: e.target.value }))}
-                  className="bg-zinc-800 border-zinc-700 text-zinc-100"
                 />
               </div>
             </div>
 
-            {error && <p className="text-sm text-red-400">{error}</p>}
+            {error && <p className="text-sm text-[var(--red)]">{error}</p>}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>

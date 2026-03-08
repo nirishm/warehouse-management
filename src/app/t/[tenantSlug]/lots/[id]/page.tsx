@@ -46,11 +46,11 @@ export default async function LotDetailPage({ params }: Props) {
 
   if (!lot) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-zinc-500">
+      <div className="flex flex-col items-center justify-center py-24 text-[var(--text-dim)]">
         <p className="text-sm font-mono">Lot not found</p>
         <Link
           href={`/t/${tenantSlug}/lots`}
-          className="text-amber-500 hover:text-amber-400 text-xs mt-2 font-mono underline underline-offset-2"
+          className="text-[var(--accent-color)] hover:text-[var(--accent-dark)] text-xs mt-2 font-mono underline underline-offset-2"
         >
           Back to lots
         </Link>
@@ -65,26 +65,26 @@ export default async function LotDetailPage({ params }: Props) {
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100 tracking-tight font-mono">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight font-mono">
             {lot.lot_number}
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-[var(--text-dim)] mt-1">
             {lot.commodity?.name ?? 'Unknown commodity'} ·{' '}
             Received {new Date(lot.received_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
           </p>
         </div>
         <Link
           href={`/t/${tenantSlug}/lots`}
-          className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
+          className="text-xs font-mono text-[var(--accent-color)] hover:text-[var(--accent-dark)] underline underline-offset-2"
         >
           Back to lots
         </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="bg-[var(--bg-base)] border-[var(--border)]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
               Lot Details
             </CardTitle>
           </CardHeader>
@@ -92,7 +92,7 @@ export default async function LotDetailPage({ params }: Props) {
             <DetailRow label="Commodity">
               {lot.commodity ? (
                 <>
-                  <span className="font-mono text-amber-500 text-xs mr-2">{lot.commodity.code}</span>
+                  <span className="font-mono text-[var(--accent-color)] text-xs mr-2">{lot.commodity.code}</span>
                   {lot.commodity.name}
                 </>
               ) : '--'}
@@ -105,7 +105,7 @@ export default async function LotDetailPage({ params }: Props) {
             </DetailRow>
             <DetailRow label="Expiry">
               {lot.expiry_date ? (
-                <span className={new Date(lot.expiry_date) < new Date() ? 'text-red-400' : 'text-zinc-200'}>
+                <span className={new Date(lot.expiry_date) < new Date() ? 'text-[var(--red)]' : 'text-[var(--text-body)]'}>
                   {formatDate(lot.expiry_date)}
                   {new Date(lot.expiry_date) < new Date() && ' (Expired)'}
                 </span>
@@ -115,35 +115,35 @@ export default async function LotDetailPage({ params }: Props) {
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-800 bg-zinc-900/60">
+        <Card className="bg-[var(--bg-base)] border-[var(--border)]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
               Stock Status
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 rounded-md bg-zinc-800/60">
-                <div className="text-2xl font-bold font-mono text-zinc-100">
+              <div className="text-center p-3 rounded-md bg-[var(--bg-off)]">
+                <div className="text-2xl font-bold font-mono text-[var(--text-primary)]">
                   {lot.initial_quantity}
                 </div>
-                <div className="text-xs font-mono uppercase text-zinc-500 mt-1">Initial</div>
+                <div className="text-xs font-mono uppercase text-[var(--text-dim)] mt-1">Initial</div>
               </div>
-              <div className="text-center p-3 rounded-md bg-zinc-800/60">
-                <div className={`text-2xl font-bold font-mono ${lot.current_quantity <= 0 ? 'text-zinc-600' : 'text-emerald-400'}`}>
+              <div className="text-center p-3 rounded-md bg-[var(--bg-off)]">
+                <div className={`text-2xl font-bold font-mono ${lot.current_quantity <= 0 ? 'text-[var(--text-dim)]' : 'text-[var(--green)]'}`}>
                   {lot.current_quantity}
                 </div>
-                <div className="text-xs font-mono uppercase text-zinc-500 mt-1">Remaining</div>
+                <div className="text-xs font-mono uppercase text-[var(--text-dim)] mt-1">Remaining</div>
               </div>
             </div>
             <div>
-              <div className="flex justify-between text-xs font-mono text-zinc-500 mb-1">
+              <div className="flex justify-between text-xs font-mono text-[var(--text-dim)] mb-1">
                 <span>Consumed</span>
                 <span>{consumedPct.toFixed(1)}%</span>
               </div>
-              <div className="w-full bg-zinc-800 rounded-full h-2">
+              <div className="w-full bg-[var(--bg-off)] rounded-full h-2">
                 <div
-                  className="bg-amber-500 h-2 rounded-full transition-all"
+                  className="bg-[var(--accent-color)] h-2 rounded-full transition-all"
                   style={{ width: `${Math.min(consumedPct, 100)}%` }}
                 />
               </div>
@@ -152,54 +152,54 @@ export default async function LotDetailPage({ params }: Props) {
         </Card>
       </div>
 
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="bg-[var(--bg-base)] border-[var(--border)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             Movement History ({movements.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {movements.length === 0 ? (
-            <div className="flex items-center justify-center py-10 text-zinc-600 text-sm font-mono">
+            <div className="flex items-center justify-center py-10 text-[var(--text-dim)] text-sm font-mono">
               No movements yet
             </div>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="border-zinc-800 hover:bg-transparent">
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6">
+                <TableRow className="border-[var(--border)] hover:bg-transparent">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
                     Type
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Reference
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Date
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right pr-6">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right pr-6">
                     Quantity
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {movements.map((m) => (
-                  <TableRow key={m.id} className="border-zinc-800/60 hover:bg-zinc-800/30">
+                  <TableRow key={m.id} className="border-[var(--border)] hover:bg-[var(--bg-off)]">
                     <TableCell className="pl-6">
                       <span className={`text-xs font-mono px-2 py-0.5 rounded border ${
                         m.movement_type === 'dispatch'
-                          ? 'bg-sky-500/15 text-sky-400 border-sky-500/30'
-                          : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                          ? 'bg-[var(--blue-bg)] text-[var(--blue)] border-[rgba(37,99,235,0.2)]'
+                          : 'bg-[var(--green-bg)] text-[var(--green)] border-[rgba(22,163,74,0.2)]'
                       }`}>
                         {m.movement_type}
                       </span>
                     </TableCell>
-                    <TableCell className="font-mono text-sm text-amber-500">
+                    <TableCell className="font-mono text-sm text-[var(--accent-color)]">
                       {m.reference_number}
                     </TableCell>
-                    <TableCell className="text-sm text-zinc-400 font-mono">
+                    <TableCell className="text-sm text-[var(--text-muted)] font-mono">
                       {formatDate(m.movement_date)}
                     </TableCell>
-                    <TableCell className="text-sm font-mono text-right pr-6 text-red-400">
+                    <TableCell className="text-sm font-mono text-right pr-6 text-[var(--red)]">
                       -{m.quantity}
                     </TableCell>
                   </TableRow>
@@ -216,10 +216,10 @@ export default async function LotDetailPage({ params }: Props) {
 function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 w-28 shrink-0 pt-0.5">
+      <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] w-28 shrink-0 pt-0.5">
         {label}
       </span>
-      <span className="text-sm text-zinc-200">{children}</span>
+      <span className="text-sm text-[var(--text-body)]">{children}</span>
     </div>
   );
 }

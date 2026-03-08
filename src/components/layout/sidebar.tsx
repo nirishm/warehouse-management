@@ -34,7 +34,7 @@ function SidebarContent({ tenantSlug, tenantName, navItems }: SidebarProps) {
       {/* Brand */}
       <div className="px-4 h-14 flex items-center border-b border-border">
         <span className="text-sm font-bold tracking-tight text-foreground font-mono uppercase">
-          <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent)] mr-1.5"></span>WareOS
+          <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent-color)] mr-1.5"></span>WareOS
         </span>
       </div>
 
@@ -143,7 +143,7 @@ function NavLink({
       href={href}
       className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-all ${
         active
-          ? 'bg-[var(--accent-tint)] text-[var(--accent)] border-l-2 border-[var(--accent)] -ml-px pl-[11px]'
+          ? 'bg-[var(--accent-tint)] text-[var(--accent-color)] border-l-2 border-[var(--accent-color)] -ml-px pl-[11px]'
           : 'text-[var(--text-muted)] hover:text-[var(--text-body)] hover:bg-[var(--bg-off)]'
       }`}
     >

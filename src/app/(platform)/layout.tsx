@@ -12,9 +12,9 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/admin" className="flex items-center gap-2">
             <span className="text-lg font-bold tracking-tight text-foreground font-mono uppercase">
-              <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent)] mr-1.5"></span>WareOS
+              <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent-color)] mr-1.5"></span>WareOS
             </span>
-            <span className="text-xs bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent)]/20 px-2 py-0.5 rounded font-mono uppercase tracking-wider">
+            <span className="text-xs bg-[var(--accent-tint)] text-[var(--accent-color)] border border-[var(--accent-color)]/20 px-2 py-0.5 rounded font-mono uppercase tracking-wider">
               Admin
             </span>
           </Link>

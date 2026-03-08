@@ -130,14 +130,14 @@ export function MobileReceiveForm({
   return (
     <div className="flex flex-col gap-4 pb-24">
       {/* Dispatch summary */}
-      <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 px-4 py-3">
-        <p className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Route</p>
-        <div className="flex items-center gap-2 mt-1 text-sm text-zinc-300">
+      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-base)] px-4 py-3">
+        <p className="text-xs font-mono text-[var(--text-dim)] uppercase tracking-wider">Route</p>
+        <div className="flex items-center gap-2 mt-1 text-sm text-[var(--text-body)]">
           <span>{dispatch.origin_name}</span>
-          <ArrowRight className="size-3 text-zinc-600" />
+          <ArrowRight className="size-3 text-[var(--text-dim)]" />
           <span>{dispatch.dest_name}</span>
         </div>
-        <p className="font-mono text-amber-500 text-sm mt-0.5">
+        <p className="font-mono text-[var(--accent-color)] text-sm mt-0.5">
           {dispatch.dispatch_number}
         </p>
       </div>
@@ -145,7 +145,7 @@ export function MobileReceiveForm({
       {/* Optional barcode scan to jump to item */}
       {barcodeEnabled && (
         <div className="space-y-1">
-          <Label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
+          <Label className="text-xs font-mono text-[var(--text-dim)] uppercase tracking-wider">
             Scan or search commodity
           </Label>
           <BarcodeScannerInput
@@ -159,7 +159,7 @@ export function MobileReceiveForm({
       {/* Item cards */}
       <div className="space-y-3">
         {visibleItems.length === 0 && (
-          <p className="text-sm text-zinc-500 text-center py-6">No matching items</p>
+          <p className="text-sm text-[var(--text-dim)] text-center py-6">No matching items</p>
         )}
         {visibleItems.map((item) => {
           const received = getReceivedQty(item.id);
@@ -169,39 +169,39 @@ export function MobileReceiveForm({
           return (
             <div
               key={item.id}
-              className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4 space-y-4"
+              className="rounded-lg border border-[var(--border)] bg-[var(--bg-base)] p-4 space-y-4"
             >
               {/* Commodity header */}
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <div className="flex items-center gap-2">
-                    <Package className="size-4 text-zinc-600" />
-                    <p className="text-sm font-medium text-zinc-200">
+                    <Package className="size-4 text-[var(--text-dim)]" />
+                    <p className="text-sm font-medium text-[var(--text-body)]">
                       {item.commodity_name}
                     </p>
                   </div>
-                  <p className="text-xs font-mono text-amber-500 mt-0.5">
+                  <p className="text-xs font-mono text-[var(--accent-color)] mt-0.5">
                     {item.commodity_code}
                   </p>
                 </div>
                 {hasShortage ? (
-                  <Badge className="bg-red-500/10 text-red-400 border-red-500/20 font-mono text-xs shrink-0">
+                  <Badge className="bg-[var(--red-bg)] text-[var(--red)] border-[rgba(220,38,38,0.2)] font-mono text-xs shrink-0">
                     -{shortage} shortage
                   </Badge>
                 ) : (
-                  <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-mono text-xs shrink-0">
+                  <Badge className="bg-[var(--green-bg)] text-[var(--green)] border-[rgba(22,163,74,0.2)] font-mono text-xs shrink-0">
                     OK
                   </Badge>
                 )}
               </div>
 
               {/* Sent qty reference */}
-              <div className="flex items-center justify-between text-xs text-zinc-500 font-mono bg-zinc-800/40 rounded px-3 py-1.5">
+              <div className="flex items-center justify-between text-xs text-[var(--text-dim)] font-mono bg-[var(--bg-off)] rounded px-3 py-1.5">
                 <span>Sent</span>
-                <span className="text-zinc-300">
+                <span className="text-[var(--text-body)]">
                   {item.sent_quantity.toLocaleString()} {item.unit_abbreviation}
                   {item.sent_bags !== null && (
-                    <span className="text-zinc-500 ml-2">({item.sent_bags} bags)</span>
+                    <span className="text-[var(--text-dim)] ml-2">({item.sent_bags} bags)</span>
                   )}
                 </span>
               </div>
@@ -209,8 +209,8 @@ export function MobileReceiveForm({
               {/* Received qty input */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
-                    Received Qty <span className="text-zinc-600">({item.unit_abbreviation})</span>
+                  <Label className="text-xs font-mono text-[var(--text-muted)] uppercase tracking-wider">
+                    Received Qty <span className="text-[var(--text-dim)]">({item.unit_abbreviation})</span>
                   </Label>
                   <Input
                     type="number"
@@ -221,12 +221,12 @@ export function MobileReceiveForm({
                     onChange={(e) =>
                       updateItem(item.id, 'received_quantity', e.target.value)
                     }
-                    className="h-12 text-base font-mono bg-zinc-800 border-zinc-700 text-zinc-100 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                    className="h-12 text-base font-mono"
                   />
                 </div>
                 {item.sent_bags !== null && (
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
+                    <Label className="text-xs font-mono text-[var(--text-muted)] uppercase tracking-wider">
                       Received Bags
                     </Label>
                     <Input
@@ -238,7 +238,7 @@ export function MobileReceiveForm({
                       onChange={(e) =>
                         updateItem(item.id, 'received_bags', e.target.value)
                       }
-                      className="h-12 text-base font-mono bg-zinc-800 border-zinc-700 text-zinc-100 focus-visible:border-amber-500 focus-visible:ring-amber-500/20"
+                      className="h-12 text-base font-mono"
                     />
                   </div>
                 )}
@@ -249,18 +249,18 @@ export function MobileReceiveForm({
       </div>
 
       {error && (
-        <div className="flex items-start gap-3 rounded-lg border border-red-500/30 bg-red-500/5 p-4">
-          <AlertTriangle className="size-5 text-red-500 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="flex items-start gap-3 rounded-lg border border-[rgba(220,38,38,0.2)] bg-[var(--red-bg)] p-4">
+          <AlertTriangle className="size-5 text-[var(--red)] shrink-0 mt-0.5" />
+          <p className="text-sm text-[var(--red)]">{error}</p>
         </div>
       )}
 
       {/* Sticky submit — fixed to bottom on mobile */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-sm border-t border-zinc-800 p-4 md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-[var(--border)] p-4 md:hidden">
         <Button
           onClick={handleSubmit}
           disabled={hasValidationErrors || submitting}
-          className="w-full h-12 text-base bg-amber-600 text-zinc-950 hover:bg-amber-500 font-semibold"
+          className="w-full h-12 text-base bg-[var(--accent-color)] text-white hover:bg-[var(--accent-dark)] font-semibold"
         >
           <CheckCircle2 className="size-5 mr-2" />
           {submitting ? 'Processing…' : 'Confirm Receipt'}

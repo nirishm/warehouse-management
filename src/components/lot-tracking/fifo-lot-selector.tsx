@@ -48,13 +48,13 @@ export function FIFOLotSelector({
 
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
+      <label className="text-xs font-mono text-[var(--text-dim)] uppercase tracking-wider">
         Lot (FIFO)
       </label>
       {loading ? (
-        <div className="text-xs text-zinc-600 font-mono">Loading lots…</div>
+        <div className="text-xs text-[var(--text-dim)] font-mono">Loading lots…</div>
       ) : lots.length === 0 ? (
-        <div className="text-xs text-zinc-600 font-mono">No lots available</div>
+        <div className="text-xs text-[var(--text-dim)] font-mono">No lots available</div>
       ) : (
         <select
           value={selectedLotId ?? ''}
@@ -63,7 +63,7 @@ export function FIFOLotSelector({
             onSelect(lot);
           }}
           disabled={disabled}
-          className="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 text-sm font-mono rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-amber-500"
+          className="w-full bg-[var(--bg-off)] border border-[var(--border)] text-[var(--text-body)] text-sm font-mono rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[var(--accent-color)]"
         >
           <option value="">No lot assigned</option>
           {lots.map((lot, idx) => (

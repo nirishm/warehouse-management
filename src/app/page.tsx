@@ -1,63 +1,38 @@
-import Image from "next/image";
+import type { Metadata } from 'next';
+import { Nav } from '@/components/landing/nav';
+import { Hero } from '@/components/landing/hero';
+import { DashboardMock } from '@/components/landing/dashboard-mock';
+import { ModuleShowcase } from '@/components/landing/module-showcase';
+import { HowItWorks } from '@/components/landing/how-it-works';
+import { FeatureDeepDive } from '@/components/landing/feature-deep-dive';
+import { CtaBanner } from '@/components/landing/cta-banner';
+import { Footer } from '@/components/landing/footer';
+import s from '@/components/landing/landing.module.css';
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: 'WareOS — Warehouse Intelligence for Modern Operations',
+  description:
+    'A unified platform for inventory, dispatch, purchasing, and sales across your entire warehouse. Join the early preview.',
+  openGraph: {
+    title: 'WareOS — Warehouse Intelligence for Modern Operations',
+    description:
+      'A unified platform for inventory, dispatch, purchasing, and sales across your entire warehouse.',
+    siteName: 'WareOS',
+    type: 'website',
+  },
+};
+
+export default function LandingPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--bg-off)] font-sans">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white sm:items-start">
-        <Image
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-foreground">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-[var(--text-muted)]">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-foreground"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-foreground"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[var(--text-body)] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-border px-5 transition-colors hover:border-transparent hover:bg-muted md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className={s.landing}>
+      <Nav />
+      <Hero />
+      <DashboardMock />
+      <ModuleShowcase />
+      <HowItWorks />
+      <FeatureDeepDive />
+      <CtaBanner />
+      <Footer />
     </div>
   );
 }

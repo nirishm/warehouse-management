@@ -21,7 +21,7 @@ interface Props {
 
 const statusColors: Record<string, string> = {
   draft: 'bg-muted text-muted-foreground border-border',
-  dispatched: 'bg-[var(--accent-tint)] text-[var(--accent)] border-[var(--accent)]/20',
+  dispatched: 'bg-[var(--accent-tint)] text-[var(--accent-color)] border-[var(--accent-color)]/20',
   in_transit: 'bg-[var(--blue-bg)] text-[var(--blue)] border-[var(--blue)]/20',
   received: 'bg-[var(--green-bg)] text-[var(--green)] border-[var(--green)]/20',
   cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border-[var(--red)]/20',
@@ -86,7 +86,7 @@ export default async function DispatchesPage({ params }: Props) {
           </p>
         </div>
         <Link href={`/t/${tenantSlug}/dispatches/new`}>
-          <Button className="bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 font-medium">
+          <Button className="bg-[var(--accent-color)] text-white hover:bg-[var(--accent-color)]/90 font-medium">
             <Plus className="size-4 mr-1" />
             New Dispatch
           </Button>
@@ -138,7 +138,7 @@ export default async function DispatchesPage({ params }: Props) {
                     <TableCell className="pl-6">
                       <Link
                         href={`/t/${tenantSlug}/dispatches/${dispatch.id}`}
-                        className="font-mono text-sm text-[var(--accent)] font-medium hover:text-[var(--accent)] underline-offset-4 hover:underline"
+                        className="font-mono text-sm text-[var(--accent-color)] font-medium hover:text-[var(--accent-color)] underline-offset-4 hover:underline"
                       >
                         {dispatch.dispatch_number}
                       </Link>

@@ -34,75 +34,75 @@ export default async function PaymentsPage({ params }: Props) {
   return (
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-100 tracking-tight font-mono">Payments</h1>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight font-mono">Payments</h1>
         <div className="text-right">
-          <p className="text-xs font-mono uppercase tracking-wider text-zinc-500">Total Recorded</p>
-          <p className="text-lg font-bold text-zinc-100 font-mono">
+          <p className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">Total Recorded</p>
+          <p className="text-lg font-bold text-[var(--text-primary)] font-mono">
             ₹{totalRecorded.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
           </p>
         </div>
       </div>
 
-      <Card className="border-zinc-800 bg-zinc-900/60">
+      <Card className="bg-[var(--bg-base)] border-[var(--border)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             All Payments ({payments.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {payments.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+            <div className="flex flex-col items-center justify-center py-16 text-[var(--text-dim)]">
               <p className="text-sm font-mono">No payments recorded yet.</p>
               <p className="text-xs mt-1">Record payments from purchase or sale detail pages.</p>
             </div>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="border-zinc-800 hover:bg-transparent">
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6">
+                <TableRow className="border-[var(--border)] hover:bg-transparent">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
                     Payment #
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Type
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Method
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Reference
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Date
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right pr-6">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right pr-6">
                     Amount
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {payments.map((p) => (
-                  <TableRow key={p.id} className="border-zinc-800/60 hover:bg-zinc-800/30">
-                    <TableCell className="pl-6 font-mono text-amber-500 text-xs">
+                  <TableRow key={p.id} className="border-[var(--border)] hover:bg-[var(--bg-off)]">
+                    <TableCell className="pl-6 font-mono text-[var(--accent-color)] text-xs">
                       {p.payment_number}
                     </TableCell>
                     <TableCell>
                       <Link
                         href={`/t/${tenantSlug}/${p.transaction_type}s/${p.transaction_id}`}
-                        className="text-xs text-zinc-300 hover:text-amber-400 capitalize"
+                        className="text-xs text-[var(--text-body)] hover:text-[var(--accent-color)] capitalize"
                       >
                         {p.transaction_type}
                       </Link>
                     </TableCell>
-                    <TableCell className="text-xs text-zinc-400 capitalize">
+                    <TableCell className="text-xs text-[var(--text-muted)] capitalize">
                       {p.payment_method.replace('_', ' ')}
                     </TableCell>
-                    <TableCell className="text-xs text-zinc-500">
+                    <TableCell className="text-xs text-[var(--text-dim)]">
                       {p.reference_number ?? '--'}
                     </TableCell>
-                    <TableCell className="text-xs text-zinc-400">
+                    <TableCell className="text-xs text-[var(--text-muted)]">
                       {new Date(p.payment_date).toLocaleDateString('en-IN')}
                     </TableCell>
-                    <TableCell className="text-right pr-6 font-mono text-zinc-200 font-semibold text-sm">
+                    <TableCell className="text-right pr-6 font-mono text-[var(--text-body)] font-semibold text-sm">
                       ₹{Number(p.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </TableCell>
                   </TableRow>

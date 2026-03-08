@@ -36,7 +36,7 @@ export default async function ContactsPage({ params }: Props) {
           <h1 className="text-2xl font-bold text-foreground tracking-tight">
             Contacts
           </h1>
-          <p className="text-sm text-foreground0 mt-1">
+          <p className="text-sm text-[var(--text-dim)] mt-1">
             Manage suppliers, customers, and contact information
           </p>
         </div>
@@ -49,7 +49,7 @@ export default async function ContactsPage({ params }: Props) {
 
       <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             All Contacts ({items.length})
           </CardTitle>
         </CardHeader>

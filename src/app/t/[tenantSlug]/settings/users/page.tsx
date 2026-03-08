@@ -19,8 +19,8 @@ interface Props {
 }
 
 const roleColors: Record<string, string> = {
-  tenant_admin: 'bg-[var(--accent)]/15 text-[var(--accent)] border-[var(--accent)]/30',
-  manager: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
+  tenant_admin: 'bg-[var(--accent-color)]/15 text-[var(--accent-color)] border-[var(--accent-color)]/30',
+  manager: 'bg-[var(--blue-bg)] text-[var(--blue)] border-[rgba(37,99,235,0.2)]',
   employee: 'bg-muted/50 text-[var(--text-muted)] border-border',
 };
 
@@ -75,20 +75,20 @@ export default async function UsersPage({ params }: Props) {
         <h1 className="text-2xl font-bold text-foreground tracking-tight">
           User Management
         </h1>
-        <p className="text-sm text-foreground0 mt-1">
+        <p className="text-sm text-[var(--text-dim)] mt-1">
           Manage user permissions, roles, and location assignments
         </p>
       </div>
 
       <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             All Users ({users.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {users.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-foreground0">
+            <div className="flex flex-col items-center justify-center py-16 text-[var(--text-dim)]">
               <p className="text-sm font-mono">No users found</p>
               <p className="text-xs mt-1">
                 Users will appear here once they join this tenant
@@ -98,19 +98,19 @@ export default async function UsersPage({ params }: Props) {
             <Table>
               <TableHeader>
                 <TableRow className="border-border hover:bg-transparent">
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 pl-6">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
                     Name
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Role
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Status
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Permissions
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 text-right pr-6">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right pr-6">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -129,7 +129,7 @@ export default async function UsersPage({ params }: Props) {
                             {user.display_name || 'Unnamed User'}
                           </span>
                           {user.phone && (
-                            <span className="block text-xs text-foreground0 font-mono mt-0.5">
+                            <span className="block text-xs text-[var(--text-dim)] font-mono mt-0.5">
                               {user.phone}
                             </span>
                           )}

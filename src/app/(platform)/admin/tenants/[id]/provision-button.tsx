@@ -31,7 +31,7 @@ export function TenantProvisionButton({ tenantId, schemaName }: { tenantId: stri
       </CardHeader>
       <CardContent className="space-y-3">
         <p className="text-sm text-[var(--text-muted)]">
-          Schema: <code className="text-[var(--accent)] font-mono">{schemaName}</code>
+          Schema: <code className="text-[var(--accent-color)] font-mono">{schemaName}</code>
         </p>
         {result && (
           <div className={`text-sm px-3 py-2 rounded-md border ${
@@ -45,7 +45,7 @@ export function TenantProvisionButton({ tenantId, schemaName }: { tenantId: stri
         <Button
           onClick={handleProvision}
           disabled={loading}
-          className="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white font-semibold"
+          className="bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold"
         >
           {loading ? 'Provisioning...' : 'Provision Schema'}
         </Button>

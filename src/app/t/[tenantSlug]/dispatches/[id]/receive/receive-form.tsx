@@ -67,14 +67,14 @@ interface Props {
 
 function getShortageColor(shortagePercent: number): string {
   if (shortagePercent === 0) return 'text-[var(--green)]';
-  if (shortagePercent > 0 && shortagePercent <= 2) return 'text-[var(--accent)]';
+  if (shortagePercent > 0 && shortagePercent <= 2) return 'text-[var(--accent-color)]';
   return 'text-[var(--red)]';
 }
 
 function getShortageBgColor(shortagePercent: number): string {
   if (shortagePercent === 0) return 'bg-[var(--green-bg)] border-[var(--green)]/20';
   if (shortagePercent > 0 && shortagePercent <= 2)
-    return 'bg-[var(--accent-tint)] border-[var(--accent)]/20';
+    return 'bg-[var(--accent-tint)] border-[var(--accent-color)]/20';
   return 'bg-[var(--red-bg)] border-[var(--red)]/20';
 }
 
@@ -202,7 +202,7 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
               <Label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
                 Dispatch #
               </Label>
-              <p className="text-sm font-mono text-[var(--accent)] mt-1">
+              <p className="text-sm font-mono text-[var(--accent-color)] mt-1">
                 {dispatch.dispatch_number}
               </p>
             </div>
@@ -330,7 +330,7 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
                         onChange={(e) =>
                           updateItem(item.id, 'received_quantity', e.target.value)
                         }
-                        className="w-28 h-8 font-mono text-sm bg-muted border-border text-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+                        className="w-28 h-8 font-mono text-sm bg-muted border-border text-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
                       />
                     </TableCell>
                     <TableCell>
@@ -343,7 +343,7 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
                           onChange={(e) =>
                             updateItem(item.id, 'received_bags', e.target.value)
                           }
-                          className="w-24 h-8 font-mono text-sm bg-muted border-border text-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+                          className="w-24 h-8 font-mono text-sm bg-muted border-border text-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
                         />
                       ) : (
                         <span className="text-sm text-[var(--text-dim)]">--</span>
@@ -377,10 +377,10 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
 
       {/* Summary and Submit */}
       {hasAnyShortage && (
-        <div className="flex items-start gap-3 rounded-lg border border-[var(--accent)]/20 bg-[var(--accent-tint)] p-4">
-          <AlertTriangle className="size-5 text-[var(--accent)] shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 rounded-lg border border-[var(--accent-color)]/20 bg-[var(--accent-tint)] p-4">
+          <AlertTriangle className="size-5 text-[var(--accent-color)] shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-[var(--accent)]">
+            <p className="text-sm font-medium text-[var(--accent-color)]">
               Shortage Detected
             </p>
             <p className="text-xs text-[var(--text-muted)] mt-1">
@@ -416,7 +416,7 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
               <Button
                 size="lg"
                 disabled={hasValidationErrors || submitting}
-                className="bg-[var(--accent)] text-white hover:bg-[var(--accent-dark)] font-semibold px-8"
+                className="bg-[var(--accent-color)] text-white hover:bg-[var(--accent-dark)] font-semibold px-8"
               />
             }
           >
@@ -430,7 +430,7 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
               </DialogTitle>
               <DialogDescription className="text-[var(--text-muted)]">
                 You are about to mark dispatch{' '}
-                <span className="font-mono text-[var(--accent)]">
+                <span className="font-mono text-[var(--accent-color)]">
                   {dispatch.dispatch_number}
                 </span>{' '}
                 as received. This action cannot be undone.
@@ -490,7 +490,7 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
               <Button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="bg-[var(--accent)] text-white hover:bg-[var(--accent-dark)] font-semibold"
+                className="bg-[var(--accent-color)] text-white hover:bg-[var(--accent-dark)] font-semibold"
               >
                 {submitting ? 'Processing...' : 'Confirm Receipt'}
               </Button>

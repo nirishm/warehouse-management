@@ -147,10 +147,8 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          trigger ? (
-            <span>{trigger}</span>
-          ) : (
-            <Button className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)]">
+          trigger ?? (
+            <Button className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)]">
               <Plus className="size-4 mr-1" />
               New Commodity
             </Button>
@@ -162,7 +160,7 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
           <DialogTitle className="text-foreground font-mono uppercase tracking-wider text-sm">
             {isEdit ? 'Edit Commodity' : 'New Commodity'}
           </DialogTitle>
-          <DialogDescription className="text-foreground0 text-xs">
+          <DialogDescription className="text-[var(--text-dim)] text-xs">
             {isEdit
               ? 'Update the commodity details below.'
               : 'Add a new commodity to your inventory.'}
@@ -258,7 +256,7 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
             <Button
               type="submit"
               disabled={loading}
-              className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)] disabled:opacity-50"
+              className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] disabled:opacity-50"
             >
               {loading ? 'Saving...' : isEdit ? 'Update' : 'Create'}
             </Button>

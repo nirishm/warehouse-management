@@ -55,7 +55,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)] focus:ring-[var(--accent)]/20"
+              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent-color)] focus:ring-[var(--accent-color)]/20"
             />
           </div>
           <div className="space-y-2">
@@ -67,7 +67,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)] focus:ring-[var(--accent)]/20"
+              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent-color)] focus:ring-[var(--accent-color)]/20"
             />
           </div>
         </CardContent>
@@ -75,13 +75,13 @@ export default function LoginPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-[var(--accent)] hover:bg-[var(--accent)] text-background font-semibold tracking-wide"
+            className="w-full bg-[var(--accent-color)] hover:bg-[var(--accent-color)] text-background font-semibold tracking-wide"
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </Button>
           <p className="text-sm text-muted-foreground">
             No account?{' '}
-            <Link href="/register" className="text-[var(--accent)] hover:text-[var(--accent)] transition-colors">
+            <Link href="/register" className="text-[var(--accent-color)] hover:text-[var(--accent-color)] transition-colors">
               Register
             </Link>
           </p>

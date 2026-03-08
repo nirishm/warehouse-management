@@ -29,7 +29,7 @@ function StockValue({ value, variant }: { value: number; variant: 'stock' | 'tra
     else if (value < 0) colorClass = 'text-[var(--red)]';
     else colorClass = 'text-muted-foreground';
   } else if (variant === 'transit') {
-    colorClass = value > 0 ? 'text-[var(--accent)]' : 'text-muted-foreground';
+    colorClass = value > 0 ? 'text-[var(--accent-color)]' : 'text-muted-foreground';
   }
 
   return (
@@ -74,7 +74,7 @@ export function StockTable({
           <select
             value={activeLocationId ?? ''}
             onChange={(e) => updateFilter('locationId', e.target.value)}
-            className="h-8 rounded-lg border border-border bg-muted px-3 text-sm text-foreground outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/50"
+            className="h-8 rounded-lg border border-border bg-muted px-3 text-sm text-foreground outline-none focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)]/50"
           >
             <option value="">All Locations</option>
             {locations.map((loc) => (
@@ -87,7 +87,7 @@ export function StockTable({
           <select
             value={activeCommodityId ?? ''}
             onChange={(e) => updateFilter('commodityId', e.target.value)}
-            className="h-8 rounded-lg border border-border bg-muted px-3 text-sm text-foreground outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/50"
+            className="h-8 rounded-lg border border-border bg-muted px-3 text-sm text-foreground outline-none focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)]/50"
           >
             <option value="">All Commodities</option>
             {commodities.map((com) => (
@@ -101,7 +101,7 @@ export function StockTable({
         {(activeLocationId || activeCommodityId) && (
           <button
             onClick={() => router.push(pathname)}
-            className="text-xs font-mono text-[var(--accent)] hover:text-[var(--accent)] underline underline-offset-2"
+            className="text-xs font-mono text-[var(--accent-color)] hover:text-[var(--accent-color)] underline underline-offset-2"
           >
             Clear filters
           </button>
@@ -148,13 +148,13 @@ export function StockTable({
                 className="border-border hover:bg-muted/50"
               >
                 <TableCell className="text-foreground text-sm">
-                  <span className="font-mono text-[var(--accent)] text-xs mr-2">
+                  <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
                     {row.location?.code ?? '---'}
                   </span>
                   {row.location?.name ?? 'Unknown'}
                 </TableCell>
                 <TableCell className="text-foreground text-sm">
-                  <span className="font-mono text-[var(--accent)] text-xs mr-2">
+                  <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
                     {row.commodity?.code ?? '---'}
                   </span>
                   {row.commodity?.name ?? 'Unknown'}

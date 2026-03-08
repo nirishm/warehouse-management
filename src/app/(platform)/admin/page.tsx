@@ -27,7 +27,7 @@ export default async function AdminDashboard() {
           <p className="text-sm text-muted-foreground mt-1">Manage tenants and monitor platform health</p>
         </div>
         <Link href="/admin/tenants/new">
-          <Button className="bg-[var(--accent)] hover:bg-[var(--accent)] text-background font-semibold">
+          <Button className="bg-[var(--accent-color)] hover:bg-[var(--accent-color)] text-background font-semibold">
             + New Tenant
           </Button>
         </Link>

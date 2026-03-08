@@ -18,7 +18,7 @@ import type { Contact } from '@/modules/inventory/validations/contact';
 const typeColors: Record<string, string> = {
   supplier: 'bg-[var(--blue-bg)] text-[var(--blue)] border-[var(--blue)]/20',
   customer: 'bg-[var(--green)]/10 text-[var(--green)] border-[var(--green)]/20',
-  both: 'bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/20',
+  both: 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] border-[var(--accent-color)]/20',
 };
 
 interface ContactsClientProps {
@@ -40,7 +40,7 @@ export function ContactsClient({ contacts, tenantSlug, renderMode }: ContactsCli
 
   if (contacts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-foreground0">
+      <div className="flex flex-col items-center justify-center py-16 text-[var(--text-dim)]">
         <p className="text-sm font-mono">No contacts found</p>
         <p className="text-xs mt-1">
           Create your first contact to get started
@@ -54,22 +54,22 @@ export function ContactsClient({ contacts, tenantSlug, renderMode }: ContactsCli
     <Table>
       <TableHeader>
         <TableRow className="border-border hover:bg-transparent">
-          <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 pl-6">
+          <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
             Name
           </TableHead>
-          <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+          <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             Type
           </TableHead>
-          <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+          <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             Email
           </TableHead>
-          <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+          <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             Phone
           </TableHead>
-          <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+          <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             Status
           </TableHead>
-          <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 text-right pr-6">
+          <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right pr-6">
             Actions
           </TableHead>
         </TableRow>

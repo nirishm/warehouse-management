@@ -8,7 +8,7 @@ import {
 
 const statusColors: Record<string, string> = {
   active: 'bg-[var(--green-bg)] text-[var(--green)] border-[var(--green)]/20',
-  trial: 'bg-[var(--accent-tint)] text-[var(--accent)] border-[var(--accent)]/20',
+  trial: 'bg-[var(--accent-tint)] text-[var(--accent-color)] border-[var(--accent-color)]/20',
   suspended: 'bg-[var(--red-bg)] text-[var(--red)] border-[var(--red)]/20',
   cancelled: 'bg-muted/50 text-[var(--text-muted)] border-border',
 };
@@ -25,7 +25,7 @@ export default async function TenantsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold font-serif text-foreground tracking-tight">Tenants</h1>
         <Link href="/admin/tenants/new">
-          <Button className="bg-[var(--accent)] hover:bg-[var(--accent)] text-background font-semibold">
+          <Button className="bg-[var(--accent-color)] hover:bg-[var(--accent-color)] text-background font-semibold">
             + New Tenant
           </Button>
         </Link>

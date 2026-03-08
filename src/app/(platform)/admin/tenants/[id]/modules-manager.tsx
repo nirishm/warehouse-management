@@ -51,7 +51,7 @@ export function TenantModulesManager({ tenantId, enabledModules, modules }: Prop
           onClick={handleSave}
           disabled={saving}
           size="sm"
-          className="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white font-semibold"
+          className="bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold"
         >
           {saving ? 'Saving...' : 'Save Changes'}
         </Button>
@@ -64,7 +64,7 @@ export function TenantModulesManager({ tenantId, enabledModules, modules }: Prop
               onClick={() => toggleModule(mod)}
               className={`p-3 rounded-lg border text-left text-sm transition-all ${
                 enabled.includes(mod)
-                  ? 'border-[var(--accent)]/30 bg-[var(--accent-tint)] text-foreground'
+                  ? 'border-[var(--accent-color)]/30 bg-[var(--accent-tint)] text-foreground'
                   : 'border-border bg-muted/50 text-muted-foreground hover:border-border'
               }`}
             >
@@ -72,7 +72,7 @@ export function TenantModulesManager({ tenantId, enabledModules, modules }: Prop
                 {mod.replace(/_/g, ' ')}
               </span>
               {enabled.includes(mod) && (
-                <Badge className="mt-2 bg-[var(--accent-tint)] text-[var(--accent)] border-[var(--accent)]/20 text-[10px]">
+                <Badge className="mt-2 bg-[var(--accent-tint)] text-[var(--accent-color)] border-[var(--accent-color)]/20 text-[10px]">
                   Active
                 </Badge>
               )}

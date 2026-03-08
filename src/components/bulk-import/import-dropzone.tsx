@@ -53,10 +53,10 @@ export function ImportDropzone({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-zinc-300">{label}</span>
+        <span className="text-sm text-[var(--text-body)]">{label}</span>
         <a
           href={templateUrl}
-          className="text-xs font-mono text-amber-500 hover:text-amber-400 underline underline-offset-2"
+          className="text-xs font-mono text-[var(--accent-color)] hover:text-[var(--accent-dark)] underline underline-offset-2"
         >
           Download template
         </a>
@@ -65,8 +65,8 @@ export function ImportDropzone({
       <div
         className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
           dragging
-            ? 'border-amber-500 bg-amber-500/5'
-            : 'border-zinc-700 hover:border-zinc-600'
+            ? 'border-[var(--accent-color)] bg-[var(--accent-tint)]'
+            : 'border-[var(--border)] hover:border-[var(--border-mid)]'
         }`}
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
@@ -85,16 +85,16 @@ export function ImportDropzone({
           onChange={(e) => handleFiles(e.target.files)}
         />
         {uploading ? (
-          <p className="text-sm font-mono text-zinc-400">Processing…</p>
+          <p className="text-sm font-mono text-[var(--text-muted)]">Processing…</p>
         ) : (
           <>
-            <p className="text-sm text-zinc-400">Drop CSV here or click to browse</p>
-            <p className="text-xs text-zinc-600 mt-1 font-mono">.csv files only</p>
+            <p className="text-sm text-[var(--text-muted)]">Drop CSV here or click to browse</p>
+            <p className="text-xs text-[var(--text-dim)] mt-1 font-mono">.csv files only</p>
           </>
         )}
       </div>
 
-      {uploadError && <p className="text-sm text-red-400">{uploadError}</p>}
+      {uploadError && <p className="text-sm text-[var(--red)]">{uploadError}</p>}
 
       {result && (
         <>
@@ -104,7 +104,7 @@ export function ImportDropzone({
               variant="ghost"
               size="sm"
               onClick={() => setResult(null)}
-              className="text-zinc-500 text-xs"
+              className="text-[var(--text-dim)] text-xs"
             >
               Import another file
             </Button>

@@ -37,14 +37,14 @@ export function PaymentPanel({ tenantSlug, transactionType, transactionId, canMa
 
   const outstandingColor = balance
     ? balance.outstanding <= 0
-      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-      : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+      ? 'bg-[var(--green-bg)] text-[var(--green)] border border-[rgba(22,163,74,0.2)]'
+      : 'bg-[var(--orange-bg)] text-[var(--accent-color)] border border-[rgba(244,95,0,0.2)]'
     : '';
 
   return (
-    <Card className="border-zinc-800 bg-zinc-900/60">
+    <Card className="bg-[var(--bg-base)] border-[var(--border)]">
       <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <CardTitle className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+        <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
           Payments
         </CardTitle>
         <div className="flex items-center gap-3">
@@ -67,34 +67,34 @@ export function PaymentPanel({ tenantSlug, transactionType, transactionId, canMa
       </CardHeader>
       <CardContent>
         {loading ? (
-          <p className="text-xs text-zinc-500 font-mono">Loading...</p>
+          <p className="text-xs text-[var(--text-dim)] font-mono">Loading...</p>
         ) : payments.length === 0 ? (
-          <p className="text-xs text-zinc-500 font-mono">No payments recorded.</p>
+          <p className="text-xs text-[var(--text-dim)] font-mono">No payments recorded.</p>
         ) : (
           <div className="space-y-2">
             {payments.map((p) => (
               <div
                 key={p.id}
-                className="flex items-center justify-between text-sm py-2 border-b border-zinc-800/60 last:border-0"
+                className="flex items-center justify-between text-sm py-2 border-b border-[var(--border)] last:border-0"
               >
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-amber-500 text-xs">{p.payment_number}</span>
-                  <span className="text-zinc-400 text-xs capitalize">
+                  <span className="font-mono text-[var(--accent-color)] text-xs">{p.payment_number}</span>
+                  <span className="text-[var(--text-muted)] text-xs capitalize">
                     {p.payment_method.replace('_', ' ')}
                   </span>
                   {p.reference_number && (
-                    <span className="text-zinc-600 text-xs">Ref: {p.reference_number}</span>
+                    <span className="text-[var(--text-dim)] text-xs">Ref: {p.reference_number}</span>
                   )}
                 </div>
-                <span className="font-mono text-zinc-200 font-semibold">
+                <span className="font-mono text-[var(--text-body)] font-semibold">
                   ₹{Number(p.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
             ))}
             {balance && (
               <div className="flex items-center justify-between pt-2 text-sm">
-                <span className="text-xs font-mono uppercase tracking-wider text-zinc-500">Total Paid</span>
-                <span className="font-mono text-zinc-200 font-bold">
+                <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">Total Paid</span>
+                <span className="font-mono text-[var(--text-body)] font-bold">
                   ₹{balance.total_paid.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>

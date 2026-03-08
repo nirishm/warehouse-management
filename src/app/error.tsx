@@ -17,7 +17,7 @@ export default function GlobalError({
         </p>
         <button
           onClick={reset}
-          className="inline-block mt-4 px-4 py-2 bg-[var(--accent)] text-white font-medium rounded-full hover:bg-[var(--accent-dark)] transition-colors"
+          className="inline-block mt-4 px-4 py-2 bg-[var(--accent-color)] text-white font-medium rounded-full hover:bg-[var(--accent-dark)] transition-colors"
         >
           Try again
         </button>

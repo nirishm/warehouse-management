@@ -40,10 +40,10 @@ export default async function LocationsPage({ params }: Props) {
   const items = (locations ?? []) as Location[];
 
   const typeColors: Record<string, string> = {
-    warehouse: 'bg-[var(--accent)]/15 text-[var(--accent)] border-[var(--accent)]/30',
+    warehouse: 'bg-[var(--accent-color)]/15 text-[var(--accent-color)] border-[var(--accent-color)]/30',
     store: 'bg-[var(--green)]/15 text-[var(--green)] border-[var(--green)]/30',
-    yard: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-    external: 'bg-violet-500/15 text-violet-400 border-violet-500/30',
+    yard: 'bg-[var(--blue-bg)] text-[var(--blue)] border-[rgba(37,99,235,0.2)]',
+    external: 'bg-[var(--orange-bg)] text-[var(--accent-color)] border-[rgba(244,95,0,0.2)]',
   };
 
   return (
@@ -53,7 +53,7 @@ export default async function LocationsPage({ params }: Props) {
           <h1 className="text-2xl font-bold text-foreground tracking-tight">
             Locations
           </h1>
-          <p className="text-sm text-foreground0 mt-1">
+          <p className="text-sm text-[var(--text-dim)] mt-1">
             Manage warehouses, stores, yards, and external locations
           </p>
         </div>
@@ -62,13 +62,13 @@ export default async function LocationsPage({ params }: Props) {
 
       <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             All Locations ({items.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-foreground0">
+            <div className="flex flex-col items-center justify-center py-16 text-[var(--text-dim)]">
               <p className="text-sm font-mono">No locations found</p>
               <p className="text-xs mt-1">
                 Create your first location to get started
@@ -79,19 +79,19 @@ export default async function LocationsPage({ params }: Props) {
             <Table>
               <TableHeader>
                 <TableRow className="border-border hover:bg-transparent">
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 pl-6">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
                     Code
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Name
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Type
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                     Status
                   </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 text-right pr-6">
+                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right pr-6">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -102,7 +102,7 @@ export default async function LocationsPage({ params }: Props) {
                     key={location.id}
                     className="border-border hover:bg-muted/50"
                   >
-                    <TableCell className="pl-6 font-mono text-sm text-[var(--accent)] font-medium">
+                    <TableCell className="pl-6 font-mono text-sm text-[var(--accent-color)] font-medium">
                       {location.code}
                     </TableCell>
                     <TableCell className="text-sm text-foreground">

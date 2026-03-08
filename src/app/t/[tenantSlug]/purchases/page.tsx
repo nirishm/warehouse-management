@@ -21,7 +21,7 @@ interface Props {
 
 const statusColors: Record<PurchaseStatus, string> = {
   draft: 'bg-muted text-muted-foreground border border-border',
-  ordered: 'bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent)]/20',
+  ordered: 'bg-[var(--accent-tint)] text-[var(--accent-color)] border border-[var(--accent-color)]/20',
   received: 'bg-[var(--green-bg)] text-[var(--green)] border border-[var(--green)]/20',
   cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border border-[var(--red)]/20',
 };
@@ -77,7 +77,7 @@ export default async function PurchasesPage({ params }: Props) {
           </p>
         </div>
         <Link href={`/t/${tenantSlug}/purchases/new`}>
-          <Button className="bg-[var(--accent)] hover:bg-[var(--accent)]/90 text-white font-medium">
+          <Button className="bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white font-medium">
             New Purchase
           </Button>
         </Link>
@@ -155,7 +155,7 @@ export default async function PurchasesPage({ params }: Props) {
                       <TableCell className="pl-6">
                         <Link
                           href={`/t/${tenantSlug}/purchases/${purchase.id}`}
-                          className="font-mono text-sm text-[var(--accent)] hover:text-[var(--accent)]/80 font-medium"
+                          className="font-mono text-sm text-[var(--accent-color)] hover:text-[var(--accent-color)]/80 font-medium"
                         >
                           {purchase.purchase_number}
                         </Link>
@@ -163,7 +163,7 @@ export default async function PurchasesPage({ params }: Props) {
                       <TableCell className="text-sm text-foreground">
                         {purchase.location ? (
                           <>
-                            <span className="font-mono text-[var(--accent)] text-xs mr-2">
+                            <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
                               {purchase.location.code}
                             </span>
                             {purchase.location.name}

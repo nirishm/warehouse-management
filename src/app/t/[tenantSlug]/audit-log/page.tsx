@@ -46,7 +46,7 @@ export default async function AuditLogPage({ params, searchParams }: Props) {
         <h1 className="text-2xl font-bold text-foreground tracking-tight">
           Audit Log
         </h1>
-        <p className="text-sm text-foreground0 mt-1">
+        <p className="text-sm text-[var(--text-dim)] mt-1">
           Track all changes and actions across your warehouse
         </p>
       </div>

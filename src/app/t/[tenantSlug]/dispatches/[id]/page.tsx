@@ -25,7 +25,7 @@ interface Props {
 
 const statusColors: Record<string, string> = {
   draft: 'bg-muted/50 text-[var(--text-muted)] border-border',
-  dispatched: 'bg-[var(--accent-tint)] text-[var(--accent)] border-[var(--accent)]/20',
+  dispatched: 'bg-[var(--accent-tint)] text-[var(--accent-color)] border-[var(--accent-color)]/20',
   in_transit: 'bg-[var(--blue-bg)] text-[var(--blue)] border-[var(--blue)]/20',
   received: 'bg-[var(--green-bg)] text-[var(--green)] border-[var(--green)]/20',
   cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border-[var(--red)]/20',

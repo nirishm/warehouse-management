@@ -34,11 +34,11 @@ export default async function UserDetailPage({ params }: Props) {
 
   if (!profile) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-foreground0">
+      <div className="flex flex-col items-center justify-center py-16 text-[var(--text-dim)]">
         <p className="text-sm font-mono">User not found</p>
         <Link
           href={`/t/${tenantSlug}/settings/users`}
-          className="text-xs text-[var(--accent)] hover:text-[var(--accent)] mt-2 font-mono"
+          className="text-xs text-[var(--accent-color)] hover:text-[var(--accent-color)] mt-2 font-mono"
         >
           Back to Users
         </Link>
@@ -78,7 +78,7 @@ export default async function UserDetailPage({ params }: Props) {
           <h1 className="text-2xl font-bold text-foreground tracking-tight">
             {user.display_name || 'Unnamed User'}
           </h1>
-          <p className="text-sm text-foreground0 mt-0.5 font-mono">
+          <p className="text-sm text-[var(--text-dim)] mt-0.5 font-mono">
             User ID: {user.user_id}
           </p>
         </div>

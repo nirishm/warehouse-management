@@ -34,35 +34,35 @@ export default async function LotsPage({ params }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">Lots</h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Lots</h1>
+        <p className="text-sm text-[var(--text-dim)] mt-1">
           Batch/lot inventory with FIFO tracking
         </p>
       </div>
 
-      <div className="border border-zinc-800 rounded-lg overflow-hidden">
+      <div className="border border-[var(--border)] rounded-lg overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-zinc-800 hover:bg-transparent">
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6">
+            <TableRow className="border-[var(--border)] hover:bg-transparent">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
                 Lot #
               </TableHead>
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                 Commodity
               </TableHead>
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                 Received
               </TableHead>
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                 Expiry
               </TableHead>
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right">
                 Initial Qty
               </TableHead>
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right">
                 Current Qty
               </TableHead>
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 text-right pr-6">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right pr-6">
                 Unit
               </TableHead>
             </TableRow>
@@ -70,25 +70,25 @@ export default async function LotsPage({ params }: Props) {
           <TableBody>
             {lots.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-12 text-zinc-500 text-sm font-mono">
+                <TableCell colSpan={7} className="text-center py-12 text-[var(--text-dim)] text-sm font-mono">
                   No lots found
                 </TableCell>
               </TableRow>
             ) : (
               lots.map((lot) => (
-                <TableRow key={lot.id} className="border-zinc-800/60 hover:bg-zinc-800/30">
+                <TableRow key={lot.id} className="border-[var(--border)] hover:bg-[var(--bg-off)]">
                   <TableCell className="pl-6">
                     <Link
                       href={`/t/${tenantSlug}/lots/${lot.id}`}
-                      className="font-mono text-amber-500 hover:text-amber-400 text-sm"
+                      className="font-mono text-[var(--accent-color)] hover:text-[var(--accent-dark)] text-sm"
                     >
                       {lot.lot_number}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-sm text-zinc-200">
+                  <TableCell className="text-sm text-[var(--text-body)]">
                     {lot.commodity ? (
                       <>
-                        <span className="font-mono text-xs text-zinc-500 mr-2">
+                        <span className="font-mono text-xs text-[var(--text-dim)] mr-2">
                           {lot.commodity.code}
                         </span>
                         {lot.commodity.name}
@@ -97,7 +97,7 @@ export default async function LotsPage({ params }: Props) {
                       '--'
                     )}
                   </TableCell>
-                  <TableCell className="text-sm text-zinc-400 font-mono">
+                  <TableCell className="text-sm text-[var(--text-muted)] font-mono">
                     {new Date(lot.received_date).toLocaleDateString('en-IN', {
                       day: '2-digit',
                       month: 'short',
@@ -109,10 +109,10 @@ export default async function LotsPage({ params }: Props) {
                     {lot.expiry_date ? (
                       <span className={
                         new Date(lot.expiry_date) < new Date()
-                          ? 'text-red-400'
+                          ? 'text-[var(--red)]'
                           : new Date(lot.expiry_date) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                          ? 'text-amber-400'
-                          : 'text-zinc-400'
+                          ? 'text-[var(--accent-color)]'
+                          : 'text-[var(--text-muted)]'
                       }>
                         {new Date(lot.expiry_date).toLocaleDateString('en-IN', {
                           day: '2-digit',
@@ -121,18 +121,18 @@ export default async function LotsPage({ params }: Props) {
                         })}
                       </span>
                     ) : (
-                      <span className="text-zinc-600">--</span>
+                      <span className="text-[var(--text-dim)]">--</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-sm text-zinc-400 font-mono text-right">
+                  <TableCell className="text-sm text-[var(--text-muted)] font-mono text-right">
                     {lot.initial_quantity}
                   </TableCell>
                   <TableCell className="text-sm font-mono text-right">
-                    <span className={lot.current_quantity <= 0 ? 'text-zinc-600' : 'text-zinc-200'}>
+                    <span className={lot.current_quantity <= 0 ? 'text-[var(--text-dim)]' : 'text-[var(--text-body)]'}>
                       {lot.current_quantity}
                     </span>
                   </TableCell>
-                  <TableCell className="text-sm text-zinc-400 font-mono text-right pr-6">
+                  <TableCell className="text-sm text-[var(--text-muted)] font-mono text-right pr-6">
                     {lot.unit?.abbreviation ?? lot.unit?.name ?? '--'}
                   </TableCell>
                 </TableRow>

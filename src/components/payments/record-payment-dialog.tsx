@@ -67,19 +67,19 @@ export function RecordPaymentDialog({ tenantSlug, transactionType, transactionId
         render={
           <Button
             size="sm"
-            className="bg-amber-600 hover:bg-amber-500 text-zinc-950 font-semibold text-xs"
+            className="bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold text-xs"
           />
         }
       >
         Record Payment
       </DialogTrigger>
-      <DialogContent className="bg-zinc-900 border-zinc-800 text-zinc-200 max-w-md">
+      <DialogContent className="bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-body)] max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-zinc-100 font-mono">Record Payment</DialogTitle>
+          <DialogTitle className="text-[var(--text-primary)] font-mono">Record Payment</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div>
-            <Label className="text-xs font-mono uppercase tracking-wider text-zinc-500">Amount</Label>
+            <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">Amount</Label>
             <Input
               type="number"
               step="0.01"
@@ -87,19 +87,19 @@ export function RecordPaymentDialog({ tenantSlug, transactionType, transactionId
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               required
-              className="mt-1 bg-zinc-800 border-zinc-700 text-zinc-200"
+              className="mt-1"
               placeholder="0.00"
             />
           </div>
           <div>
-            <Label className="text-xs font-mono uppercase tracking-wider text-zinc-500">Method</Label>
+            <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">Method</Label>
             <Select value={method} onValueChange={(v) => setMethod(v ?? 'cash')}>
-              <SelectTrigger className="mt-1 bg-zinc-800 border-zinc-700 text-zinc-200">
+              <SelectTrigger className="mt-1">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800">
+              <SelectContent>
                 {(['cash', 'bank_transfer', 'cheque', 'upi', 'other'] as const).map((m) => (
-                  <SelectItem key={m} value={m} className="text-zinc-200 focus:bg-zinc-800">
+                  <SelectItem key={m} value={m}>
                     {m.replace('_', ' ')}
                   </SelectItem>
                 ))}
@@ -107,20 +107,20 @@ export function RecordPaymentDialog({ tenantSlug, transactionType, transactionId
             </Select>
           </div>
           <div>
-            <Label className="text-xs font-mono uppercase tracking-wider text-zinc-500">Reference #</Label>
+            <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">Reference #</Label>
             <Input
               value={reference}
               onChange={(e) => setReference(e.target.value)}
-              className="mt-1 bg-zinc-800 border-zinc-700 text-zinc-200"
+              className="mt-1"
               placeholder="Optional"
             />
           </div>
           <div>
-            <Label className="text-xs font-mono uppercase tracking-wider text-zinc-500">Notes</Label>
+            <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">Notes</Label>
             <Input
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="mt-1 bg-zinc-800 border-zinc-700 text-zinc-200"
+              className="mt-1"
               placeholder="Optional"
             />
           </div>
@@ -130,7 +130,6 @@ export function RecordPaymentDialog({ tenantSlug, transactionType, transactionId
               variant="ghost"
               size="sm"
               onClick={() => setOpen(false)}
-              className="text-zinc-400 hover:text-zinc-200"
             >
               Cancel
             </Button>
@@ -138,7 +137,7 @@ export function RecordPaymentDialog({ tenantSlug, transactionType, transactionId
               type="submit"
               size="sm"
               disabled={saving || !amount}
-              className="bg-amber-600 hover:bg-amber-500 text-zinc-950 font-semibold"
+              className="bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold"
             >
               {saving ? 'Saving...' : 'Record'}
             </Button>

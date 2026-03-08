@@ -25,8 +25,8 @@ export default async function DocumentSettingsPage({ params }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">Document Settings</h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">Document Settings</h1>
+        <p className="text-sm text-[var(--text-dim)] mt-1">
           Configure company letterhead for PDF documents
         </p>
       </div>

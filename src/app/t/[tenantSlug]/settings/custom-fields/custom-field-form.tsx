@@ -193,7 +193,7 @@ export function CustomFieldForm({
       <DialogTrigger
         render={
           trigger ?? (
-            <Button className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)] font-medium">
+            <Button className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] font-medium">
               <Plus className="size-4 mr-1" />
               New Custom Field
             </Button>
@@ -205,7 +205,7 @@ export function CustomFieldForm({
           <DialogTitle className="text-foreground font-semibold">
             {isEditing ? 'Edit Custom Field' : 'New Custom Field'}
           </DialogTitle>
-          <DialogDescription className="text-foreground0">
+          <DialogDescription className="text-[var(--text-dim)]">
             {isEditing
               ? 'Update the custom field definition.'
               : 'Define a new custom field for an entity type.'}
@@ -257,7 +257,7 @@ export function CustomFieldForm({
               onChange={(e) => setFieldLabel(e.target.value)}
               placeholder="e.g. Batch Number"
               required
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
             />
           </div>
 
@@ -278,7 +278,7 @@ export function CustomFieldForm({
               placeholder="e.g. batch_number"
               required
               pattern="^[a-z0-9_]+$"
-              className="bg-background border-border text-[var(--accent)] font-mono placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+              className="bg-background border-border text-[var(--accent-color)] font-mono placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
             />
             <p className="text-xs text-[var(--text-dim)]">
               Lowercase letters, numbers, and underscores only
@@ -324,7 +324,7 @@ export function CustomFieldForm({
                 onChange={(e) => setOptionsText(e.target.value)}
                 placeholder="Option A, Option B, Option C"
                 required
-                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
               />
               <p className="text-xs text-[var(--text-dim)]">
                 Comma-separated list of options
@@ -339,7 +339,7 @@ export function CustomFieldForm({
                 id="cf-required"
                 checked={isRequired}
                 onChange={(e) => setIsRequired(e.target.checked)}
-                className="size-4 rounded border-border bg-background text-[var(--accent)] focus:ring-[var(--accent)]/20 accent-[var(--accent)]"
+                className="size-4 rounded border-border bg-background text-[var(--accent-color)] focus:ring-[var(--accent-color)]/20 accent-[var(--accent-color)]"
               />
               <Label
                 htmlFor="cf-required"
@@ -362,7 +362,7 @@ export function CustomFieldForm({
                 min={0}
                 value={sortOrder}
                 onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)}
-                className="w-20 bg-background border-border text-foreground font-mono focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+                className="w-20 bg-background border-border text-foreground font-mono focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
               />
             </div>
           </div>
@@ -371,7 +371,7 @@ export function CustomFieldForm({
             <Button
               type="submit"
               disabled={loading}
-              className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)] font-medium"
+              className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] font-medium"
             >
               {loading && <Loader2 className="size-4 mr-1 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Field'}

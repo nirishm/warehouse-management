@@ -21,7 +21,7 @@ interface Props {
 
 const statusColors: Record<SaleStatus, string> = {
   draft: 'bg-muted/50 text-[var(--text-muted)] border border-border',
-  confirmed: 'bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent)]/20',
+  confirmed: 'bg-[var(--accent-tint)] text-[var(--accent-color)] border border-[var(--accent-color)]/20',
   dispatched: 'bg-[var(--green-bg)] text-[var(--green)] border border-[var(--green)]/20',
   cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border border-[var(--red)]/20',
 };
@@ -77,7 +77,7 @@ export default async function SalesPage({ params }: Props) {
           </p>
         </div>
         <Link href={`/t/${tenantSlug}/sales/new`}>
-          <Button className="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white font-medium">
+          <Button className="bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-medium">
             New Sale
           </Button>
         </Link>
@@ -155,7 +155,7 @@ export default async function SalesPage({ params }: Props) {
                       <TableCell className="pl-6">
                         <Link
                           href={`/t/${tenantSlug}/sales/${sale.id}`}
-                          className="font-mono text-sm text-[var(--accent)] hover:text-[var(--accent)] font-medium"
+                          className="font-mono text-sm text-[var(--accent-color)] hover:text-[var(--accent-color)] font-medium"
                         >
                           {sale.sale_number}
                         </Link>
@@ -163,7 +163,7 @@ export default async function SalesPage({ params }: Props) {
                       <TableCell className="text-sm text-foreground">
                         {sale.location ? (
                           <>
-                            <span className="font-mono text-[var(--accent)] text-xs mr-2">
+                            <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
                               {sale.location.code}
                             </span>
                             {sale.location.name}

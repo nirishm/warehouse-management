@@ -138,7 +138,7 @@ export default function NewPurchasePage() {
   }
 
   const selectClass =
-    'h-8 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/50';
+    'h-8 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)]/50';
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -400,7 +400,7 @@ export default function NewPurchasePage() {
           <Button
             type="submit"
             disabled={submitting}
-            className="bg-[var(--accent)] hover:bg-[var(--accent)]/90 text-white font-medium"
+            className="bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white font-medium"
           >
             {submitting ? 'Creating...' : 'Create Purchase'}
           </Button>

@@ -44,7 +44,7 @@ export default function RegisterPage() {
     return (
       <Card className="border-border bg-[var(--bg-off)] backdrop-blur shadow-2xl">
         <CardContent className="pt-6 text-center space-y-3">
-          <div className="text-[var(--accent)] text-4xl">✓</div>
+          <div className="text-[var(--accent-color)] text-4xl">✓</div>
           <h2 className="text-lg text-foreground font-medium">Check your email</h2>
           <p className="text-sm text-[var(--text-muted)]">
             We sent a confirmation link to <span className="text-foreground">{email}</span>
@@ -80,7 +80,7 @@ export default function RegisterPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)] focus:ring-[var(--accent)]/20"
+              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent-color)] focus:ring-[var(--accent-color)]/20"
             />
           </div>
           <div className="space-y-2">
@@ -92,7 +92,7 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)] focus:ring-[var(--accent)]/20"
+              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent-color)] focus:ring-[var(--accent-color)]/20"
             />
           </div>
           <div className="space-y-2">
@@ -105,7 +105,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)] focus:ring-[var(--accent)]/20"
+              className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent-color)] focus:ring-[var(--accent-color)]/20"
             />
           </div>
         </CardContent>
@@ -113,13 +113,13 @@ export default function RegisterPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-[var(--accent)] hover:bg-[var(--accent)] text-background font-semibold tracking-wide"
+            className="w-full bg-[var(--accent-color)] hover:bg-[var(--accent-color)] text-background font-semibold tracking-wide"
           >
             {loading ? 'Creating account...' : 'Create account'}
           </Button>
           <p className="text-sm text-muted-foreground">
             Already have an account?{' '}
-            <Link href="/login" className="text-[var(--accent)] hover:text-[var(--accent)] transition-colors">
+            <Link href="/login" className="text-[var(--accent-color)] hover:text-[var(--accent-color)] transition-colors">
               Sign in
             </Link>
           </p>

@@ -53,8 +53,8 @@ function formatDate(dateStr: string): string {
 
 const statusColors: Record<string, string> = {
   draft: 'bg-muted/50 text-[var(--text-muted)] border-border',
-  dispatched: 'bg-[var(--accent)]/15 text-[var(--accent)] border-[var(--accent)]/30',
-  in_transit: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
+  dispatched: 'bg-[var(--accent-color)]/15 text-[var(--accent-color)] border-[var(--accent-color)]/30',
+  in_transit: 'bg-[var(--blue-bg)] text-[var(--blue)] border-[rgba(37,99,235,0.2)]',
   received: 'bg-[var(--green)]/15 text-[var(--green)] border-[var(--green)]/30',
   cancelled: 'bg-[var(--red)]/15 text-[var(--red)] border-[var(--red)]/30',
   confirmed: 'bg-[var(--green)]/15 text-[var(--green)] border-[var(--green)]/30',
@@ -71,13 +71,13 @@ const statusLabels: Record<string, string> = {
 
 function shortageColorClass(pct: number): string {
   if (pct < 1) return 'text-[var(--green)]';
-  if (pct <= 3) return 'text-[var(--accent)]';
+  if (pct <= 3) return 'text-[var(--accent-color)]';
   return 'text-[var(--red)]';
 }
 
 function shortageBarColor(pct: number): string {
   if (pct < 1) return 'bg-[var(--green)]';
-  if (pct <= 3) return 'bg-[var(--accent)]';
+  if (pct <= 3) return 'bg-[var(--accent-color)]';
   return 'bg-[var(--red)]';
 }
 
@@ -148,10 +148,10 @@ export function AnalyticsDashboard({
           return (
             <Card
               key={card.label}
-              className="border-border bg-[var(--bg-off)]"
+              className="border-border bg-[var(--bg-base)]"
             >
               <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                   {card.label}
                 </CardTitle>
                 <Icon className="size-4 text-[var(--text-dim)]" />
@@ -169,9 +169,9 @@ export function AnalyticsDashboard({
       {/* ── Dispatch Performance ────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Status Breakdown + Shortage */}
-        <Card className="border-border bg-[var(--bg-off)]">
+        <Card className="border-border bg-[var(--bg-base)]">
           <CardHeader>
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0 flex items-center gap-2">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] flex items-center gap-2">
               <BarChart3 className="size-4" />
               Dispatch Status Breakdown
             </CardTitle>
@@ -180,7 +180,7 @@ export function AnalyticsDashboard({
             {/* Status bars */}
             <div className="space-y-3">
               {dispatches.statusBreakdown.length === 0 ? (
-                <p className="text-sm text-foreground0 font-mono">
+                <p className="text-sm text-[var(--text-dim)] font-mono">
                   No dispatches yet
                 </p>
               ) : (
@@ -195,7 +195,7 @@ export function AnalyticsDashboard({
                       <div key={s.status} className="space-y-1">
                         <div className="flex items-center justify-between">
                           <span
-                            className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-mono font-medium ${colorClass}`}
+                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-mono font-medium ${colorClass}`}
                           >
                             {statusLabels[s.status] ?? s.status}
                           </span>
@@ -205,7 +205,7 @@ export function AnalyticsDashboard({
                         </div>
                         <div className="h-2 w-full rounded-full bg-muted">
                           <div
-                            className="h-2 rounded-full bg-[var(--accent)]/60 transition-all"
+                            className="h-2 rounded-full bg-[var(--accent-color)]/60 transition-all"
                             style={{ width: `${widthPct}%` }}
                           />
                         </div>
@@ -219,7 +219,7 @@ export function AnalyticsDashboard({
             <div className="border-t border-border pt-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-mono uppercase tracking-wider text-foreground0 mb-1">
+                  <p className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] mb-1">
                     Overall Shortage
                   </p>
                   <p className="text-sm text-[var(--text-muted)] font-mono">
@@ -239,7 +239,7 @@ export function AnalyticsDashboard({
                   >
                     {formatPercent(dispatches.overallShortagePercent)}
                   </p>
-                  <p className="text-xs text-foreground0 font-mono">shortage</p>
+                  <p className="text-xs text-[var(--text-dim)] font-mono">shortage</p>
                 </div>
               </div>
             </div>
@@ -247,32 +247,32 @@ export function AnalyticsDashboard({
         </Card>
 
         {/* Top Routes Table */}
-        <Card className="border-border bg-[var(--bg-off)]">
+        <Card className="border-border bg-[var(--bg-base)]">
           <CardHeader>
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0 flex items-center gap-2">
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] flex items-center gap-2">
               <ArrowRight className="size-4" />
               Top 5 Routes
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {dispatches.topRoutes.length === 0 ? (
-              <div className="flex items-center justify-center py-12 text-foreground0">
+              <div className="flex items-center justify-center py-12 text-[var(--text-dim)]">
                 <p className="text-sm font-mono">No dispatch routes yet</p>
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 pl-6">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
                       Origin
                     </TableHead>
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                       Destination
                     </TableHead>
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 text-right">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right">
                       Count
                     </TableHead>
-                    <TableHead className="text-xs font-mono uppercase tracking-wider text-foreground0 text-right pr-6">
+                    <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right pr-6">
                       Avg Shortage
                     </TableHead>
                   </TableRow>
@@ -319,15 +319,15 @@ export function AnalyticsDashboard({
       </div>
 
       {/* ── Recent Activity ─────────────────────────────────────── */}
-      <Card className="border-border bg-[var(--bg-off)]">
+      <Card className="border-border bg-[var(--bg-base)]">
         <CardHeader>
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-foreground0">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             Recent Activity
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {movements.length === 0 ? (
-            <div className="flex items-center justify-center py-12 text-foreground0">
+            <div className="flex items-center justify-center py-12 text-[var(--text-dim)]">
               <p className="text-sm font-mono">No recent activity</p>
             </div>
           ) : (
@@ -336,9 +336,9 @@ export function AnalyticsDashboard({
                 const Icon = typeIcons[m.type] ?? Package;
                 const typeBg =
                   m.type === 'dispatch'
-                    ? 'bg-[var(--accent)]/10 text-[var(--accent)]'
+                    ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)]'
                     : m.type === 'purchase'
-                      ? 'bg-sky-500/10 text-sky-500'
+                      ? 'bg-[var(--blue-bg)] text-[var(--blue)]'
                       : 'bg-[var(--green)]/10 text-[var(--green)]';
                 const badgeColor =
                   statusColors[m.status] ??
@@ -366,7 +366,7 @@ export function AnalyticsDashboard({
                           {typeLabels[m.type] ?? m.type}
                         </span>
                       </div>
-                      <p className="text-xs text-foreground0 font-mono truncate">
+                      <p className="text-xs text-[var(--text-dim)] font-mono truncate">
                         {m.description}
                       </p>
                     </div>
@@ -379,7 +379,7 @@ export function AnalyticsDashboard({
                     </span>
 
                     {/* Date */}
-                    <span className="text-xs font-mono text-foreground0 flex-shrink-0 w-24 text-right">
+                    <span className="text-xs font-mono text-[var(--text-dim)] flex-shrink-0 w-24 text-right">
                       {formatDate(m.date)}
                     </span>
                   </div>

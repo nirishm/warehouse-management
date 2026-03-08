@@ -74,7 +74,7 @@ export function BarcodeScannerInput({
             title="Scan barcode with camera"
             disabled={scanning}
             onClick={() => fileRef.current?.click()}
-            className="shrink-0 border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+            className="shrink-0"
           >
             <ScanLine className="size-4" />
           </Button>

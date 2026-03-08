@@ -9,7 +9,7 @@ import { InviteForm } from './invite-form';
 
 const statusColors: Record<string, string> = {
   active: 'bg-[var(--green-bg)] text-[var(--green)] border-[var(--green)]/20',
-  trial: 'bg-[var(--accent-tint)] text-[var(--accent)] border-[var(--accent)]/20',
+  trial: 'bg-[var(--accent-tint)] text-[var(--accent-color)] border-[var(--accent-color)]/20',
   suspended: 'bg-[var(--red-bg)] text-[var(--red)] border-[var(--red)]/20',
   cancelled: 'bg-muted/50 text-muted-foreground border-border',
 };

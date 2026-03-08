@@ -62,7 +62,7 @@ export default function NewTenantPage() {
                 onChange={(e) => { setName(e.target.value); setSlug(generateSlug(e.target.value)); }}
                 placeholder="Acme Grain Corp"
                 required
-                className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent)]"
+                className="bg-muted border-border text-foreground placeholder:text-[var(--text-dim)] focus:border-[var(--accent-color)]"
               />
             </div>
             <div className="space-y-2">
@@ -73,7 +73,7 @@ export default function NewTenantPage() {
                 placeholder="acme-grain"
                 required
                 pattern="[a-z0-9-]+"
-                className="bg-muted border-border text-foreground font-mono placeholder:text-[var(--text-dim)] focus:border-[var(--accent)]"
+                className="bg-muted border-border text-foreground font-mono placeholder:text-[var(--text-dim)] focus:border-[var(--accent-color)]"
               />
             </div>
             <div className="space-y-2">
@@ -81,7 +81,7 @@ export default function NewTenantPage() {
               <select
                 value={plan}
                 onChange={(e) => setPlan(e.target.value)}
-                className="w-full h-10 rounded-md border border-border bg-muted text-foreground px-3 text-sm focus:border-[var(--accent)] focus:outline-none"
+                className="w-full h-10 rounded-md border border-border bg-muted text-foreground px-3 text-sm focus:border-[var(--accent-color)] focus:outline-none"
               >
                 <option value="free">Free</option>
                 <option value="starter">Starter</option>
@@ -92,7 +92,7 @@ export default function NewTenantPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[var(--accent)] hover:bg-[var(--accent)] text-background font-semibold"
+              className="w-full bg-[var(--accent-color)] hover:bg-[var(--accent-color)] text-background font-semibold"
             >
               {loading ? 'Creating...' : 'Create Tenant'}
             </Button>

@@ -64,7 +64,7 @@ const DATE_FORMAT_OPTIONS = [
 
 const STATUS_STYLES: Record<string, string> = {
   active: 'bg-[var(--green)]/10 text-[var(--green)] border-[var(--green)]/20',
-  trial: 'bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/20',
+  trial: 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] border-[var(--accent-color)]/20',
   suspended: 'bg-[var(--red)]/10 text-[var(--red)] border-[var(--red)]/20',
   inactive: 'bg-muted/50 text-[var(--text-muted)] border-border',
 };
@@ -72,7 +72,7 @@ const STATUS_STYLES: Record<string, string> = {
 const PLAN_STYLES: Record<string, string> = {
   free: 'bg-muted/50 text-[var(--text-muted)] border-border',
   starter: 'bg-[var(--blue-bg)] text-[var(--blue)] border-[var(--blue)]/20',
-  pro: 'bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/20',
+  pro: 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] border-[var(--accent-color)]/20',
   enterprise: 'bg-[var(--green)]/10 text-[var(--green)] border-[var(--green)]/20',
 };
 
@@ -174,13 +174,13 @@ export function SettingsClient({
                   <Input
                     value={tenantName}
                     onChange={(e) => setTenantName(e.target.value)}
-                    className="bg-background border-border text-foreground focus:border-[var(--accent)]"
+                    className="bg-background border-border text-foreground focus:border-[var(--accent-color)]"
                     placeholder="Organization name"
                   />
                   <Button
                     onClick={handleSaveName}
                     disabled={saving || tenantName === tenant.name || !tenantName.trim()}
-                    className="bg-[var(--accent)] hover:bg-[var(--accent)] text-white shrink-0"
+                    className="bg-[var(--accent-color)] hover:bg-[var(--accent-color)] text-white shrink-0"
                   >
                     {saving ? 'Saving...' : 'Save'}
                   </Button>
@@ -265,7 +265,7 @@ export function SettingsClient({
                   key={mod.id}
                   className={`rounded-lg border p-4 transition-colors ${
                     isEnabled
-                      ? 'border-[var(--accent)]/30 bg-[var(--accent)]/5'
+                      ? 'border-[var(--accent-color)]/30 bg-[var(--accent-color)]/5'
                       : 'border-border bg-background/50 opacity-50'
                   }`}
                 >
@@ -277,21 +277,21 @@ export function SettingsClient({
                       className={`text-[10px] font-mono ${
                         isEnabled
                           ? 'bg-[var(--green)]/10 text-[var(--green)] border-[var(--green)]/20'
-                          : 'bg-muted/50 text-foreground0 border-border'
+                          : 'bg-muted/50 text-[var(--text-dim)] border-border'
                       }`}
                     >
                       {isEnabled ? 'Enabled' : 'Disabled'}
                     </Badge>
                   </div>
                   <h3 className="text-sm font-medium text-foreground">{mod.name}</h3>
-                  <p className="text-xs text-foreground0 mt-1 line-clamp-2">{mod.description}</p>
+                  <p className="text-xs text-[var(--text-dim)] mt-1 line-clamp-2">{mod.description}</p>
                 </div>
               );
             })}
           </div>
 
           {allModules.length === 0 && (
-            <p className="text-sm text-foreground0 font-mono text-center py-8">
+            <p className="text-sm text-[var(--text-dim)] font-mono text-center py-8">
               No modules registered
             </p>
           )}
@@ -316,7 +316,7 @@ export function SettingsClient({
                 Currency
               </Label>
               <Select value={currency} onValueChange={handleCurrencyChange}>
-                <SelectTrigger className="bg-background border-border text-foreground focus:border-[var(--accent)]">
+                <SelectTrigger className="bg-background border-border text-foreground focus:border-[var(--accent-color)]">
                   <SelectValue placeholder="Select currency" />
                 </SelectTrigger>
                 <SelectContent className="bg-[var(--bg-off)] border-border">
@@ -339,7 +339,7 @@ export function SettingsClient({
                 Date Format
               </Label>
               <Select value={dateFormat} onValueChange={handleDateFormatChange}>
-                <SelectTrigger className="bg-background border-border text-foreground focus:border-[var(--accent)]">
+                <SelectTrigger className="bg-background border-border text-foreground focus:border-[var(--accent-color)]">
                   <SelectValue placeholder="Select date format" />
                 </SelectTrigger>
                 <SelectContent className="bg-[var(--bg-off)] border-border">

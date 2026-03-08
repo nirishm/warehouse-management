@@ -119,7 +119,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
       <DialogTrigger
         render={
           trigger ?? (
-            <Button className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)] font-medium">
+            <Button className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] font-medium">
               <Plus className="size-4 mr-1" />
               New Location
             </Button>
@@ -131,7 +131,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
           <DialogTitle className="text-foreground font-semibold">
             {isEditing ? 'Edit Location' : 'New Location'}
           </DialogTitle>
-          <DialogDescription className="text-foreground0">
+          <DialogDescription className="text-[var(--text-dim)]">
             {isEditing
               ? 'Update the location details below.'
               : 'Add a new warehouse, store, yard, or external location.'}
@@ -155,7 +155,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
               onChange={(e) => setName(e.target.value)}
               placeholder="Main Warehouse"
               required
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
             />
           </div>
 
@@ -170,7 +170,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
               placeholder="WH-MAIN"
               required
               pattern="^[A-Z0-9-]+$"
-              className="bg-background border-border text-[var(--accent)] font-mono placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+              className="bg-background border-border text-[var(--accent-color)] font-mono placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
             />
             <p className="text-xs text-[var(--text-dim)]">
               Uppercase letters, numbers, and dashes only
@@ -206,7 +206,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
               onChange={(e) => setAddress(e.target.value)}
               placeholder="123 Warehouse St, City, State"
               rows={2}
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent)] focus-visible:ring-[var(--accent)]/20"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
             />
           </div>
 
@@ -214,7 +214,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
             <Button
               type="submit"
               disabled={loading}
-              className="bg-[var(--accent)] text-foreground hover:bg-[var(--accent)] font-medium"
+              className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] font-medium"
             >
               {loading && <Loader2 className="size-4 mr-1 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Location'}

@@ -38,7 +38,7 @@ export default async function AnalyticsPage({ params }: Props) {
         <h1 className="text-2xl font-bold text-foreground tracking-tight">
           Analytics
         </h1>
-        <p className="text-sm text-foreground0 mt-1">
+        <p className="text-sm text-[var(--text-dim)] mt-1">
           Warehouse performance overview for {tenant.name}
         </p>
       </div>

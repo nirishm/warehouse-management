@@ -23,7 +23,7 @@ interface Props {
 
 const statusColors: Record<SaleStatus, string> = {
   draft: 'bg-muted/50 text-[var(--text-muted)] border border-border',
-  confirmed: 'bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent)]/20',
+  confirmed: 'bg-[var(--accent-tint)] text-[var(--accent-color)] border border-[var(--accent-color)]/20',
   dispatched: 'bg-[var(--green-bg)] text-[var(--green)] border border-[var(--green)]/20',
   cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border border-[var(--red)]/20',
 };
@@ -70,7 +70,7 @@ export default async function SaleDetailPage({ params }: Props) {
         <p className="text-sm font-mono">Sale not found</p>
         <Link
           href={`/t/${tenantSlug}/sales`}
-          className="text-[var(--accent)] hover:text-[var(--accent)] text-xs mt-2 font-mono underline underline-offset-2"
+          className="text-[var(--accent-color)] hover:text-[var(--accent-color)] text-xs mt-2 font-mono underline underline-offset-2"
         >
           Back to sales
         </Link>
@@ -118,7 +118,7 @@ export default async function SaleDetailPage({ params }: Props) {
           )}
           <Link
             href={`/t/${tenantSlug}/sales`}
-            className="text-xs font-mono text-[var(--accent)] hover:text-[var(--accent)] underline underline-offset-2"
+            className="text-xs font-mono text-[var(--accent-color)] hover:text-[var(--accent-color)] underline underline-offset-2"
           >
             Back to sales
           </Link>
@@ -137,7 +137,7 @@ export default async function SaleDetailPage({ params }: Props) {
             <DetailRow label="Location">
               {sale.location ? (
                 <>
-                  <span className="font-mono text-[var(--accent)] text-xs mr-2">
+                  <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
                     {sale.location.code}
                   </span>
                   {sale.location.name}
@@ -220,7 +220,7 @@ export default async function SaleDetailPage({ params }: Props) {
                     <TableCell className="pl-6 text-sm text-foreground">
                       {item.commodity ? (
                         <>
-                          <span className="font-mono text-[var(--accent)] text-xs mr-2">
+                          <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
                             {item.commodity.code}
                           </span>
                           {item.commodity.name}

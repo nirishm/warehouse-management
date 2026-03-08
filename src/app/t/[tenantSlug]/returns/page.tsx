@@ -18,9 +18,9 @@ interface Props {
 }
 
 const statusColors: Record<ReturnStatus, string> = {
-  draft: 'bg-zinc-500/15 text-zinc-400 border border-zinc-500/30',
-  confirmed: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-  cancelled: 'bg-red-500/15 text-red-400 border border-red-500/30',
+  draft: 'bg-[var(--bg-off)] text-[var(--text-muted)] border border-[var(--border)]',
+  confirmed: 'bg-[var(--green-bg)] text-[var(--green)] border border-[rgba(22,163,74,0.2)]',
+  cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border border-[rgba(220,38,38,0.2)]',
 };
 
 const typeLabels: Record<ReturnType, string> = {
@@ -47,37 +47,37 @@ export default async function ReturnsPage({ params }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">Returns</h1>
-          <p className="text-sm text-zinc-500 mt-1">Purchase and sale return management</p>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Returns</h1>
+          <p className="text-sm text-[var(--text-dim)] mt-1">Purchase and sale return management</p>
         </div>
         <Link
           href={`/t/${tenantSlug}/returns/new`}
-          className="inline-flex items-center px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-400 text-black text-sm font-medium transition-colors"
+          className="inline-flex items-center px-3 py-1.5 rounded-md bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white text-sm font-medium transition-colors"
         >
           New Return
         </Link>
       </div>
 
-      <div className="border border-zinc-800 rounded-lg overflow-hidden">
+      <div className="border border-[var(--border)] rounded-lg overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-zinc-800 hover:bg-transparent">
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pl-6">
+            <TableRow className="border-[var(--border)] hover:bg-transparent">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
                 Return #
               </TableHead>
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                 Type
               </TableHead>
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                 Location
               </TableHead>
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                 Contact
               </TableHead>
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                 Date
               </TableHead>
-              <TableHead className="text-xs font-mono uppercase tracking-wider text-zinc-500 pr-6">
+              <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pr-6">
                 Status
               </TableHead>
             </TableRow>
@@ -85,31 +85,31 @@ export default async function ReturnsPage({ params }: Props) {
           <TableBody>
             {returns.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-12 text-zinc-500 text-sm font-mono">
+                <TableCell colSpan={6} className="text-center py-12 text-[var(--text-dim)] text-sm font-mono">
                   No returns found
                 </TableCell>
               </TableRow>
             ) : (
               returns.map((ret) => (
-                <TableRow key={ret.id} className="border-zinc-800/60 hover:bg-zinc-800/30">
+                <TableRow key={ret.id} className="border-[var(--border)] hover:bg-[var(--bg-off)]">
                   <TableCell className="pl-6">
                     <Link
                       href={`/t/${tenantSlug}/returns/${ret.id}`}
-                      className="font-mono text-amber-500 hover:text-amber-400 text-sm"
+                      className="font-mono text-[var(--accent-color)] hover:text-[var(--accent-dark)] text-sm"
                     >
                       {ret.return_number}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-sm text-zinc-400">
+                  <TableCell className="text-sm text-[var(--text-muted)]">
                     {typeLabels[ret.return_type]}
                   </TableCell>
-                  <TableCell className="text-sm text-zinc-300">
+                  <TableCell className="text-sm text-[var(--text-body)]">
                     {ret.location?.name ?? '--'}
                   </TableCell>
-                  <TableCell className="text-sm text-zinc-400">
+                  <TableCell className="text-sm text-[var(--text-muted)]">
                     {ret.contact?.name ?? '--'}
                   </TableCell>
-                  <TableCell className="text-sm text-zinc-400 font-mono">
+                  <TableCell className="text-sm text-[var(--text-muted)] font-mono">
                     {new Date(ret.return_date).toLocaleDateString('en-IN', {
                       day: '2-digit',
                       month: 'short',

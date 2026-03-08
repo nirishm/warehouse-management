@@ -33,8 +33,8 @@ export default async function StockAlertsPage({ params }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">Stock Alerts</h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Stock Alerts</h1>
+          <p className="text-sm text-[var(--text-dim)] mt-1">
             Real-time stock levels vs configured thresholds
           </p>
         </div>
@@ -48,16 +48,16 @@ export default async function StockAlertsPage({ params }: Props) {
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Critical', count: critical.length, color: 'text-red-400' },
-          { label: 'Warning', count: warning.length, color: 'text-yellow-400' },
-          { label: 'OK', count: ok.length, color: 'text-green-400' },
+          { label: 'Critical', count: critical.length, color: 'text-[var(--red)]' },
+          { label: 'Warning', count: warning.length, color: 'text-[var(--accent-color)]' },
+          { label: 'OK', count: ok.length, color: 'text-[var(--green)]' },
         ].map((s) => (
           <div
             key={s.label}
-            className="border border-zinc-800 rounded-lg bg-zinc-900/60 p-4 text-center"
+            className="border border-[var(--border)] rounded-lg bg-[var(--bg-base)] p-4 text-center"
           >
             <p className={`text-3xl font-bold font-mono ${s.color}`}>{s.count}</p>
-            <p className="text-xs font-mono uppercase tracking-wider text-zinc-500 mt-1">
+            <p className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] mt-1">
               {s.label}
             </p>
           </div>
@@ -65,53 +65,53 @@ export default async function StockAlertsPage({ params }: Props) {
       </div>
 
       {alerts.length === 0 ? (
-        <div className="border border-zinc-800 rounded-lg p-8 text-center text-zinc-500">
+        <div className="border border-[var(--border)] rounded-lg p-8 text-center text-[var(--text-dim)]">
           No thresholds configured.{' '}
-          <Link href={`/t/${tenantSlug}/stock-alerts/thresholds`} className="text-zinc-300 underline">
+          <Link href={`/t/${tenantSlug}/stock-alerts/thresholds`} className="text-[var(--text-body)] underline">
             Add thresholds
           </Link>{' '}
           to start monitoring stock levels.
         </div>
       ) : (
-        <div className="border border-zinc-800 rounded-lg overflow-hidden">
+        <div className="border border-[var(--border)] rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-zinc-800 bg-zinc-900/40">
-                <th className="text-left px-4 py-3 text-zinc-500 font-mono text-xs uppercase tracking-wider">
+              <tr className="border-b border-[var(--border)] bg-[var(--bg-off)]">
+                <th className="text-left px-4 py-3 text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider">
                   Commodity
                 </th>
-                <th className="text-left px-4 py-3 text-zinc-500 font-mono text-xs uppercase tracking-wider">
+                <th className="text-left px-4 py-3 text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider">
                   Location
                 </th>
-                <th className="text-right px-4 py-3 text-zinc-500 font-mono text-xs uppercase tracking-wider">
+                <th className="text-right px-4 py-3 text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider">
                   Current
                 </th>
-                <th className="text-right px-4 py-3 text-zinc-500 font-mono text-xs uppercase tracking-wider">
+                <th className="text-right px-4 py-3 text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider">
                   Reorder
                 </th>
-                <th className="text-right px-4 py-3 text-zinc-500 font-mono text-xs uppercase tracking-wider">
+                <th className="text-right px-4 py-3 text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider">
                   Min
                 </th>
-                <th className="text-right px-4 py-3 text-zinc-500 font-mono text-xs uppercase tracking-wider">
+                <th className="text-right px-4 py-3 text-[var(--text-dim)] font-mono text-xs uppercase tracking-wider">
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/50">
+            <tbody className="divide-y divide-[var(--border)]">
               {[...critical, ...warning, ...ok].map((alert) => (
-                <tr key={alert.threshold_id} className="hover:bg-zinc-800/30 transition-colors">
+                <tr key={alert.threshold_id} className="hover:bg-[var(--bg-off)] transition-colors">
                   <td className="px-4 py-3">
-                    <p className="text-zinc-100 font-medium">{alert.commodity_name}</p>
-                    <p className="text-xs text-zinc-500 font-mono">{alert.commodity_code}</p>
+                    <p className="text-[var(--text-primary)] font-medium">{alert.commodity_name}</p>
+                    <p className="text-xs text-[var(--text-dim)] font-mono">{alert.commodity_code}</p>
                   </td>
-                  <td className="px-4 py-3 text-zinc-300">{alert.location_name}</td>
-                  <td className="px-4 py-3 text-right font-mono text-zinc-100">
+                  <td className="px-4 py-3 text-[var(--text-body)]">{alert.location_name}</td>
+                  <td className="px-4 py-3 text-right font-mono text-[var(--text-primary)]">
                     {alert.current_stock} {alert.unit_abbreviation}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-zinc-400">
+                  <td className="px-4 py-3 text-right font-mono text-[var(--text-muted)]">
                     {alert.reorder_point}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-zinc-400">
+                  <td className="px-4 py-3 text-right font-mono text-[var(--text-muted)]">
                     {alert.min_stock}
                   </td>
                   <td className="px-4 py-3 text-right">

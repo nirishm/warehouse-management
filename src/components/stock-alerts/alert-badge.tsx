@@ -11,15 +11,15 @@ interface AlertBadgeProps {
 const CONFIG: Record<AlertState, { label: string; classes: string }> = {
   CRITICAL: {
     label: 'Critical',
-    classes: 'bg-red-500/20 text-red-400 border border-red-500/40',
+    classes: 'bg-[var(--red-bg)] text-[var(--red)] border border-[rgba(220,38,38,0.2)]',
   },
   WARNING: {
     label: 'Warning',
-    classes: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40',
+    classes: 'bg-[var(--orange-bg)] text-[var(--accent-color)] border border-[rgba(244,95,0,0.2)]',
   },
   OK: {
     label: 'OK',
-    classes: 'bg-green-500/20 text-green-400 border border-green-500/40',
+    classes: 'bg-[var(--green-bg)] text-[var(--green)] border border-[rgba(22,163,74,0.2)]',
   },
 };
 
@@ -28,7 +28,7 @@ export function AlertBadge({ state, className }: AlertBadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium',
+        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-mono font-medium',
         classes,
         className
       )}
