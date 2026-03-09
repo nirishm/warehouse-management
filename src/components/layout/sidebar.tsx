@@ -121,7 +121,7 @@ export function MobileSidebar({ tenantSlug, tenantName, navItems }: SidebarProps
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
-        render={<button className="md:hidden p-2 text-[var(--text-muted)] hover:text-[var(--text-body)] transition-colors" />}
+        render={<button className="md:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-body)] transition-colors" />}
       >
         <Menu size={20} />
         <span className="sr-only">Open menu</span>

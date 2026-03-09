@@ -52,7 +52,7 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
         new_data: result as unknown as Record<string, unknown>,
       }).catch((e) => console.error('Audit log error:', e));
 
-      return NextResponse.json(result);
+      return NextResponse.json({ data: result });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to receive dispatch';
 

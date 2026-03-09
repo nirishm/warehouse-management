@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { DownloadDocumentButton } from '@/components/document-gen/download-document-button';
@@ -12,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Truck } from 'lucide-react';
 import type {
   DispatchWithLocations,
   DispatchItemWithNames,
@@ -52,6 +53,7 @@ function formatDateTime(dateStr: string | null): string {
 
 export default async function DispatchDetailPage({ params }: Props) {
   const { tenantSlug, id } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'dispatch', permission: 'canDispatch' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -107,7 +109,7 @@ export default async function DispatchDetailPage({ params }: Props) {
     <div className="space-y-6">
       <RealtimeListener table="dispatches" />
       <RealtimeListener table="dispatch_items" />
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
         <Link href={`/t/${tenantSlug}/dispatches`}>
           <Button variant="ghost" size="icon" className="text-[var(--text-muted)] hover:text-foreground">
             <ArrowLeft className="size-5" />
@@ -129,12 +131,22 @@ export default async function DispatchDetailPage({ params }: Props) {
             {d.dest_location?.name ?? 'Unknown'}
           </p>
         </div>
-        {docGenEnabled && (
-          <DownloadDocumentButton
-            href={`/api/t/${tenantSlug}/documents/dispatch-challan/${id}`}
-            label="Download Challan"
-          />
-        )}
+        <div className="flex items-center gap-2 flex-wrap">
+          {(d.status === 'dispatched' || d.status === 'in_transit') && (
+            <Link href={`/t/${tenantSlug}/dispatches/${id}/receive`}>
+              <Button variant="orange" size="sm">
+                <Truck className="size-4 mr-1" />
+                Receive
+              </Button>
+            </Link>
+          )}
+          {docGenEnabled && (
+            <DownloadDocumentButton
+              href={`/api/t/${tenantSlug}/documents/dispatch-challan/${id}`}
+              label="Download Challan"
+            />
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, redirect } from 'next/navigation';
+import { useTenant } from '@/components/layout/tenant-provider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +40,8 @@ export default function NewSalePage() {
   const router = useRouter();
   const routeParams = useParams<{ tenantSlug: string }>();
   const tenantSlug = routeParams.tenantSlug;
+  const ctx = useTenant();
+  if (ctx.role !== 'tenant_admin' && !ctx.permissions.canSale) redirect(`/t/${tenantSlug}`);
 
   const [locations, setLocations] = useState<DropdownItem[]>([]);
   const [commodities, setCommodities] = useState<DropdownItem[]>([]);
@@ -143,7 +146,7 @@ export default function NewSalePage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
           New Sale
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -400,7 +403,7 @@ export default function NewSalePage() {
           <Button
             type="submit"
             disabled={submitting}
-            className="bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-medium"
+            variant="orange"
           >
             {submitting ? 'Creating...' : 'Create Sale'}
           </Button>

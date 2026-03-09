@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,6 +47,7 @@ function formatDate(dateStr: string | null): string {
 
 export default async function DispatchesPage({ params }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'dispatch', permission: 'canDispatch' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -86,7 +88,7 @@ export default async function DispatchesPage({ params }: Props) {
           </p>
         </div>
         <Link href={`/t/${tenantSlug}/dispatches/new`}>
-          <Button className="bg-[var(--accent-color)] text-white hover:bg-[var(--accent-color)]/90 font-medium">
+          <Button variant="orange">
             <Plus className="size-4 mr-1" />
             New Dispatch
           </Button>

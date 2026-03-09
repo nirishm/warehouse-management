@@ -1,3 +1,4 @@
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { listAuditEntries } from '@/modules/audit-trail/queries/audit-log';
@@ -10,6 +11,7 @@ interface Props {
 
 export default async function AuditLogPage({ params, searchParams }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'audit-trail', permission: 'canViewAuditLog' });
   const query = await searchParams;
   const supabase = await createServerSupabaseClient();
 
@@ -43,7 +45,7 @@ export default async function AuditLogPage({ params, searchParams }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
           Audit Log
         </h1>
         <p className="text-sm text-[var(--text-dim)] mt-1">

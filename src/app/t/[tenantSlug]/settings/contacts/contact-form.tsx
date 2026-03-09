@@ -116,7 +116,7 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
       <DialogTrigger
         render={
           trigger ?? (
-            <Button className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] font-medium">
+            <Button variant="orange">
               <Plus className="size-4 mr-1" />
               New Contact
             </Button>
@@ -223,7 +223,7 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
             <Button
               type="submit"
               disabled={loading}
-              className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] font-medium"
+              variant="orange"
             >
               {loading && <Loader2 className="size-4 mr-1 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Contact'}

@@ -12,6 +12,7 @@ export type Permission =
 
 export interface TenantContext {
   tenantId: string;
+  tenantSlug: string;
   schemaName: string;
   role: 'tenant_admin' | 'manager' | 'employee';
   enabledModules: string[];

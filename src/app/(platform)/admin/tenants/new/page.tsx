@@ -92,7 +92,8 @@ export default function NewTenantPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[var(--accent-color)] hover:bg-[var(--accent-color)] text-background font-semibold"
+              variant="orange"
+              className="w-full"
             >
               {loading ? 'Creating...' : 'Create Tenant'}
             </Button>

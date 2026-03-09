@@ -207,7 +207,7 @@ export function AuditTable({
           )}
         </div>
 
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           {entries.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-[var(--text-dim)]">
               <p className="text-sm font-mono">No audit entries found</p>

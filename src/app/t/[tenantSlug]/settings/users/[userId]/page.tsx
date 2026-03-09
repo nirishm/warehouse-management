@@ -1,3 +1,4 @@
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -14,6 +15,7 @@ interface Props {
 
 export default async function UserDetailPage({ params }: Props) {
   const { tenantSlug, userId } = await params;
+  await requirePageAccess({ tenantSlug, adminOnly: true });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -75,7 +77,7 @@ export default async function UserDetailPage({ params }: Props) {
           &larr; Back
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
             {user.display_name || 'Unnamed User'}
           </h1>
           <p className="text-sm text-[var(--text-dim)] mt-0.5 font-mono">

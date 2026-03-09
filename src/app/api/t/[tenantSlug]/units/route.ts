@@ -7,6 +7,6 @@ export async function GET(request: NextRequest) {
     requireModule(ctx, 'inventory');
 
     const units = await listUnits(ctx.schemaName);
-    return NextResponse.json(units);
+    return NextResponse.json({ data: units });
   });
 }

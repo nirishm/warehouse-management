@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { getSaleById } from '@/modules/sale/queries/sales';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,6 +41,7 @@ function formatDate(dateStr: string): string {
 
 export default async function SaleDetailPage({ params }: Props) {
   const { tenantSlug, id } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'sale', permission: 'canSale' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -85,7 +87,7 @@ export default async function SaleDetailPage({ params }: Props) {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-foreground tracking-tight font-mono">
@@ -101,7 +103,7 @@ export default async function SaleDetailPage({ params }: Props) {
             {formatDate(sale.sold_at ?? sale.created_at)}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {docGenEnabled && (
             <DownloadDocumentButton
               href={`/api/t/${tenantSlug}/documents/delivery-note/${id}`}

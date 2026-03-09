@@ -1,3 +1,4 @@
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +21,7 @@ interface Props {
 
 export default async function LocationsPage({ params }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, permission: 'canManageLocations' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -50,7 +52,7 @@ export default async function LocationsPage({ params }: Props) {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
             Locations
           </h1>
           <p className="text-sm text-[var(--text-dim)] mt-1">

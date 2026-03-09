@@ -1,3 +1,4 @@
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { getDocumentConfig } from '@/modules/document-gen/queries/config';
 import { DocumentConfigForm } from './document-config-form';
@@ -9,6 +10,7 @@ interface Props {
 
 export default async function DocumentSettingsPage({ params }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'document-gen', permission: 'canGenerateDocuments' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -25,7 +27,7 @@ export default async function DocumentSettingsPage({ params }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Document Settings</h1>
+        <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">Document Settings</h1>
         <p className="text-sm text-[var(--text-dim)] mt-1">
           Configure company letterhead for PDF documents
         </p>

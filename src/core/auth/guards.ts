@@ -68,8 +68,11 @@ export async function withTenantContext(
       allowedLocationIds = (locs ?? []).map((l: { location_id: string }) => l.location_id);
     }
 
+    // Extract tenant slug from URL path: /api/t/[slug]/...
+    const tenantSlug = request.nextUrl.pathname.match(/\/api\/t\/([^/]+)/)?.[1] ?? '';
+
     return handler({
-      tenantId, schemaName, role: verifiedRole, enabledModules,
+      tenantId, tenantSlug, schemaName, role: verifiedRole, enabledModules,
       userId: user.id, userName, permissions, allowedLocationIds,
     });
   } catch (error) {

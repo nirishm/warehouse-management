@@ -78,7 +78,7 @@ export function InviteForm({ tenantId }: { tenantId: string }) {
           <Button
             type="submit"
             disabled={loading}
-            className="bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold"
+            variant="orange"
           >
             {loading ? 'Sending...' : 'Send Invite'}
           </Button>

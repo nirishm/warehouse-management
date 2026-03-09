@@ -21,7 +21,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: 'Commodity not found' }, { status: 404 });
     }
 
-    return NextResponse.json(commodity);
+    return NextResponse.json({ data: commodity });
   });
 }
 
@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     }
 
     const commodity = await updateCommodity(ctx.schemaName, id, parsed.data);
-    return NextResponse.json(commodity);
+    return NextResponse.json({ data: commodity });
   });
 }
 

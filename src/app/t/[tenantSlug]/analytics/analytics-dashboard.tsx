@@ -142,7 +142,7 @@ export function AnalyticsDashboard({
   return (
     <div className="space-y-6">
       {/* ── Overview Cards ──────────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         {overviewCards.map((card) => {
           const Icon = card.icon;
           return (
@@ -150,11 +150,11 @@ export function AnalyticsDashboard({
               key={card.label}
               className="border-border bg-[var(--bg-base)]"
             >
-              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
+              <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
+                <CardTitle className="text-[10px] sm:text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] leading-tight">
                   {card.label}
                 </CardTitle>
-                <Icon className="size-4 text-[var(--text-dim)]" />
+                <Icon className="size-4 text-[var(--text-dim)] flex-shrink-0" />
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold text-foreground font-mono">

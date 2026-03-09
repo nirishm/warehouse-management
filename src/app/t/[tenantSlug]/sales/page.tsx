@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { listSales } from '@/modules/sale/queries/sales';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +22,7 @@ interface Props {
 
 const statusColors: Record<SaleStatus, string> = {
   draft: 'bg-muted/50 text-[var(--text-muted)] border border-border',
-  confirmed: 'bg-[var(--accent-tint)] text-[var(--accent-color)] border border-[var(--accent-color)]/20',
+  confirmed: 'bg-[var(--blue-bg)] text-[var(--blue)] border border-[var(--blue)]/20',
   dispatched: 'bg-[var(--green-bg)] text-[var(--green)] border border-[var(--green)]/20',
   cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border border-[var(--red)]/20',
 };
@@ -49,6 +50,7 @@ function computeTotal(sale: Sale): number {
 
 export default async function SalesPage({ params }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'sale', permission: 'canSale' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -69,7 +71,7 @@ export default async function SalesPage({ params }: Props) {
       <RealtimeListener table="sales" />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
             Sales
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -77,7 +79,7 @@ export default async function SalesPage({ params }: Props) {
           </p>
         </div>
         <Link href={`/t/${tenantSlug}/sales/new`}>
-          <Button className="bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-medium">
+          <Button variant="orange">
             New Sale
           </Button>
         </Link>

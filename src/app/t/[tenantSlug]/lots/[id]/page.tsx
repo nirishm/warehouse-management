@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { getLot, getLotMovements } from '@/modules/lot-tracking/queries/lots';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,6 +29,7 @@ function formatDate(dateStr: string): string {
 
 export default async function LotDetailPage({ params }: Props) {
   const { tenantSlug, id } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'lot-tracking', permission: 'canManageLots' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase

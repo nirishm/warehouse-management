@@ -103,7 +103,7 @@ export function ThresholdsManager({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight font-serif">
             Alert Thresholds
           </h1>
           <p className="text-sm text-[var(--text-dim)] mt-1">
@@ -167,7 +167,7 @@ export function ThresholdsManager({
                     <td className="px-4 py-3">
                       <button
                         onClick={() => handleDelete(t.id)}
-                        className="text-xs text-[var(--text-dim)] hover:text-[var(--red)] transition-colors"
+                        className="text-xs text-[var(--text-dim)] hover:text-[var(--red)] transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
                       >
                         Delete
                       </button>

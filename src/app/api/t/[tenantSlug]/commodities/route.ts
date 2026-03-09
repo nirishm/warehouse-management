@@ -6,10 +6,21 @@ import { createCommoditySchema } from '@/modules/inventory/validations/commodity
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
     requireModule(ctx, 'inventory');
-    requirePermission(ctx, 'canManageCommodities');
+    // Allow read access for users who can purchase, dispatch, receive, sale, or view stock
+    // (not just canManageCommodities which is for CRUD management)
+    const canRead = ctx.role === 'tenant_admin' ||
+      ctx.permissions.canManageCommodities ||
+      ctx.permissions.canPurchase ||
+      ctx.permissions.canDispatch ||
+      ctx.permissions.canReceive ||
+      ctx.permissions.canSale ||
+      ctx.permissions.canViewStock;
+    if (!canRead) {
+      throw new Error('Missing permission: canManageCommodities');
+    }
 
     const commodities = await listCommodities(ctx.schemaName);
-    return NextResponse.json(commodities);
+    return NextResponse.json({ data: commodities });
   });
 }
 
@@ -29,6 +40,6 @@ export async function POST(request: NextRequest) {
     }
 
     const commodity = await createCommodity(ctx.schemaName, parsed.data);
-    return NextResponse.json(commodity, { status: 201 });
+    return NextResponse.json({ data: commodity }, { status: 201 });
   });
 }

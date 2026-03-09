@@ -1,3 +1,4 @@
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { listThresholds } from '@/modules/stock-alerts/queries/alerts';
@@ -10,6 +11,7 @@ interface Props {
 
 export default async function ThresholdsPage({ params }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'stock-alerts', permission: 'canManageAlerts' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase

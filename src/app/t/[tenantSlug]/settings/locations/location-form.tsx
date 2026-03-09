@@ -119,7 +119,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
       <DialogTrigger
         render={
           trigger ?? (
-            <Button className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] font-medium">
+            <Button variant="orange">
               <Plus className="size-4 mr-1" />
               New Location
             </Button>
@@ -214,7 +214,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
             <Button
               type="submit"
               disabled={loading}
-              className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] font-medium"
+              variant="orange"
             >
               {loading && <Loader2 className="size-4 mr-1 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Location'}

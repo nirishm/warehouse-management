@@ -1,5 +1,6 @@
+import { redirect } from 'next/navigation';
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { createTenantClient } from '@/core/db/tenant-query';
 import {
   getShortageOverview,
   getShortageByRoute,
@@ -15,15 +16,17 @@ interface Props {
 
 export default async function ShortageTrackingPage({ params }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'shortage-tracking', permission: 'canViewAnalytics' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
     .from('tenants')
-    .select('schema_name')
+    .select('schema_name, enabled_modules')
     .eq('slug', tenantSlug)
     .single();
 
-  if (!tenant) return null;
+  if (!tenant) redirect(`/t/${tenantSlug}`);
+  if (!tenant.enabled_modules?.includes('shortage_tracking')) redirect(`/t/${tenantSlug}`);
 
   const [overview, byRoute, byTransporter, byCommodity, recent] =
     await Promise.all([
@@ -37,7 +40,7 @@ export default async function ShortageTrackingPage({ params }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
           Shortage Tracking
         </h1>
         <p className="text-sm text-[var(--text-dim)] mt-1">
@@ -47,6 +50,7 @@ export default async function ShortageTrackingPage({ params }: Props) {
       </div>
 
       <ShortageDashboard
+        tenantSlug={tenantSlug}
         overview={overview}
         byRoute={byRoute}
         byTransporter={byTransporter}

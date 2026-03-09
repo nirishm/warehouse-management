@@ -1,3 +1,4 @@
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import {
@@ -13,6 +14,7 @@ interface Props {
 
 export default async function AnalyticsPage({ params }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'analytics', permission: 'canViewAnalytics' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -35,7 +37,7 @@ export default async function AnalyticsPage({ params }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
           Analytics
         </h1>
         <p className="text-sm text-[var(--text-dim)] mt-1">

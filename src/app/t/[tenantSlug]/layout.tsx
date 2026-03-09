@@ -69,6 +69,7 @@ export default async function TenantLayout({ children, params }: Props) {
 
   const ctx: TenantContext = {
     tenantId: tenant.id,
+    tenantSlug,
     schemaName: tenant.schema_name,
     role,
     enabledModules: tenant.enabled_modules || [],

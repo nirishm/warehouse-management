@@ -46,6 +46,11 @@ CREATE TABLE {schema}.units (
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- FK: commodities.default_unit_id -> units (added after units table exists)
+ALTER TABLE {schema}.commodities
+  ADD CONSTRAINT commodities_default_unit_id_fkey
+  FOREIGN KEY (default_unit_id) REFERENCES {schema}.units(id);
+
 -- Contacts (suppliers and customers)
 CREATE TABLE {schema}.contacts (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),

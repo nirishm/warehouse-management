@@ -1,3 +1,4 @@
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -37,6 +38,7 @@ function countPermissions(permissions: Permissions | null): number {
 
 export default async function UsersPage({ params }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, adminOnly: true });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -72,7 +74,7 @@ export default async function UsersPage({ params }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
           User Management
         </h1>
         <p className="text-sm text-[var(--text-dim)] mt-1">
@@ -86,7 +88,7 @@ export default async function UsersPage({ params }: Props) {
             All Users ({users.length})
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           {users.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-[var(--text-dim)]">
               <p className="text-sm font-mono">No users found</p>

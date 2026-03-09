@@ -92,7 +92,7 @@ export function CustomFieldsClient({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
             Custom Fields
           </h1>
           <p className="text-sm text-[var(--text-dim)] mt-1">
@@ -122,7 +122,7 @@ export function CustomFieldsClient({
                 {grouped[entityType].length})
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent className="p-0 overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="border-border hover:bg-transparent">

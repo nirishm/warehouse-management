@@ -38,14 +38,8 @@ export function CommodityActions({ commodity, onSuccess }: CommodityActionsProps
 
     setDeleting(true);
     try {
-      const res = await fetch(`/api/t/${ctx.tenantId}/commodities/${commodity.id}`, {
+      const res = await fetch(`/api/t/${ctx.tenantSlug}/commodities/${commodity.id}`, {
         method: 'DELETE',
-        headers: {
-          'x-tenant-id': ctx.tenantId,
-          'x-tenant-schema': ctx.schemaName,
-          'x-tenant-role': ctx.role,
-          'x-tenant-modules': JSON.stringify(ctx.enabledModules),
-        },
       });
 
       if (!res.ok) {

@@ -1,3 +1,4 @@
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { listPayments } from '@/modules/payments/queries/payments';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +18,7 @@ interface Props {
 
 export default async function PaymentsPage({ params }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'payments', permission: 'canManagePayments' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -34,7 +36,7 @@ export default async function PaymentsPage({ params }: Props) {
   return (
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight font-mono">Payments</h1>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight font-serif">Payments</h1>
         <div className="text-right">
           <p className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">Total Recorded</p>
           <p className="text-lg font-bold text-[var(--text-primary)] font-mono">

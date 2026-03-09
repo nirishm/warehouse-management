@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { listPurchases } from '@/modules/purchase/queries/purchases';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -49,6 +50,7 @@ function computeTotal(purchase: Purchase): number {
 
 export default async function PurchasesPage({ params }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'purchase', permission: 'canPurchase' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase

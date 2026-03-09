@@ -82,14 +82,7 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
 
   async function fetchUnits() {
     try {
-      const res = await fetch(`/api/t/${ctx.tenantId}/units`, {
-        headers: {
-          'x-tenant-id': ctx.tenantId,
-          'x-tenant-schema': ctx.schemaName,
-          'x-tenant-role': ctx.role,
-          'x-tenant-modules': JSON.stringify(ctx.enabledModules),
-        },
-      });
+      const res = await fetch(`/api/t/${ctx.tenantSlug}/units`);
       if (res.ok) {
         const data = await res.json();
         setUnits(data);
@@ -114,17 +107,13 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
 
     try {
       const url = isEdit
-        ? `/api/t/${ctx.tenantId}/commodities/${commodity!.id}`
-        : `/api/t/${ctx.tenantId}/commodities`;
+        ? `/api/t/${ctx.tenantSlug}/commodities/${commodity!.id}`
+        : `/api/t/${ctx.tenantSlug}/commodities`;
 
       const res = await fetch(url, {
         method: isEdit ? 'PATCH' : 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-tenant-id': ctx.tenantId,
-          'x-tenant-schema': ctx.schemaName,
-          'x-tenant-role': ctx.role,
-          'x-tenant-modules': JSON.stringify(ctx.enabledModules),
         },
         body: JSON.stringify(payload),
       });
@@ -148,7 +137,7 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
       <DialogTrigger
         render={
           trigger ?? (
-            <Button className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)]">
+            <Button variant="orange">
               <Plus className="size-4 mr-1" />
               New Commodity
             </Button>
@@ -256,7 +245,7 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
             <Button
               type="submit"
               disabled={loading}
-              className="bg-[var(--accent-color)] text-foreground hover:bg-[var(--accent-color)] disabled:opacity-50"
+              variant="orange"
             >
               {loading ? 'Saving...' : isEdit ? 'Update' : 'Create'}
             </Button>

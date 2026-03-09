@@ -67,7 +67,8 @@ export function RecordPaymentDialog({ tenantSlug, transactionType, transactionId
         render={
           <Button
             size="sm"
-            className="bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold text-xs"
+            variant="orange"
+            className="font-semibold text-xs"
           />
         }
       >
@@ -137,7 +138,8 @@ export function RecordPaymentDialog({ tenantSlug, transactionType, transactionId
               type="submit"
               size="sm"
               disabled={saving || !amount}
-              className="bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold"
+              variant="orange"
+              className="font-semibold"
             >
               {saving ? 'Saving...' : 'Record'}
             </Button>

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, redirect } from 'next/navigation';
+import { useTenant } from '@/components/layout/tenant-provider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +31,8 @@ function emptyRow(): ItemRow {
 export default function NewReturnPage() {
   const router = useRouter();
   const { tenantSlug } = useParams<{ tenantSlug: string }>();
+  const ctx = useTenant();
+  if (ctx.role !== 'tenant_admin' && !ctx.permissions.canManageReturns) redirect(`/t/${tenantSlug}`);
 
   const [locations, setLocations] = useState<DropdownItem[]>([]);
   const [commodities, setCommodities] = useState<DropdownItem[]>([]);
@@ -107,7 +110,7 @@ export default function NewReturnPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">New Return</h1>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight font-serif">New Return</h1>
         <p className="text-sm text-[var(--text-dim)] mt-1">Record a purchase or sale return</p>
       </div>
 
@@ -258,7 +261,7 @@ export default function NewReturnPage() {
         {error && <p className="text-sm text-[var(--red)]">{error}</p>}
 
         <div className="flex gap-3">
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting} variant="orange">
             {submitting ? 'Saving…' : 'Create Return'}
           </Button>
           <Button

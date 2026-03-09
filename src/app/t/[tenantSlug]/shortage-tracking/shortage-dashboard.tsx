@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -18,6 +19,7 @@ import type {
 } from '@/modules/shortage-tracking/queries/shortages';
 
 interface ShortageDashboardProps {
+  tenantSlug: string;
   overview: ShortageOverview;
   byRoute: ShortageByRoute[];
   byTransporter: ShortageByTransporter[];
@@ -77,6 +79,7 @@ const thClass =
 // ---------------------------------------------------------------------------
 
 export function ShortageDashboard({
+  tenantSlug,
   overview,
   byRoute,
   byTransporter,
@@ -385,8 +388,13 @@ export function ShortageDashboard({
                     key={item.id}
                     className="border-border hover:bg-muted/50"
                   >
-                    <TableCell className="pl-6 font-mono text-sm text-[var(--accent-color)] font-medium">
-                      {item.dispatch_number}
+                    <TableCell className="pl-6">
+                      <Link
+                        href={`/t/${tenantSlug}/dispatches/${item.dispatch_id}`}
+                        className="font-mono text-sm text-[var(--accent-color)] font-medium hover:text-[var(--accent-color)] underline-offset-4 hover:underline"
+                      >
+                        {item.dispatch_number}
+                      </Link>
                     </TableCell>
                     <TableCell className="text-sm text-foreground">
                       {item.commodity_name}

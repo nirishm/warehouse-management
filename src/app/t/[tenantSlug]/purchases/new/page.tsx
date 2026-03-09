@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, redirect } from 'next/navigation';
+import { useTenant } from '@/components/layout/tenant-provider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +40,8 @@ export default function NewPurchasePage() {
   const router = useRouter();
   const routeParams = useParams<{ tenantSlug: string }>();
   const tenantSlug = routeParams.tenantSlug;
+  const ctx = useTenant();
+  if (ctx.role !== 'tenant_admin' && !ctx.permissions.canPurchase) redirect(`/t/${tenantSlug}`);
 
   const [locations, setLocations] = useState<DropdownItem[]>([]);
   const [commodities, setCommodities] = useState<DropdownItem[]>([]);
@@ -57,10 +60,12 @@ export default function NewPurchasePage() {
 
   useEffect(() => {
     const base = `/api/t/${tenantSlug}`;
+    const safeFetch = (url: string) =>
+      fetch(url).then((r) => (r.ok ? r.json() : { data: [] }));
     Promise.all([
-      fetch(`${base}/locations`).then((r) => r.json()),
-      fetch(`${base}/commodities`).then((r) => r.json()),
-      fetch(`${base}/units`).then((r) => r.json()),
+      safeFetch(`${base}/locations`),
+      safeFetch(`${base}/commodities`),
+      safeFetch(`${base}/units`),
     ]).then(([locRes, comRes, unitRes]) => {
       setLocations(locRes.data ?? locRes ?? []);
       setCommodities(comRes.data ?? comRes ?? []);
@@ -400,7 +405,7 @@ export default function NewPurchasePage() {
           <Button
             type="submit"
             disabled={submitting}
-            className="bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white font-medium"
+            variant="orange"
           >
             {submitting ? 'Creating...' : 'Create Purchase'}
           </Button>

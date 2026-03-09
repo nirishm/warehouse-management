@@ -127,6 +127,15 @@
   --heading-letter-spacing: -0.3px;
 }
 
+/* ─── Mobile Touch Targets ──────────────────── */
+@media (max-width: 767px) {
+  :root {
+    --btn-h: 44px;
+    --btn-h-sm: 44px;
+    --input-h: 44px;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

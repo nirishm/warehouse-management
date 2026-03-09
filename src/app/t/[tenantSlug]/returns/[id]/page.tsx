@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { getReturn } from '@/modules/returns/queries/returns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,6 +38,7 @@ function formatDate(dateStr: string) {
 
 export default async function ReturnDetailPage({ params }: Props) {
   const { tenantSlug, id } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'returns', permission: 'canManageReturns' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -68,7 +70,7 @@ export default async function ReturnDetailPage({ params }: Props) {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight font-mono">
@@ -80,7 +82,7 @@ export default async function ReturnDetailPage({ params }: Props) {
             {typeLabel} · {formatDate(ret.return_date)}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {ret.status === 'draft' && (
             <ConfirmReturnButton tenantSlug={tenantSlug} returnId={id} />
           )}
@@ -91,6 +93,7 @@ export default async function ReturnDetailPage({ params }: Props) {
             Back to returns
           </Link>
         </div>
+
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

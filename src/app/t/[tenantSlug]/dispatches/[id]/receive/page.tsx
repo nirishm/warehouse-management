@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { ReceiveForm } from './receive-form';
@@ -10,6 +11,7 @@ interface Props {
 
 export default async function ReceiveDispatchPage({ params }: Props) {
   const { tenantSlug, id } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'dispatch', permission: 'canReceive' });
 
   const supabase = await createServerSupabaseClient();
   const { data: tenant } = await supabase
@@ -96,7 +98,7 @@ export default async function ReceiveDispatchPage({ params }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
           Receive Dispatch
         </h1>
         <p className="text-sm text-muted-foreground mt-1">

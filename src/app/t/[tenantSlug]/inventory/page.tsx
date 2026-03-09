@@ -1,3 +1,4 @@
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import {
   getStockLevels,
@@ -15,6 +16,7 @@ interface Props {
 
 export default async function StockLevelsPage({ params, searchParams }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'inventory', permission: 'canViewStock' });
   const filters = await searchParams;
 
   const supabase = await createServerSupabaseClient();

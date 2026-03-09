@@ -6,7 +6,18 @@ import { createLocationSchema } from '@/modules/inventory/validations/location';
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
     requireModule(ctx, 'inventory');
-    requirePermission(ctx, 'canManageLocations');
+    // Allow read access for users who can purchase, dispatch, receive, sale, or view stock
+    // (not just canManageLocations which is for CRUD management)
+    const canRead = ctx.role === 'tenant_admin' ||
+      ctx.permissions.canManageLocations ||
+      ctx.permissions.canPurchase ||
+      ctx.permissions.canDispatch ||
+      ctx.permissions.canReceive ||
+      ctx.permissions.canSale ||
+      ctx.permissions.canViewStock;
+    if (!canRead) {
+      throw new Error('Missing permission: canManageLocations');
+    }
 
     const locations = await listLocations(ctx.schemaName);
     return NextResponse.json({ data: locations });

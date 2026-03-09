@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { BarcodePrintManager } from './barcode-print-manager';
@@ -9,6 +10,7 @@ interface Props {
 
 export default async function BarcodesPage({ params }: Props) {
   const { tenantSlug } = await params;
+  await requirePageAccess({ tenantSlug, moduleId: 'barcode' });
   const supabase = await createServerSupabaseClient();
 
   const { data: tenant } = await supabase
@@ -38,7 +40,7 @@ export default async function BarcodesPage({ params }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Barcode Labels</h1>
+        <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">Barcode Labels</h1>
         <p className="text-sm text-[var(--text-dim)] mt-1">
           Select commodities to generate printable QR code labels
         </p>

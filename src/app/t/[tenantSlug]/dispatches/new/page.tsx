@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, redirect } from 'next/navigation';
+import { useTenant } from '@/components/layout/tenant-provider';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,6 +60,8 @@ export default function NewDispatchPage() {
   const router = useRouter();
   const params = useParams<{ tenantSlug: string }>();
   const tenantSlug = params.tenantSlug;
+  const ctx = useTenant();
+  if (ctx.role !== 'tenant_admin' && !ctx.permissions.canDispatch) redirect(`/t/${tenantSlug}`);
 
   const [locations, setLocations] = useState<LocationOption[]>([]);
   const [commodities, setCommodities] = useState<CommodityOption[]>([]);
@@ -95,13 +98,14 @@ export default function NewDispatchPage() {
       }
       if (comRes.ok) {
         const comData = await comRes.json();
+        const comArray = Array.isArray(comData) ? comData : (comData.data ?? []);
         setCommodities(
-          (comData.data ?? []).filter((c: CommodityOption & { is_active?: boolean }) => c.is_active !== false)
+          comArray.filter((c: CommodityOption & { is_active?: boolean }) => c.is_active !== false)
         );
       }
       if (unitRes.ok) {
         const unitData = await unitRes.json();
-        setUnits(unitData.data ?? []);
+        setUnits(Array.isArray(unitData) ? unitData : (unitData.data ?? []));
       }
     } catch {
       setError('Failed to load form data');
@@ -215,7 +219,7 @@ export default function NewDispatchPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">
             New Dispatch
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -250,7 +254,7 @@ export default function NewDispatchPage() {
                   </SelectTrigger>
                   <SelectContent className="bg-[var(--bg-off)] border-border">
                     {locations.map((loc) => (
-                      <SelectItem key={loc.id} value={loc.id} className="text-foreground focus:bg-muted">
+                      <SelectItem key={loc.id} value={loc.id} label={`${loc.code} — ${loc.name}`} className="text-foreground focus:bg-muted">
                         <span className="font-mono text-[var(--accent-color)] mr-2">{loc.code}</span>
                         {loc.name}
                       </SelectItem>
@@ -269,7 +273,7 @@ export default function NewDispatchPage() {
                   </SelectTrigger>
                   <SelectContent className="bg-[var(--bg-off)] border-border">
                     {locations.map((loc) => (
-                      <SelectItem key={loc.id} value={loc.id} className="text-foreground focus:bg-muted">
+                      <SelectItem key={loc.id} value={loc.id} label={`${loc.code} — ${loc.name}`} className="text-foreground focus:bg-muted">
                         <span className="font-mono text-[var(--accent-color)] mr-2">{loc.code}</span>
                         {loc.name}
                       </SelectItem>
@@ -407,7 +411,7 @@ export default function NewDispatchPage() {
                         </SelectTrigger>
                         <SelectContent className="bg-[var(--bg-off)] border-border">
                           {commodities.map((c) => (
-                            <SelectItem key={c.id} value={c.id} className="text-foreground focus:bg-muted">
+                            <SelectItem key={c.id} value={c.id} label={`${c.code} — ${c.name}`} className="text-foreground focus:bg-muted">
                               <span className="font-mono text-[var(--accent-color)] mr-2">{c.code}</span>
                               {c.name}
                             </SelectItem>
@@ -425,7 +429,7 @@ export default function NewDispatchPage() {
                         </SelectTrigger>
                         <SelectContent className="bg-[var(--bg-off)] border-border">
                           {units.map((u) => (
-                            <SelectItem key={u.id} value={u.id} className="text-foreground focus:bg-muted">
+                            <SelectItem key={u.id} value={u.id} label={`${u.name} (${u.abbreviation})`} className="text-foreground focus:bg-muted">
                               {u.name}
                               <span className="text-muted-foreground ml-1">({u.abbreviation})</span>
                             </SelectItem>
@@ -488,7 +492,7 @@ export default function NewDispatchPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="bg-[var(--accent-color)] text-white hover:bg-[var(--accent-color)]/90 font-medium"
+            variant="orange"
           >
             {loading && <Loader2 className="size-4 mr-1 animate-spin" />}
             Create Dispatch

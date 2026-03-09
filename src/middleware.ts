@@ -113,7 +113,12 @@ export async function middleware(request: NextRequest) {
     requestHeaders.set('x-tenant-schema', tenant.schema_name);
     requestHeaders.set('x-tenant-role', membership.role);
     requestHeaders.set('x-tenant-modules', JSON.stringify(tenant.enabled_modules));
-    return NextResponse.next({ request: { headers: requestHeaders } });
+    const tenantResponse = NextResponse.next({ request: { headers: requestHeaders } });
+    // Preserve cookies from original response (refreshed Supabase session tokens)
+    response.cookies.getAll().forEach(cookie => {
+      tenantResponse.cookies.set(cookie.name, cookie.value, cookie);
+    });
+    return tenantResponse;
   }
 
   return response;
