@@ -52,3 +52,5 @@ next-env.d.ts
 
 # screenshots from visual reviews
 /screenshots/
+.playwright-mcp/
+supabase/.temp/
