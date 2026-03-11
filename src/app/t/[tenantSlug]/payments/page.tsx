@@ -2,15 +2,7 @@ import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { listPayments } from '@/modules/payments/queries/payments';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import Link from 'next/link';
+import { PaymentsTable } from './payments-table';
 
 interface Props {
   params: Promise<{ tenantSlug: string }>;
@@ -40,13 +32,13 @@ export default async function PaymentsPage({ params }: Props) {
         <div className="text-right">
           <p className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">Total Recorded</p>
           <p className="text-lg font-bold text-[var(--text-primary)] font-mono">
-            ₹{totalRecorded.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+            {'\u20B9'}{totalRecorded.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
           </p>
         </div>
       </div>
 
       <Card className="bg-[var(--bg-base)] border-[var(--border)]">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-0">
           <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
             All Payments ({payments.length})
           </CardTitle>
@@ -58,59 +50,7 @@ export default async function PaymentsPage({ params }: Props) {
               <p className="text-xs mt-1">Record payments from purchase or sale detail pages.</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-[var(--border)] hover:bg-transparent">
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
-                    Payment #
-                  </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
-                    Type
-                  </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
-                    Method
-                  </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
-                    Reference
-                  </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
-                    Date
-                  </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] text-right pr-6">
-                    Amount
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {payments.map((p) => (
-                  <TableRow key={p.id} className="border-[var(--border)] hover:bg-[var(--bg-off)]">
-                    <TableCell className="pl-6 font-mono text-[var(--accent-color)] text-xs">
-                      {p.payment_number}
-                    </TableCell>
-                    <TableCell>
-                      <Link
-                        href={`/t/${tenantSlug}/${p.transaction_type}s/${p.transaction_id}`}
-                        className="text-xs text-[var(--text-body)] hover:text-[var(--accent-color)] capitalize"
-                      >
-                        {p.transaction_type}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="text-xs text-[var(--text-muted)] capitalize">
-                      {p.payment_method.replace('_', ' ')}
-                    </TableCell>
-                    <TableCell className="text-xs text-[var(--text-dim)]">
-                      {p.reference_number ?? '--'}
-                    </TableCell>
-                    <TableCell className="text-xs text-[var(--text-muted)]">
-                      {new Date(p.payment_date).toLocaleDateString('en-IN')}
-                    </TableCell>
-                    <TableCell className="text-right pr-6 font-mono text-[var(--text-body)] font-semibold text-sm">
-                      ₹{Number(p.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <PaymentsTable data={payments} tenantSlug={tenantSlug} />
           )}
         </CardContent>
       </Card>

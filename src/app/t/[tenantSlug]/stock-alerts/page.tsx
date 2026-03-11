@@ -1,12 +1,11 @@
 import Link from 'next/link';
 import { requirePageAccess } from '@/core/auth/page-guard';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { createTenantClient } from '@/core/db/tenant-query';
 import { getStockAlerts } from '@/modules/stock-alerts/queries/alerts';
-import { AlertBadge } from '@/components/stock-alerts/alert-badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { redirect } from 'next/navigation';
+import { StockAlertsTable } from './stock-alerts-table';
 
 interface Props {
   params: Promise<{ tenantSlug: string }>;
@@ -30,6 +29,9 @@ export default async function StockAlertsPage({ params }: Props) {
   const critical = alerts.filter((a) => a.alert_state === 'CRITICAL');
   const warning = alerts.filter((a) => a.alert_state === 'WARNING');
   const ok = alerts.filter((a) => a.alert_state === 'OK');
+
+  // Sort: critical first, then warning, then ok
+  const sortedAlerts = [...critical, ...warning, ...ok];
 
   return (
     <div className="space-y-6">
@@ -68,7 +70,7 @@ export default async function StockAlertsPage({ params }: Props) {
       </div>
 
       <Card className="border-border bg-[var(--bg-off)]">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-0">
           <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
             All Alerts ({alerts.length})
           </CardTitle>
@@ -85,55 +87,7 @@ export default async function StockAlertsPage({ params }: Props) {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-[var(--bg-off)]">
-                  <th className="text-left px-4 py-3 text-muted-foreground font-mono text-xs uppercase tracking-wider pl-6">
-                    Commodity
-                  </th>
-                  <th className="text-left px-4 py-3 text-muted-foreground font-mono text-xs uppercase tracking-wider">
-                    Location
-                  </th>
-                  <th className="text-right px-4 py-3 text-muted-foreground font-mono text-xs uppercase tracking-wider">
-                    Current
-                  </th>
-                  <th className="text-right px-4 py-3 text-muted-foreground font-mono text-xs uppercase tracking-wider">
-                    Reorder
-                  </th>
-                  <th className="text-right px-4 py-3 text-muted-foreground font-mono text-xs uppercase tracking-wider">
-                    Min
-                  </th>
-                  <th className="text-right px-4 py-3 text-muted-foreground font-mono text-xs uppercase tracking-wider pr-6">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {[...critical, ...warning, ...ok].map((alert) => (
-                  <tr key={alert.threshold_id} className="hover:bg-muted/50 transition-colors">
-                    <td className="px-4 py-3 pl-6">
-                      <p className="text-[var(--text-primary)] font-medium">{alert.commodity_name}</p>
-                      <p className="text-xs text-[var(--text-dim)] font-mono">{alert.commodity_code}</p>
-                    </td>
-                    <td className="px-4 py-3 text-[var(--text-body)]">{alert.location_name}</td>
-                    <td className="px-4 py-3 text-right font-mono text-[var(--text-primary)]">
-                      {alert.current_stock} {alert.unit_abbreviation}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-[var(--text-muted)]">
-                      {alert.reorder_point}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-[var(--text-muted)]">
-                      {alert.min_stock}
-                    </td>
-                    <td className="px-4 py-3 text-right pr-6">
-                      <AlertBadge state={alert.alert_state} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            </div>
+            <StockAlertsTable data={sortedAlerts} />
           )}
         </CardContent>
       </Card>
