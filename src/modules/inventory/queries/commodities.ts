@@ -26,7 +26,7 @@ export async function listCommodities(schemaName: string): Promise<Commodity[]> 
     .is('deleted_at', null)
     .order('name', { ascending: true });
 
-  if (error) throw new Error(`Failed to list commodities: ${error.message}`);
+  if (error) throw new Error(`Failed to list items: ${error.message}`);
 
   return (data ?? []).map((row: Record<string, unknown>) => {
     const unit = row.units as { name: string; abbreviation: string } | null;
@@ -53,7 +53,7 @@ export async function getCommodityById(
 
   if (error) {
     if (error.code === 'PGRST116') return null;
-    throw new Error(`Failed to get commodity: ${error.message}`);
+    throw new Error(`Failed to get item: ${error.message}`);
   }
 
   const unit = (data as Record<string, unknown>).units as { name: string; abbreviation: string } | null;
@@ -80,7 +80,7 @@ export async function createCommodity(
     .select()
     .single();
 
-  if (error) throw new Error(`Failed to create commodity: ${error.message}`);
+  if (error) throw new Error(`Failed to create item: ${error.message}`);
   return data as Commodity;
 }
 
@@ -99,7 +99,7 @@ export async function updateCommodity(
     .select()
     .single();
 
-  if (error) throw new Error(`Failed to update commodity: ${error.message}`);
+  if (error) throw new Error(`Failed to update item: ${error.message}`);
   return data as Commodity;
 }
 
@@ -115,5 +115,5 @@ export async function softDeleteCommodity(
     .eq('id', id)
     .is('deleted_at', null);
 
-  if (error) throw new Error(`Failed to delete commodity: ${error.message}`);
+  if (error) throw new Error(`Failed to delete item: ${error.message}`);
 }

@@ -8,6 +8,6 @@ export const userManagementManifest: ModuleManifest = {
   dependencies: [],
   permissions: [],
   navItems: [
-    { label: 'Users', href: 'settings/users', icon: 'Users' },
+    { label: 'Users', href: 'settings/users', icon: 'Users', group: 'settings' },
   ],
 };

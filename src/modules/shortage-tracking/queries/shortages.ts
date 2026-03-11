@@ -364,7 +364,7 @@ export async function getShortageByCommodity(
     .select('id, name')
     .in('id', Array.from(commodityIds));
 
-  if (cErr) throw new Error(`Failed to fetch commodities: ${cErr.message}`);
+  if (cErr) throw new Error(`Failed to fetch items: ${cErr.message}`);
 
   const comMap = new Map(
     (commodities ?? []).map((c) => [c.id, c.name as string])
@@ -465,7 +465,7 @@ export async function getRecentShortages(
     .select('id, name')
     .in('id', Array.from(commodityIds));
 
-  if (cErr) throw new Error(`Failed to fetch commodities: ${cErr.message}`);
+  if (cErr) throw new Error(`Failed to fetch items: ${cErr.message}`);
 
   const comMap = new Map(
     (commodities ?? []).map((c) => [c.id, c.name as string])

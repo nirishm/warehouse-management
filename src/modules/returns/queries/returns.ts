@@ -109,7 +109,7 @@ async function validateReturnQuantities(
 
     if (originalQty === undefined) {
       throw new Error(
-        `Commodity ${item.commodity_id} with unit ${item.unit_id} not found in original transaction`
+        `Item ${item.commodity_id} with unit ${item.unit_id} not found in original transaction`
       );
     }
 
@@ -118,7 +118,7 @@ async function validateReturnQuantities(
 
     if (item.quantity > remaining) {
       throw new Error(
-        `Return quantity ${item.quantity} exceeds remaining returnable quantity ${remaining} for commodity ${item.commodity_id}`
+        `Return quantity ${item.quantity} exceeds remaining returnable quantity ${remaining} for item ${item.commodity_id}`
       );
     }
   }

@@ -12,7 +12,7 @@ export const stockAlertsManifest: ModuleManifest = {
   dependencies: ['inventory'],
   permissions: ['canManageAlerts'],
   navItems: [
-    { label: 'Stock Alerts', href: 'stock-alerts', icon: 'Bell', permission: 'canManageAlerts' },
-    { label: 'Alert Thresholds', href: 'stock-alerts/thresholds', icon: 'Settings', permission: 'canManageAlerts' },
+    { label: 'Stock Alerts', href: 'stock-alerts', icon: 'Bell', permission: 'canManageAlerts', group: 'inventory' },
+    { label: 'Alert Thresholds', href: 'stock-alerts/thresholds', icon: 'Settings', permission: 'canManageAlerts', group: 'inventory' },
   ],
 };

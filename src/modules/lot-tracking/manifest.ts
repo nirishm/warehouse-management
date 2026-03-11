@@ -12,6 +12,6 @@ export const lotTrackingManifest: ModuleManifest = {
   dependencies: ['inventory', 'purchase'],
   permissions: ['canManageLots'],
   navItems: [
-    { label: 'Lots', href: 'lots', icon: 'Layers', permission: 'canManageLots' },
+    { label: 'Lots', href: 'lots', icon: 'Layers', permission: 'canManageLots', group: 'inventory' },
   ],
 };

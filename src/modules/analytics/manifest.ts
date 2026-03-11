@@ -8,6 +8,6 @@ export const analyticsManifest: ModuleManifest = {
   dependencies: ['inventory'],
   permissions: ['canViewAnalytics'],
   navItems: [
-    { label: 'Analytics', href: 'analytics', icon: 'BarChart3', permission: 'canViewAnalytics' },
+    { label: 'Analytics', href: 'analytics', icon: 'BarChart3', permission: 'canViewAnalytics', group: 'reports' },
   ],
 };

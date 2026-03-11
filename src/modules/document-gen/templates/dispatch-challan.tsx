@@ -129,7 +129,7 @@ export function DispatchChallanDocument({ data, config }: Props) {
 
         <PdfTable
           columns={[
-            { label: 'Commodity', width: '25%' },
+            { label: 'Item', width: '25%' },
             { label: 'Code', width: '12%' },
             { label: 'Requested', width: '12%', align: 'right' },
             { label: 'Dispatched', width: '12%', align: 'right' },

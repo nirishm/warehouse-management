@@ -45,7 +45,7 @@ export async function importPurchases(
 
     const commodityId = commodityMap.get(row.commodity_code.toLowerCase());
     if (!commodityId) {
-      errors.push({ row: rowNum, field: 'commodity_code', message: `Commodity '${row.commodity_code}' not found` });
+      errors.push({ row: rowNum, field: 'commodity_code', message: `Item '${row.commodity_code}' not found` });
       continue;
     }
 

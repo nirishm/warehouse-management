@@ -12,6 +12,6 @@ export const paymentsManifest: ModuleManifest = {
   dependencies: ['inventory'],
   permissions: ['canManagePayments'],
   navItems: [
-    { label: 'Payments', href: 'payments', icon: 'CreditCard', permission: 'canManagePayments' },
+    { label: 'Payments', href: 'payments', icon: 'CreditCard', permission: 'canManagePayments', group: 'reports' },
   ],
 };

@@ -12,6 +12,6 @@ export const returnsManifest: ModuleManifest = {
   dependencies: ['inventory', 'purchase', 'sale'],
   permissions: ['canManageReturns'],
   navItems: [
-    { label: 'Returns', href: 'returns', icon: 'RotateCcw', permission: 'canManageReturns' },
+    { label: 'Returns', href: 'returns', icon: 'RotateCcw', permission: 'canManageReturns', group: 'operations' },
   ],
 };

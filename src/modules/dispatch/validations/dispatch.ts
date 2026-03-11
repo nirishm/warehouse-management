@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const dispatchItemSchema = z.object({
-  commodity_id: z.string().uuid('Invalid commodity'),
+  commodity_id: z.string().uuid('Invalid item'),
   unit_id: z.string().uuid('Invalid unit'),
   sent_quantity: z.number().positive('Quantity must be greater than 0'),
   sent_bags: z.number().int().nonnegative().optional(),

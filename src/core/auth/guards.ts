@@ -50,7 +50,7 @@ export async function withTenantContext(
       'canManageContacts', 'canViewAnalytics', 'canExportData',
       'canViewAuditLog', 'canManagePayments', 'canManageAlerts',
       'canGenerateDocuments', 'canManageLots', 'canManageReturns',
-      'canImportData',
+      'canImportData', 'canManageAdjustments',
     ];
 
     if (verifiedRole === 'tenant_admin') {
