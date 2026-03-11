@@ -2,15 +2,9 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
+import { ColumnDef } from '@tanstack/react-table';
 import { Card } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { DataTable } from '@/components/ui/data-table';
 import type { StockLevelRow } from '@/modules/inventory/queries/stock';
 
 interface StockTableProps {
@@ -38,6 +32,83 @@ function StockValue({ value, variant }: { value: number; variant: 'stock' | 'tra
     </span>
   );
 }
+
+const columns: ColumnDef<StockLevelRow>[] = [
+  {
+    id: 'location',
+    header: 'Location',
+    accessorFn: (row) => row.location?.name ?? 'Unknown',
+    cell: ({ row }) => (
+      <span className="text-foreground text-sm">
+        <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
+          {row.original.location?.code ?? '---'}
+        </span>
+        {row.original.location?.name ?? 'Unknown'}
+      </span>
+    ),
+  },
+  {
+    id: 'commodity',
+    header: 'Item',
+    accessorFn: (row) => row.commodity?.name ?? 'Unknown',
+    cell: ({ row }) => (
+      <span className="text-foreground text-sm">
+        <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
+          {row.original.commodity?.code ?? '---'}
+        </span>
+        {row.original.commodity?.name ?? 'Unknown'}
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'current_stock',
+    header: 'Current Stock',
+    cell: ({ row }) => (
+      <span className="text-right block">
+        <StockValue value={row.original.current_stock} variant="stock" />
+        <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
+          {row.original.unit?.abbreviation ?? ''}
+        </span>
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'in_transit',
+    header: 'In Transit',
+    cell: ({ row }) => (
+      <span className="text-right block">
+        <StockValue value={row.original.in_transit} variant="transit" />
+        <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
+          {row.original.unit?.abbreviation ?? ''}
+        </span>
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'total_in',
+    header: 'Total In',
+    cell: ({ row }) => (
+      <span className="text-right block">
+        <StockValue value={row.original.total_in} variant="neutral" />
+        <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
+          {row.original.unit?.abbreviation ?? ''}
+        </span>
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'total_out',
+    header: 'Total Out',
+    cell: ({ row }) => (
+      <span className="text-right block">
+        <StockValue value={row.original.total_out} variant="neutral" />
+        <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
+          {row.original.unit?.abbreviation ?? ''}
+        </span>
+      </span>
+    ),
+  },
+];
 
 export function StockTable({
   stockLevels,
@@ -89,7 +160,7 @@ export function StockTable({
             onChange={(e) => updateFilter('commodityId', e.target.value)}
             className="h-8 rounded-lg border border-border bg-muted px-3 text-sm text-foreground outline-none focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)]/50"
           >
-            <option value="">All Commodities</option>
+            <option value="">All Items</option>
             {commodities.map((com) => (
               <option key={com.id} value={com.id}>
                 {com.code} - {com.name}
@@ -108,94 +179,10 @@ export function StockTable({
         )}
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow className="border-border hover:bg-transparent">
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-              Location
-            </TableHead>
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-              Commodity
-            </TableHead>
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
-              Current Stock
-            </TableHead>
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
-              In Transit
-            </TableHead>
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
-              Total In
-            </TableHead>
-            <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right">
-              Total Out
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {stockLevels.length === 0 ? (
-            <TableRow className="border-border">
-              <TableCell
-                colSpan={6}
-                className="h-24 text-center text-muted-foreground font-mono text-sm"
-              >
-                No stock data found
-              </TableCell>
-            </TableRow>
-          ) : (
-            stockLevels.map((row) => (
-              <TableRow
-                key={`${row.location_id}-${row.commodity_id}-${row.unit_id}`}
-                className="border-border hover:bg-muted/50"
-              >
-                <TableCell className="text-foreground text-sm">
-                  <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
-                    {row.location?.code ?? '---'}
-                  </span>
-                  {row.location?.name ?? 'Unknown'}
-                </TableCell>
-                <TableCell className="text-foreground text-sm">
-                  <span className="font-mono text-[var(--accent-color)] text-xs mr-2">
-                    {row.commodity?.code ?? '---'}
-                  </span>
-                  {row.commodity?.name ?? 'Unknown'}
-                </TableCell>
-                <TableCell className="text-right">
-                  <StockValue value={row.current_stock} variant="stock" />
-                  <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
-                    {row.unit?.abbreviation ?? ''}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <StockValue value={row.in_transit} variant="transit" />
-                  <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
-                    {row.unit?.abbreviation ?? ''}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <StockValue value={row.total_in} variant="neutral" />
-                  <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
-                    {row.unit?.abbreviation ?? ''}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <StockValue value={row.total_out} variant="neutral" />
-                  <span className="text-[var(--text-dim)] text-xs font-mono ml-1">
-                    {row.unit?.abbreviation ?? ''}
-                  </span>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-
-      {stockLevels.length > 0 && (
-        <div className="px-4 py-3 border-t border-border">
-          <p className="text-xs font-mono text-[var(--text-dim)]">
-            {stockLevels.length} {stockLevels.length === 1 ? 'row' : 'rows'}
-          </p>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        data={stockLevels}
+      />
     </Card>
   );
 }

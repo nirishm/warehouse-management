@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams, redirect } from 'next/navigation';
 import { useTenant } from '@/components/layout/tenant-provider';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FormSection } from '@/components/ui/form-section';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -115,13 +115,8 @@ export default function NewReturnPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card className="bg-[var(--bg-base)] border-[var(--border)]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
-              Return Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <FormSection title="Details">
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-[var(--text-muted)] text-xs">Return Type *</Label>
@@ -141,7 +136,7 @@ export default function NewReturnPage() {
                   onChange={(e) => setLocationId(e.target.value)}
                   className={selectCls}
                 >
-                  <option value="">Select location…</option>
+                  <option value="">Select location...</option>
                   {locations.map((l) => (
                     <option key={l.id} value={l.id}>{l.name}</option>
                   ))}
@@ -160,7 +155,11 @@ export default function NewReturnPage() {
                 className="font-mono text-xs"
               />
             </div>
+          </div>
+        </FormSection>
 
+        <FormSection title="Notes" defaultOpen={false} badge="optional">
+          <div className="space-y-4">
             <div className="space-y-1.5">
               <Label className="text-[var(--text-muted)] text-xs">Reason</Label>
               <Input
@@ -179,14 +178,11 @@ export default function NewReturnPage() {
                 className="resize-none"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </FormSection>
 
-        <Card className="bg-[var(--bg-base)] border-[var(--border)]">
-          <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
-              Items
-            </CardTitle>
+        <FormSection title="Items">
+          <div className="flex justify-end mb-3">
             <Button
               type="button"
               variant="ghost"
@@ -196,8 +192,8 @@ export default function NewReturnPage() {
             >
               + Add Row
             </Button>
-          </CardHeader>
-          <CardContent className="space-y-3">
+          </div>
+          <div className="space-y-3">
             {items.map((row) => (
               <div key={row.key} className="grid grid-cols-12 gap-2 items-end">
                 <div className="col-span-4">
@@ -206,9 +202,9 @@ export default function NewReturnPage() {
                     onChange={(e) => updateItem(row.key, 'commodity_id', e.target.value)}
                     className={selectCls}
                   >
-                    <option value="">Commodity…</option>
+                    <option value="">Item...</option>
                     {commodities.map((c) => (
-                      <option key={c.id} value={c.id}>{c.code} — {c.name}</option>
+                      <option key={c.id} value={c.id}>{c.code} -- {c.name}</option>
                     ))}
                   </select>
                 </div>
@@ -218,7 +214,7 @@ export default function NewReturnPage() {
                     onChange={(e) => updateItem(row.key, 'unit_id', e.target.value)}
                     className={selectCls}
                   >
-                    <option value="">Unit…</option>
+                    <option value="">Unit...</option>
                     {units.map((u) => (
                       <option key={u.id} value={u.id}>{u.abbreviation ?? u.name}</option>
                     ))}
@@ -250,13 +246,13 @@ export default function NewReturnPage() {
                     disabled={items.length === 1}
                     className="text-[var(--text-dim)] hover:text-[var(--red)] h-9 w-9 p-0"
                   >
-                    ×
+                    x
                   </Button>
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </FormSection>
 
         {error && <p className="text-sm text-[var(--red)]">{error}</p>}
 

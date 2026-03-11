@@ -6,6 +6,7 @@ import '@/modules'; // Register all modules
 import { TenantProvider } from '@/components/layout/tenant-provider';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
+import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import type { TenantContext, Permission } from '@/core/auth/types';
 
 interface Props {
@@ -94,10 +95,11 @@ export default async function TenantLayout({ children, params }: Props) {
         />
         <div className="flex-1 flex flex-col min-w-0">
           <Header tenantSlug={tenantSlug} tenantName={tenant.name} navItems={navItems} />
-          <main className="flex-1 p-4 md:p-6">
+          <main className="flex-1 p-4 pb-20 md:p-6 md:pb-6">
             {children}
           </main>
         </div>
+        <MobileBottomNav tenantSlug={tenantSlug} tenantName={tenant.name} navItems={navItems} />
       </div>
     </TenantProvider>
   );

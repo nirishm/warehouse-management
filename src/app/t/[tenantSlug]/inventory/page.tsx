@@ -52,7 +52,7 @@ export default async function StockLevelsPage({ params, searchParams }: Props) {
   const inTransitCount = stockLevels.filter((s) => s.in_transit > 0).length;
 
   const summaryStats = [
-    { label: 'Commodities in Stock', value: distinctCommodities },
+    { label: 'Items in Stock', value: distinctCommodities },
     { label: 'Active Locations', value: distinctLocations },
     { label: 'Items in Transit', value: inTransitCount },
   ];
