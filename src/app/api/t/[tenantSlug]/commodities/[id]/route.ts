@@ -18,7 +18,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
     const commodity = await getCommodityById(ctx.schemaName, id);
 
     if (!commodity) {
-      return NextResponse.json({ error: 'Commodity not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 });
     }
 
     return NextResponse.json({ data: commodity });

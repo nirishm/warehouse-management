@@ -107,7 +107,7 @@ export function ThresholdsManager({
             Alert Thresholds
           </h1>
           <p className="text-sm text-[var(--text-dim)] mt-1">
-            Configure min stock and reorder points per commodity and location
+            Configure min stock and reorder points per item and location
           </p>
         </div>
         <div className="flex gap-2">
@@ -129,7 +129,7 @@ export function ThresholdsManager({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[var(--border)] bg-[var(--bg-off)]">
-                {['Commodity', 'Location', 'Unit', 'Min Stock', 'Reorder Point', 'Active', ''].map(
+                {['Item', 'Location', 'Unit', 'Min Stock', 'Reorder Point', 'Active', ''].map(
                   (h) => (
                     <th
                       key={h}
@@ -187,13 +187,13 @@ export function ThresholdsManager({
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-[var(--text-muted)] text-xs">Commodity</Label>
+              <Label className="text-[var(--text-muted)] text-xs">Item</Label>
               <Select
                 value={form.commodity_id}
                 onValueChange={(v) => setForm((f) => ({ ...f, commodity_id: v ?? '' }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select commodity" />
+                  <SelectValue placeholder="Select item" />
                 </SelectTrigger>
                 <SelectContent>
                   {commodities.map((c) => (

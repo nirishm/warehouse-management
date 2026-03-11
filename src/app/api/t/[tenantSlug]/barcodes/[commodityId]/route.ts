@@ -21,7 +21,7 @@ export async function GET(
       .single();
 
     if (error || !commodity) {
-      return NextResponse.json({ error: 'Commodity not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 });
     }
 
     const buffer = await generateQRCodeBuffer(commodity.code as string);

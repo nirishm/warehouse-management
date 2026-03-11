@@ -26,7 +26,7 @@ export default async function BulkImportPage({ params }: Props) {
       <div>
         <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">Import / Export</h1>
         <p className="text-sm text-[var(--text-dim)] mt-1">
-          Bulk import commodities, contacts, and initial stock via CSV
+          Bulk import items, contacts, and initial stock via CSV
         </p>
       </div>
       <BulkImportTabs tenantSlug={tenantSlug} />

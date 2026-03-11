@@ -285,18 +285,18 @@ export function ShortageDashboard({
         <Card className="border-border bg-[var(--bg-off)]">
           <CardHeader className="pb-3">
             <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
-              Shortage by Commodity ({byCommodity.length})
+              Shortage by Item ({byCommodity.length})
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {byCommodity.length === 0 ? (
-              <EmptyState label="No commodity shortage data" />
+              <EmptyState label="No item shortage data" />
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow className="border-border hover:bg-transparent">
                     <TableHead className={`${thClass} pl-6`}>
-                      Commodity
+                      Item
                     </TableHead>
                     <TableHead className={`${thClass} text-right`}>
                       Dispatches
@@ -363,7 +363,7 @@ export function ShortageDashboard({
                   <TableHead className={`${thClass} pl-6`}>
                     Dispatch #
                   </TableHead>
-                  <TableHead className={thClass}>Commodity</TableHead>
+                  <TableHead className={thClass}>Item</TableHead>
                   <TableHead className={thClass}>Route</TableHead>
                   <TableHead className={`${thClass} text-right`}>
                     Sent

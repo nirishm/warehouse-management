@@ -58,9 +58,9 @@ export default async function CommoditiesPage({ params }: Props) {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">Commodities</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">Items</h1>
           <p className="text-sm text-[var(--text-dim)] mt-1">
-            Manage the commodities tracked in your warehouse
+            Manage the items tracked in your warehouse
           </p>
         </div>
         <CommoditiesClient
@@ -74,7 +74,7 @@ export default async function CommoditiesPage({ params }: Props) {
       <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
           <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
-            All Commodities
+            All Items
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

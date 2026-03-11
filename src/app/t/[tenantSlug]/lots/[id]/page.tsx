@@ -71,7 +71,7 @@ export default async function LotDetailPage({ params }: Props) {
             {lot.lot_number}
           </h1>
           <p className="text-sm text-[var(--text-dim)] mt-1">
-            {lot.commodity?.name ?? 'Unknown commodity'} ·{' '}
+            {lot.commodity?.name ?? 'Unknown item'} ·{' '}
             Received {new Date(lot.received_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
           </p>
         </div>
@@ -91,7 +91,7 @@ export default async function LotDetailPage({ params }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <DetailRow label="Commodity">
+            <DetailRow label="Item">
               {lot.commodity ? (
                 <>
                   <span className="font-mono text-[var(--accent-color)] text-xs mr-2">{lot.commodity.code}</span>

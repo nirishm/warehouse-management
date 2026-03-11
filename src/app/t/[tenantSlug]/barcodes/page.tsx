@@ -42,7 +42,7 @@ export default async function BarcodesPage({ params }: Props) {
       <div>
         <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">Barcode Labels</h1>
         <p className="text-sm text-[var(--text-dim)] mt-1">
-          Select commodities to generate printable QR code labels
+          Select items to generate printable QR code labels
         </p>
       </div>
       <BarcodePrintManager commodities={rows} tenantSlug={tenantSlug} />

@@ -257,7 +257,7 @@ export function ReceiveForm({ dispatch, items, tenantSlug }: Props) {
             <TableHeader>
               <TableRow className="border-border hover:bg-transparent">
                 <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground pl-4">
-                  Commodity
+                  Item
                 </TableHead>
                 <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   Unit

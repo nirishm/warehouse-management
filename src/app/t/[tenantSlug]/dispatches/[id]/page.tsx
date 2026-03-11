@@ -198,7 +198,7 @@ export default async function DispatchDetailPage({ params }: Props) {
               <TableHeader>
                 <TableRow className="border-border hover:bg-transparent">
                   <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground pl-6">
-                    Commodity
+                    Item
                   </TableHead>
                   <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                     Unit

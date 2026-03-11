@@ -77,7 +77,7 @@ export function BarcodePrintManager({ commodities, tenantSlug: _tenantSlug }: Pr
             <Input
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              placeholder="Filter commodities…"
+              placeholder="Filter items…"
               className="pl-9"
             />
           </div>
@@ -112,7 +112,7 @@ export function BarcodePrintManager({ commodities, tenantSlug: _tenantSlug }: Pr
         <div className="border border-[var(--border)] rounded-lg overflow-hidden">
           {filtered.length === 0 ? (
             <div className="py-12 text-center text-sm text-[var(--text-dim)] font-mono">
-              No commodities found
+              No items found
             </div>
           ) : (
             <div className="divide-y divide-[var(--border)]">

@@ -127,7 +127,7 @@ export function AnalyticsDashboard({
       icon: MapPin,
     },
     {
-      label: 'Active Commodities',
+      label: 'Active Items',
       value: overview.activeCommodities,
       icon: Wheat,
     },

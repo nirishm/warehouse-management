@@ -146,12 +146,12 @@ export function MobileReceiveForm({
       {barcodeEnabled && (
         <div className="space-y-1">
           <Label className="text-xs font-mono text-[var(--text-dim)] uppercase tracking-wider">
-            Scan or search commodity
+            Scan or search item
           </Label>
           <BarcodeScannerInput
             value={scanFilter}
             onChange={setScanFilter}
-            placeholder="Scan or type commodity code…"
+            placeholder="Scan or type item code…"
           />
         </div>
       )}

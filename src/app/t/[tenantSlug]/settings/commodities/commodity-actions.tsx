@@ -32,7 +32,7 @@ export function CommodityActions({ commodity, onSuccess }: CommodityActionsProps
   const ctx = useTenant();
 
   async function handleDelete() {
-    if (!confirm(`Delete commodity "${commodity.name}"? This action cannot be undone.`)) {
+    if (!confirm(`Delete item "${commodity.name}"? This action cannot be undone.`)) {
       return;
     }
 
@@ -49,7 +49,7 @@ export function CommodityActions({ commodity, onSuccess }: CommodityActionsProps
 
       onSuccess();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete commodity');
+      alert(err instanceof Error ? err.message : 'Failed to delete item');
     } finally {
       setDeleting(false);
     }
@@ -62,6 +62,8 @@ export function CommodityActions({ commodity, onSuccess }: CommodityActionsProps
     description: commodity.description ?? '',
     category: commodity.category ?? '',
     default_unit_id: commodity.default_unit_id ?? '',
+    hsn_code: ((commodity as unknown as Record<string, unknown>).hsn_code as string) ?? '',
+    tax_rate: String((commodity as unknown as Record<string, unknown>).tax_rate ?? ''),
   };
 
   return (

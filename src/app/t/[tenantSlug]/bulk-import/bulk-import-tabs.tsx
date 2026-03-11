@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ImportDropzone } from '@/components/bulk-import/import-dropzone';
 
 const TABS = [
-  { id: 'commodities', label: 'Commodities' },
+  { id: 'commodities', label: 'Items' },
   { id: 'contacts', label: 'Contacts' },
   { id: 'initial-stock', label: 'Initial Stock' },
 ] as const;
@@ -40,7 +40,7 @@ export function BulkImportTabs({ tenantSlug }: Props) {
       <div className="max-w-xl">
         {active === 'commodities' && (
           <ImportDropzone
-            label="Import commodities from CSV"
+            label="Import items from CSV"
             uploadUrl={`${base}/commodities`}
             templateUrl={`${base}/commodities`}
           />
