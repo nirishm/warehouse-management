@@ -7,9 +7,8 @@ import { describe, it, expect, afterEach } from 'vitest';
 import {
   tenantClient,
   TEST_TENANT,
-  DEMO_LOCATIONS,
-  DEMO_COMMODITIES,
-  DEMO_PURCHASES,
+  TW_LOCATIONS,
+  TW_COMMODITIES,
 } from '../setup/test-env';
 import {
   createTestPurchase,
@@ -28,7 +27,7 @@ afterEach(async () => {
 // Purchase: read existing data
 // ---------------------------------------------------------------------------
 describe('purchases: read operations', () => {
-  it('demo tenant has 4 seeded purchases', async () => {
+  it('test-warehouse has purchases', async () => {
     const client = tenantClient(SCHEMA);
     const { data, error } = await client
       .from('purchases')
@@ -36,10 +35,12 @@ describe('purchases: read operations', () => {
       .is('deleted_at', null);
 
     expect(error).toBeNull();
-    expect(data!.length).toBe(4);
+    expect(data!.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('seeded purchases have correct status distribution', async () => {
+  it('purchases have at least one received status (CHECK constraint allows: draft|ordered|received|cancelled)', async () => {
+    // ARRANGE: test-warehouse seed data has received purchases
+    // NOTE: do not assert specific status diversity from seed data — the test DB may only have 'received'
     const client = tenantClient(SCHEMA);
     const { data } = await client
       .from('purchases')
@@ -47,12 +48,27 @@ describe('purchases: read operations', () => {
       .is('deleted_at', null);
 
     const statuses = (data ?? []).map((r) => r.status);
+    // Always assert at least the base status present in test-warehouse seed
     expect(statuses).toContain('received');
-    expect(statuses).toContain('ordered');
-    expect(statuses).toContain('draft');
+
+    // Verify all status values conform to CHECK constraint
+    const validStatuses = ['draft', 'ordered', 'received', 'cancelled'];
+    for (const status of statuses) {
+      expect(validStatuses).toContain(status);
+    }
   });
 
   it('can fetch purchase by ID with items (JOIN)', async () => {
+    // ARRANGE: create a purchase via factory so it has items
+    const unit = await getDefaultUnit(SCHEMA);
+    const purchase = await createTestPurchase(SCHEMA, {
+      locationId: TW_LOCATIONS.LOC1,
+      commodityId: TW_COMMODITIES.COMM1,
+      unitId: unit.id,
+      quantity: 10,
+    });
+
+    // ACT: fetch it back with items JOIN
     const client = tenantClient(SCHEMA);
     const { data, error } = await client
       .from('purchases')
@@ -60,13 +76,13 @@ describe('purchases: read operations', () => {
         id, purchase_number, status,
         items:purchase_items(id, commodity_id, quantity)
       `)
-      .eq('id', DEMO_PURCHASES.PUR_001)
+      .eq('id', purchase.id)
       .single();
 
+    // ASSERT: header + items present
     expect(error).toBeNull();
     expect(data).not.toBeNull();
-    expect(data!.purchase_number).toBe('PUR-000001');
-    expect(data!.status).toBe('received');
+    expect(data!.purchase_number).toBe(purchase.purchase_number);
     expect(Array.isArray(data!.items)).toBe(true);
     expect(data!.items.length).toBeGreaterThan(0);
   });
@@ -80,7 +96,7 @@ describe('purchases: read operations', () => {
       .from('purchases')
       .insert({
         purchase_number: purchaseNumber,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -116,8 +132,8 @@ describe('purchases: create operations', () => {
 
     // ACT: create purchase using factory
     const purchase = await createTestPurchase(SCHEMA, {
-      locationId: DEMO_LOCATIONS.WH_NORTH,
-      commodityId: DEMO_COMMODITIES.WHEAT,
+      locationId: TW_LOCATIONS.LOC1,
+      commodityId: TW_COMMODITIES.COMM1,
       unitId: unit.id,
       quantity: 100,
     });
@@ -128,20 +144,36 @@ describe('purchases: create operations', () => {
   });
 
   it('purchase_number must be unique (duplicate rejected)', async () => {
+    // ARRANGE: create a purchase first to get an existing number
     const client = tenantClient(SCHEMA);
-    const duplicateNumber = 'PUR-000001'; // Existing seeded purchase number
+    const purchaseNumber = `PUR-UNIQ-${Date.now()}`;
 
+    const { error: firstErr } = await client
+      .from('purchases')
+      .insert({
+        purchase_number: purchaseNumber,
+        location_id: TW_LOCATIONS.LOC1,
+        status: 'draft',
+        created_by: '00000000-0000-0000-0000-000000000099',
+      });
+    expect(firstErr).toBeNull();
+
+    // ACT: try to insert another with the same number
     const { error } = await client
       .from('purchases')
       .insert({
-        purchase_number: duplicateNumber,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        purchase_number: purchaseNumber,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'received',
         created_by: '00000000-0000-0000-0000-000000000099',
       });
 
+    // ASSERT: unique constraint violation
     expect(error).not.toBeNull();
     expect(error!.message).toMatch(/unique|duplicate/i);
+
+    // Cleanup
+    await client.from('purchases').delete().eq('purchase_number', purchaseNumber);
   });
 
   it('purchase creation with contact_id links to existing contact', async () => {
@@ -150,8 +182,8 @@ describe('purchases: create operations', () => {
     const unit = await getDefaultUnit(SCHEMA);
 
     const purchase = await createTestPurchase(SCHEMA, {
-      locationId: DEMO_LOCATIONS.WH_NORTH,
-      commodityId: DEMO_COMMODITIES.WHEAT,
+      locationId: TW_LOCATIONS.LOC1,
+      commodityId: TW_COMMODITIES.COMM1,
       unitId: unit.id,
       quantity: 50,
       contactId: contact.id,
@@ -194,7 +226,7 @@ describe('purchases: status transitions', () => {
       .from('purchases')
       .insert({
         purchase_number: purchaseNumber,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -218,14 +250,35 @@ describe('purchases: status transitions', () => {
   });
 
   it('invalid status value is rejected by CHECK constraint', async () => {
+    // ARRANGE: create a purchase first
     const client = tenantClient(SCHEMA);
+    const purchaseNumber = `PUR-BADSTATUS-${Date.now()}`;
+
+    const { data: purchase, error: createErr } = await client
+      .from('purchases')
+      .insert({
+        purchase_number: purchaseNumber,
+        location_id: TW_LOCATIONS.LOC1,
+        status: 'draft',
+        created_by: '00000000-0000-0000-0000-000000000099',
+      })
+      .select('id')
+      .single();
+
+    expect(createErr).toBeNull();
+
+    // ACT: try to set an invalid status
     const { error } = await client
       .from('purchases')
       .update({ status: 'shipped' })
-      .eq('id', DEMO_PURCHASES.PUR_003);
+      .eq('id', purchase!.id);
 
+    // ASSERT: check constraint violation
     expect(error).not.toBeNull();
     expect(error!.message).toMatch(/check|violates/i);
+
+    // Cleanup
+    await client.from('purchases').delete().eq('id', purchase!.id);
   });
 });
 
@@ -238,12 +291,12 @@ describe('purchases: location-scoped access', () => {
     const { data, error } = await client
       .from('purchases')
       .select('id, location_id')
-      .eq('location_id', DEMO_LOCATIONS.WH_NORTH)
+      .eq('location_id', TW_LOCATIONS.LOC1)
       .is('deleted_at', null);
 
     expect(error).toBeNull();
     for (const purchase of data ?? []) {
-      expect(purchase.location_id).toBe(DEMO_LOCATIONS.WH_NORTH);
+      expect(purchase.location_id).toBe(TW_LOCATIONS.LOC1);
     }
   });
 

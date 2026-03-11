@@ -40,12 +40,12 @@ export async function getTestTenant() {
   const { data, error } = await serviceClient
     .from('tenants')
     .select('id, name, slug, schema_name, status, plan, enabled_modules')
-    .eq('slug', 'demo')
+    .eq('slug', 'test-warehouse')
     .single();
 
   if (error || !data) {
     throw new Error(
-      `Test tenant 'demo' not found. Ensure the demo tenant is provisioned before running tests. Error: ${error?.message}`
+      `Test tenant 'test-warehouse' not found. Ensure the test-warehouse tenant is provisioned before running tests. Error: ${error?.message}`
     );
   }
   return data;
@@ -157,7 +157,7 @@ export async function createTestPurchase(
   userId = '00000000-0000-0000-0000-000000000099'
 ): Promise<{ id: string; purchase_number: string }> {
   const client = tenantClient(schemaName);
-  const purchaseNumber = `PUR-TEST-${Date.now()}`;
+  const purchaseNumber = `PUR-TEST-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
   const { data: purchase, error: pErr } = await client
     .from('purchases')
@@ -208,7 +208,7 @@ export async function createTestDispatch(
   userId = '00000000-0000-0000-0000-000000000099'
 ): Promise<{ id: string; dispatch_number: string }> {
   const client = tenantClient(schemaName);
-  const dispatchNumber = `DSP-TEST-${Date.now()}`;
+  const dispatchNumber = `DSP-TEST-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
   const { data: dispatch, error: dErr } = await client
     .from('dispatches')
@@ -258,7 +258,7 @@ export async function createTestSale(
   userId = '00000000-0000-0000-0000-000000000099'
 ): Promise<{ id: string; sale_number: string }> {
   const client = tenantClient(schemaName);
-  const saleNumber = `SAL-TEST-${Date.now()}`;
+  const saleNumber = `SAL-TEST-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
   const { data: sale, error: sErr } = await client
     .from('sales')

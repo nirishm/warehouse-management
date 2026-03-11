@@ -4,7 +4,7 @@
 // Runner: Vitest (node environment)
 
 import { describe, it, expect, afterEach } from 'vitest';
-import { tenantClient, TEST_TENANT, DEMO_LOCATIONS, DEMO_COMMODITIES } from '../setup/test-env';
+import { tenantClient, TEST_TENANT, TW_LOCATIONS, TW_COMMODITIES, TW_UNIT_KG } from '../setup/test-env';
 import { runCleanup, createTestLocation, createTestCommodity } from '../setup/seed-factories';
 
 const SCHEMA = TEST_TENANT.schema_name;
@@ -90,7 +90,7 @@ describe('soft deletes: filtering behavior', () => {
       .from('purchases')
       .insert({
         purchase_number: purchaseNumber,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'received',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -157,14 +157,22 @@ describe('soft deletes: unique constraint reuse', () => {
   });
 
   it('duplicate location code rejected when active record exists (partial unique still enforced)', async () => {
-    // ARRANGE: use an existing active location code
+    // ARRANGE: fetch an active location code from this tenant dynamically
     const client = tenantClient(SCHEMA);
-    const existingCode = 'WH-NORTH'; // Known active location in demo tenant
+    const { data: existing } = await client
+      .from('locations')
+      .select('code')
+      .is('deleted_at', null)
+      .limit(1)
+      .single();
+
+    expect(existing).not.toBeNull();
+    const existingCode = existing!.code;
 
     // ACT: try to create duplicate
     const { error } = await client
       .from('locations')
-      .insert({ name: 'Duplicate North', code: existingCode, type: 'warehouse' });
+      .insert({ name: 'Duplicate Location', code: existingCode, type: 'warehouse' });
 
     // ASSERT: unique constraint violation
     expect(error).not.toBeNull();
@@ -214,8 +222,8 @@ describe('FK cascade: dispatch_items delete when dispatch deleted', () => {
       .from('dispatches')
       .insert({
         dispatch_number: dispatchNumber,
-        origin_location_id: DEMO_LOCATIONS.WH_NORTH,
-        dest_location_id: DEMO_LOCATIONS.YD_SOUTH,
+        origin_location_id: TW_LOCATIONS.LOC1,
+        dest_location_id: TW_LOCATIONS.LOC3,
         status: 'draft',
         dispatched_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -229,8 +237,8 @@ describe('FK cascade: dispatch_items delete when dispatch deleted', () => {
       .from('dispatch_items')
       .insert({
         dispatch_id: dispatch!.id,
-        commodity_id: DEMO_COMMODITIES.WHEAT,
-        unit_id: 'c2f3fdc1-ebc2-4b48-b08f-185b189a469d', // MT unit
+        commodity_id: TW_COMMODITIES.COMM1,
+        unit_id: TW_UNIT_KG,
         sent_quantity: 10,
       })
       .select('id')
@@ -263,7 +271,7 @@ describe('FK cascade: purchase_items delete when purchase deleted', () => {
       .from('purchases')
       .insert({
         purchase_number: purchaseNumber,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'received',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -276,8 +284,8 @@ describe('FK cascade: purchase_items delete when purchase deleted', () => {
       .from('purchase_items')
       .insert({
         purchase_id: purchase!.id,
-        commodity_id: DEMO_COMMODITIES.WHEAT,
-        unit_id: 'c2f3fdc1-ebc2-4b48-b08f-185b189a469d',
+        commodity_id: TW_COMMODITIES.COMM1,
+        unit_id: TW_UNIT_KG,
         quantity: 100,
       })
       .select('id')
@@ -308,7 +316,7 @@ describe('soft delete: does NOT cascade to line items', () => {
       .from('purchases')
       .insert({
         purchase_number: purchaseNumber,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'received',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -317,8 +325,8 @@ describe('soft delete: does NOT cascade to line items', () => {
 
     await client.from('purchase_items').insert({
       purchase_id: purchase!.id,
-      commodity_id: DEMO_COMMODITIES.WHEAT,
-      unit_id: 'c2f3fdc1-ebc2-4b48-b08f-185b189a469d',
+      commodity_id: TW_COMMODITIES.COMM1,
+      unit_id: TW_UNIT_KG,
       quantity: 50,
     });
 
@@ -360,8 +368,8 @@ describe('NOT NULL constraints: null guard checks', () => {
     const client = tenantClient(SCHEMA);
     const { error } = await client.from('dispatches').insert({
       dispatch_number: null,
-      origin_location_id: DEMO_LOCATIONS.WH_NORTH,
-      dest_location_id: DEMO_LOCATIONS.YD_SOUTH,
+      origin_location_id: TW_LOCATIONS.LOC1,
+      dest_location_id: TW_LOCATIONS.LOC3,
       status: 'draft',
       dispatched_by: '00000000-0000-0000-0000-000000000099',
     });
@@ -373,7 +381,7 @@ describe('NOT NULL constraints: null guard checks', () => {
     const client = tenantClient(SCHEMA);
     const { error } = await client.from('purchases').insert({
       purchase_number: `PUR-NULL-${Date.now()}`,
-      location_id: DEMO_LOCATIONS.WH_NORTH,
+      location_id: TW_LOCATIONS.LOC1,
       status: 'received',
       created_by: null,
     });
@@ -395,7 +403,7 @@ describe('CHECK constraints: negative quantity rejection', () => {
       .from('purchases')
       .insert({
         purchase_number: purchaseNumber,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'received',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -405,7 +413,7 @@ describe('CHECK constraints: negative quantity rejection', () => {
     // ACT: try to insert negative quantity item
     const { error } = await client.from('purchase_items').insert({
       purchase_id: purchase!.id,
-      commodity_id: DEMO_COMMODITIES.WHEAT,
+      commodity_id: TW_COMMODITIES.COMM1,
       unit_id: 'c2f3fdc1-ebc2-4b48-b08f-185b189a469d',
       quantity: -100,
     });
@@ -426,7 +434,7 @@ describe('CHECK constraints: negative quantity rejection', () => {
       .from('sales')
       .insert({
         sale_number: saleNumber,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -435,7 +443,7 @@ describe('CHECK constraints: negative quantity rejection', () => {
 
     const { error } = await client.from('sale_items').insert({
       sale_id: sale!.id,
-      commodity_id: DEMO_COMMODITIES.WHEAT,
+      commodity_id: TW_COMMODITIES.COMM1,
       unit_id: 'c2f3fdc1-ebc2-4b48-b08f-185b189a469d',
       quantity: 0,
     });
@@ -454,8 +462,8 @@ describe('CHECK constraints: negative quantity rejection', () => {
       .from('dispatches')
       .insert({
         dispatch_number: dispatchNumber,
-        origin_location_id: DEMO_LOCATIONS.WH_NORTH,
-        dest_location_id: DEMO_LOCATIONS.YD_SOUTH,
+        origin_location_id: TW_LOCATIONS.LOC1,
+        dest_location_id: TW_LOCATIONS.LOC3,
         status: 'draft',
         dispatched_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -464,7 +472,7 @@ describe('CHECK constraints: negative quantity rejection', () => {
 
     const { error } = await client.from('dispatch_items').insert({
       dispatch_id: dispatch!.id,
-      commodity_id: DEMO_COMMODITIES.WHEAT,
+      commodity_id: TW_COMMODITIES.COMM1,
       unit_id: 'c2f3fdc1-ebc2-4b48-b08f-185b189a469d',
       sent_quantity: 0,
     });

@@ -13,8 +13,8 @@ import { describe, it, expect, afterEach } from 'vitest';
 import {
   tenantClient,
   TEST_TENANT,
-  DEMO_LOCATIONS,
-  DEMO_COMMODITIES,
+  TW_LOCATIONS,
+  TW_COMMODITIES,
   EXEC_SQL_RPC_EXISTS,
 } from '../setup/test-env';
 import {
@@ -30,27 +30,15 @@ afterEach(async () => {
 });
 
 // ---------------------------------------------------------------------------
-// Sequence counter: exec_sql RPC gap
+// Sequence counter: exec_sql RPC availability
 // ---------------------------------------------------------------------------
-describe('[HIGH] sequence counter: exec_sql RPC not available', () => {
-  it('[HIGH] EXEC_SQL_RPC_EXISTS is false — getNextSequenceNumber() is broken in production', () => {
-    // This is the most critical finding in the entire codebase.
-    // Every sequence-dependent operation (createPurchase, createDispatch, createSale,
-    // createReturn, createLot, createPayment) calls getNextSequenceNumber() which
-    // calls client.rpc('exec_sql', ...) — a non-existent RPC function.
-    //
-    // Impact: ALL sequence-numbered record creation fails at runtime with PGRST202.
-    // Workaround used in production: records are created with manually provided numbers
-    // (the API route handlers may be bypassing the sequence — requires investigation).
-    //
-    // FIX: Replace exec_sql approach with a stored procedure or NEXTVAL sequence.
-    console.error(
-      '[HIGH CRITICAL] exec_sql RPC does not exist. ' +
-        'getNextSequenceNumber() in src/core/db/tenant-query.ts is non-functional. ' +
-        'ALL auto-numbered record creation (purchases, dispatches, sales, returns, lots, payments) ' +
-        'will fail at runtime when the API route is called.'
-    );
-    expect(EXEC_SQL_RPC_EXISTS).toBe(false);
+describe('sequence counter: exec_sql RPC is available', () => {
+  it('EXEC_SQL_RPC_EXISTS is true — getNextSequenceNumber() is operational', () => {
+    // exec_sql RPC was created in the public schema (confirmed 2026-03-11).
+    // getNextSequenceNumber() in src/core/db/tenant-query.ts is now functional.
+    // All auto-numbered record creation (purchases, dispatches, sales, returns, lots, payments)
+    // can proceed at runtime.
+    expect(EXEC_SQL_RPC_EXISTS).toBe(true);
   });
 
   it('[HIGH] direct sequence_counters UPDATE works as a safe alternative to exec_sql', async () => {
@@ -203,8 +191,8 @@ describe('unique number constraints: duplicate prevention', () => {
         .from('dispatches')
         .insert({
           dispatch_number: duplicateNumber,
-          origin_location_id: DEMO_LOCATIONS.WH_NORTH,
-          dest_location_id: DEMO_LOCATIONS.YD_SOUTH,
+          origin_location_id: TW_LOCATIONS.LOC1,
+          dest_location_id: TW_LOCATIONS.LOC3,
           status: 'draft',
           dispatched_by: '00000000-0000-0000-0000-000000000099',
         })
@@ -214,8 +202,8 @@ describe('unique number constraints: duplicate prevention', () => {
         .from('dispatches')
         .insert({
           dispatch_number: duplicateNumber, // same!
-          origin_location_id: DEMO_LOCATIONS.WH_NORTH,
-          dest_location_id: DEMO_LOCATIONS.YD_SOUTH,
+          origin_location_id: TW_LOCATIONS.LOC1,
+          dest_location_id: TW_LOCATIONS.LOC3,
           status: 'draft',
           dispatched_by: '00000000-0000-0000-0000-000000000099',
         })
@@ -252,7 +240,7 @@ describe('unique number constraints: duplicate prevention', () => {
         .from('purchases')
         .insert({
           purchase_number: duplicateNumber,
-          location_id: DEMO_LOCATIONS.WH_NORTH,
+          location_id: TW_LOCATIONS.LOC1,
           status: 'draft',
           created_by: '00000000-0000-0000-0000-000000000099',
         })
@@ -262,7 +250,7 @@ describe('unique number constraints: duplicate prevention', () => {
         .from('purchases')
         .insert({
           purchase_number: duplicateNumber,
-          location_id: DEMO_LOCATIONS.WH_NORTH,
+          location_id: TW_LOCATIONS.LOC1,
           status: 'draft',
           created_by: '00000000-0000-0000-0000-000000000099',
         })
@@ -289,9 +277,9 @@ describe('concurrent dispatch_items: shortage calculation under parallel updates
     // ARRANGE: create a dispatch with a single item
     const unit = await getDefaultUnit(SCHEMA);
     const dispatch = await createTestDispatch(SCHEMA, {
-      originLocationId: DEMO_LOCATIONS.WH_NORTH,
-      destLocationId: DEMO_LOCATIONS.YD_SOUTH,
-      commodityId: DEMO_COMMODITIES.WHEAT,
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC3,
+      commodityId: TW_COMMODITIES.COMM1,
       unitId: unit.id,
       sentQuantity: 100,
       status: 'dispatched',
@@ -348,8 +336,8 @@ describe('edge cases: zero and boundary quantity operations', () => {
       .from('dispatches')
       .insert({
         dispatch_number: `DSP-ZERO-${Date.now()}`,
-        origin_location_id: DEMO_LOCATIONS.WH_NORTH,
-        dest_location_id: DEMO_LOCATIONS.YD_SOUTH,
+        origin_location_id: TW_LOCATIONS.LOC1,
+        dest_location_id: TW_LOCATIONS.LOC3,
         status: 'draft',
         dispatched_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -361,7 +349,7 @@ describe('edge cases: zero and boundary quantity operations', () => {
       .from('dispatch_items')
       .insert({
         dispatch_id: dispatch!.id,
-        commodity_id: DEMO_COMMODITIES.WHEAT,
+        commodity_id: TW_COMMODITIES.COMM1,
         unit_id: unit.id,
         sent_quantity: 0,
       });
@@ -382,7 +370,7 @@ describe('edge cases: zero and boundary quantity operations', () => {
       .from('purchases')
       .insert({
         purchase_number: `PUR-ZERO-${Date.now()}`,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -394,7 +382,7 @@ describe('edge cases: zero and boundary quantity operations', () => {
       .from('purchase_items')
       .insert({
         purchase_id: purchase!.id,
-        commodity_id: DEMO_COMMODITIES.WHEAT,
+        commodity_id: TW_COMMODITIES.COMM1,
         unit_id: unit.id,
         quantity: 0,
       });
@@ -415,7 +403,7 @@ describe('edge cases: zero and boundary quantity operations', () => {
       .from('purchases')
       .insert({
         purchase_number: `PUR-MINQTY-${Date.now()}`,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -427,7 +415,7 @@ describe('edge cases: zero and boundary quantity operations', () => {
       .from('purchase_items')
       .insert({
         purchase_id: purchase!.id,
-        commodity_id: DEMO_COMMODITIES.WHEAT,
+        commodity_id: TW_COMMODITIES.COMM1,
         unit_id: unit.id,
         quantity: 0.001,
       });
@@ -448,7 +436,7 @@ describe('edge cases: zero and boundary quantity operations', () => {
       .from('purchases')
       .insert({
         purchase_number: `PUR-NULLQTY-${Date.now()}`,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -460,7 +448,7 @@ describe('edge cases: zero and boundary quantity operations', () => {
       .from('purchase_items')
       .insert({
         purchase_id: purchase!.id,
-        commodity_id: DEMO_COMMODITIES.WHEAT,
+        commodity_id: TW_COMMODITIES.COMM1,
         unit_id: unit.id,
         quantity: null,
       });
@@ -488,8 +476,8 @@ describe('edge cases: large batch dispatch operations', () => {
       .from('dispatches')
       .insert({
         dispatch_number: dispatchNumber,
-        origin_location_id: DEMO_LOCATIONS.WH_NORTH,
-        dest_location_id: DEMO_LOCATIONS.YD_SOUTH,
+        origin_location_id: TW_LOCATIONS.LOC1,
+        dest_location_id: TW_LOCATIONS.LOC3,
         status: 'dispatched',
         dispatched_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -497,7 +485,8 @@ describe('edge cases: large batch dispatch operations', () => {
       .single();
 
     // Generate 50 items alternating between WHEAT and RICE
-    const commodities = [DEMO_COMMODITIES.WHEAT, DEMO_COMMODITIES.RICE, DEMO_COMMODITIES.CORN];
+    // test-warehouse has 2 commodities (COMM1=Wheat Grade A, COMM2=Rice Basmati) — cycle between them
+    const commodities = [TW_COMMODITIES.COMM1, TW_COMMODITIES.COMM2];
     const items = Array.from({ length: 50 }, (_, i) => ({
       dispatch_id: dispatch!.id,
       commodity_id: commodities[i % commodities.length],

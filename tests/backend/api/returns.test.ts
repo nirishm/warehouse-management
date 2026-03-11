@@ -5,18 +5,15 @@
 //           API-layer tests marked .skip — require running dev server + auth.
 // Runner: Vitest (node environment)
 //
-// KNOWN GAP [HIGH]: The returns table only exists after applyReturnsMigration() is called
-// per-tenant. That function uses the missing exec_sql RPC, so it has never been run on the
-// demo tenant. Tests that require the table are wrapped in a skip guard.
+// NOTE: The returns table exists in tenant_test_warehouse (exec_sql RPC is available and
+// applyReturnsMigration() was successfully applied). All tests run unconditionally.
 
 import { describe, it, expect, afterEach, beforeAll } from 'vitest';
 import {
   tenantClient,
   TEST_TENANT,
-  DEMO_LOCATIONS,
-  DEMO_COMMODITIES,
-  DEMO_PURCHASES,
-  DEMO_SALES,
+  TW_LOCATIONS,
+  TW_COMMODITIES,
 } from '../setup/test-env';
 import {
   getDefaultUnit,
@@ -40,30 +37,24 @@ afterEach(async () => {
   await runCleanup();
 });
 
+// Placeholder UUIDs used as original_txn_id — no FK constraint on this column by design
+// (returns can reference purchases, sales, or other txn types)
+const PLACEHOLDER_TXN_1 = '00000000-0000-0000-0000-000000000001';
+const PLACEHOLDER_TXN_2 = '00000000-0000-0000-0000-000000000002';
+const PLACEHOLDER_TXN_3 = '00000000-0000-0000-0000-000000000003';
+
 // ---------------------------------------------------------------------------
 // Returns: module existence gate
 // ---------------------------------------------------------------------------
 describe('returns: module DDL presence', () => {
-  it('[HIGH] returns table existence depends on applyReturnsMigration() being called', async () => {
+  it('returns table exists in tenant_test_warehouse (applyReturnsMigration was applied)', async () => {
     // ARRANGE: query the returns table
     const client = tenantClient(SCHEMA);
     const { error } = await client.from('returns').select('id').limit(1);
 
-    if (error?.code === 'PGRST205') {
-      // ASSERT: table does not exist — module migration was never applied
-      // This is the EXPECTED state for the demo tenant because applyReturnsMigration()
-      // uses the missing exec_sql RPC and has never been called.
-      console.error(
-        '[HIGH] returns table does not exist in tenant_demo schema. ' +
-          'applyReturnsMigration() was never called. ' +
-          'applyReturnsMigration() uses exec_sql RPC which does not exist (PGRST202). ' +
-          'FIX: Register returns migration via registerModuleMigration() or apply DDL directly.'
-      );
-      expect(error.code).toBe('PGRST205');
-    } else {
-      // Table exists — this is the correct state
-      expect(error).toBeNull();
-    }
+    // ASSERT: table exists — migration was successfully applied
+    expect(error).toBeNull();
+    expect(returnsTableExists).toBe(true);
   });
 
   it('[HIGH] return_items table existence mirrors returns table', async () => {
@@ -84,18 +75,16 @@ describe('returns: module DDL presence', () => {
 // ---------------------------------------------------------------------------
 describe('returns: table structure and constraints', () => {
   it.skipIf(!returnsTableExists)('returns table has correct status CHECK constraint values', async () => {
-    // ARRANGE: test each invalid status
+    // ARRANGE: create a valid return
     const client = tenantClient(SCHEMA);
-    const unit = await getDefaultUnit(SCHEMA);
 
-    // First create a valid return
     const { data: ret } = await client
       .from('returns')
       .insert({
         return_number: `RET-STRUCT-${Date.now()}`,
         return_type: 'purchase_return',
-        original_txn_id: DEMO_PURCHASES.PUR_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_1,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -127,8 +116,8 @@ describe('returns: table structure and constraints', () => {
       .insert({
         return_number: `RET-TYPE-${Date.now()}`,
         return_type: 'exchange', // invalid
-        original_txn_id: DEMO_PURCHASES.PUR_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_1,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       });
@@ -148,8 +137,8 @@ describe('returns: table structure and constraints', () => {
       .insert({
         return_number: `RET-NEGQTY-${Date.now()}`,
         return_type: 'purchase_return',
-        original_txn_id: DEMO_PURCHASES.PUR_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_1,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -163,7 +152,7 @@ describe('returns: table structure and constraints', () => {
       .from('return_items')
       .insert({
         return_id: ret!.id,
-        commodity_id: DEMO_COMMODITIES.WHEAT,
+        commodity_id: TW_COMMODITIES.COMM1,
         unit_id: unit.id,
         quantity: -5,
       });
@@ -190,8 +179,8 @@ describe('returns: create operations', () => {
       .insert({
         return_number: returnNumber,
         return_type: 'purchase_return',
-        original_txn_id: DEMO_PURCHASES.PUR_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_1,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -205,7 +194,7 @@ describe('returns: create operations', () => {
     // Insert items
     const { error: itemErr } = await client.from('return_items').insert({
       return_id: ret!.id,
-      commodity_id: DEMO_COMMODITIES.WHEAT,
+      commodity_id: TW_COMMODITIES.COMM1,
       unit_id: unit.id,
       quantity: 10,
     });
@@ -217,16 +206,15 @@ describe('returns: create operations', () => {
   it.skipIf(!returnsTableExists)('can create a sale_return referencing a sale txn', async () => {
     // ARRANGE
     const client = tenantClient(SCHEMA);
-    const unit = await getDefaultUnit(SCHEMA);
 
-    // ACT: sale_return type references a sale
+    // ACT: sale_return type references a sale (placeholder UUID — no FK constraint)
     const { data: ret, error } = await client
       .from('returns')
       .insert({
         return_number: `RET-SALE-${Date.now()}`,
         return_type: 'sale_return',
-        original_txn_id: DEMO_SALES.SAL_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_3,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -249,8 +237,8 @@ describe('returns: create operations', () => {
       .insert({
         return_number: returnNumber,
         return_type: 'purchase_return',
-        original_txn_id: DEMO_PURCHASES.PUR_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_1,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -265,8 +253,8 @@ describe('returns: create operations', () => {
       .insert({
         return_number: returnNumber, // same number!
         return_type: 'purchase_return',
-        original_txn_id: DEMO_PURCHASES.PUR_002,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_2,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       });
@@ -291,8 +279,8 @@ describe('returns: confirm flow', () => {
       .insert({
         return_number: returnNumber,
         return_type: 'purchase_return',
-        original_txn_id: DEMO_PURCHASES.PUR_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_1,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -325,8 +313,8 @@ describe('returns: confirm flow', () => {
       .insert({
         return_number: `RET-IDEM-${Date.now()}`,
         return_type: 'purchase_return',
-        original_txn_id: DEMO_PURCHASES.PUR_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_1,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'confirmed', // already confirmed
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -358,8 +346,8 @@ describe('returns: confirm flow', () => {
       .insert({
         return_number: `RET-CANCEL-${Date.now()}`,
         return_type: 'purchase_return',
-        original_txn_id: DEMO_PURCHASES.PUR_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_1,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -391,8 +379,8 @@ describe('returns: confirm flow', () => {
       .insert({
         return_number: `RET-NOCNL-${Date.now()}`,
         return_type: 'purchase_return',
-        original_txn_id: DEMO_PURCHASES.PUR_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_1,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'confirmed',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -430,8 +418,8 @@ describe('returns: cascade delete behavior', () => {
       .insert({
         return_number: `RET-CASCADE-${Date.now()}`,
         return_type: 'purchase_return',
-        original_txn_id: DEMO_PURCHASES.PUR_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_1,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -442,7 +430,7 @@ describe('returns: cascade delete behavior', () => {
       .from('return_items')
       .insert({
         return_id: ret!.id,
-        commodity_id: DEMO_COMMODITIES.WHEAT,
+        commodity_id: TW_COMMODITIES.COMM1,
         unit_id: unit.id,
         quantity: 5,
       })
@@ -474,8 +462,8 @@ describe('returns: soft delete', () => {
       .insert({
         return_number: `RET-SOFTDEL-${Date.now()}`,
         return_type: 'purchase_return',
-        original_txn_id: DEMO_PURCHASES.PUR_001,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        original_txn_id: PLACEHOLDER_TXN_1,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'draft',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -499,29 +487,6 @@ describe('returns: soft delete', () => {
 
     // Cleanup
     await client.from('returns').delete().eq('id', ret!.id);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// GAP documentation
-// ---------------------------------------------------------------------------
-describe('[HIGH] KNOWN GAPS: returns module', () => {
-  it('[HIGH] documents that applyReturnsMigration() is blocked by missing exec_sql RPC', () => {
-    // applyReturnsMigration() at src/modules/returns/migrations/apply.ts
-    // calls client.rpc('exec_sql', { query: `CREATE TABLE ...` })
-    // exec_sql RPC does not exist in the Supabase project (PGRST202 confirmed).
-    // The returns table has never been created in the demo tenant.
-    // The returns module UI is visible but all API calls will fail with 500.
-    //
-    // FIX OPTIONS:
-    // 1. Create exec_sql function in Supabase (security risk — arbitrary SQL execution)
-    // 2. Apply DDL via Supabase migrations directly instead of via RPC
-    // 3. Replace applyReturnsMigration() with a native Supabase migration file
-    console.error(
-      '[HIGH] applyReturnsMigration() blocked: exec_sql RPC does not exist. ' +
-        'returns and return_items tables are missing from all tenant schemas.'
-    );
-    expect(returnsTableExists).toBe(false); // confirms the gap
   });
 });
 
