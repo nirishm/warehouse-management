@@ -8,7 +8,8 @@ export type Permission =
   | 'canGenerateDocuments'
   | 'canManageLots'
   | 'canManageReturns'
-  | 'canImportData';
+  | 'canImportData'
+  | 'canManageAdjustments';
 
 export interface TenantContext {
   tenantId: string;

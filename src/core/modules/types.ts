@@ -8,9 +8,12 @@ export interface ModuleManifest {
   navItems: ModuleNavItem[];
 }
 
+export type NavGroup = 'operations' | 'inventory' | 'reports' | 'settings';
+
 export interface ModuleNavItem {
   label: string;
   href: string;
   icon: string;
   permission?: string;
+  group?: NavGroup;
 }
