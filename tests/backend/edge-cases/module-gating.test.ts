@@ -260,7 +260,7 @@ describe('module registry: manifest completeness', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('module-gating API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('module-gating API: HTTP contract (requires dev server + auth)', () => {
   it('[HIGH] GET /api/t/[slug]/returns returns 403 when returns not in x-tenant-modules', async () => {
     expect(true).toBe(true);
   });

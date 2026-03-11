@@ -603,7 +603,7 @@ describe('user_profiles: soft-delete behavior', () => {
 // ---------------------------------------------------------------------------
 // API contract tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('user-management API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('user-management API: HTTP contract (requires dev server + auth)', () => {
   it('GET /api/t/[slug]/users returns user list for tenant_admin', () => {
     expect(true).toBe(true);
   });

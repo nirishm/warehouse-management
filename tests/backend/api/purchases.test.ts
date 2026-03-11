@@ -339,7 +339,7 @@ describe('purchases: Zod validation contract', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('purchases API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('purchases API: HTTP contract (requires dev server + auth)', () => {
   it('POST /api/t/[slug]/purchases with missing location_id returns 400', async () => {
     expect(true).toBe(true);
   });

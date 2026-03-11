@@ -493,7 +493,7 @@ describe('returns: soft delete', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('returns API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('returns API: HTTP contract (requires dev server + auth)', () => {
   it('POST /api/t/[slug]/returns with missing return_type returns 400', async () => {
     expect(true).toBe(true);
   });

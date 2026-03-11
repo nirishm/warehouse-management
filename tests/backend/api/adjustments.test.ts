@@ -630,7 +630,7 @@ describe('adjustments: sequence counter', () => {
 // ---------------------------------------------------------------------------
 // API contract tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('adjustments API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('adjustments API: HTTP contract (requires dev server + auth)', () => {
   it('GET /api/t/[slug]/adjustments returns list for authorized user', () => {
     expect(true).toBe(true);
   });

@@ -377,7 +377,7 @@ describe('stock_alert_thresholds: query and filter operations', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('stock-alerts API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('stock-alerts API: HTTP contract (requires dev server + auth)', () => {
   it('POST /api/t/[slug]/stock-alerts with missing commodity_id returns 400', async () => {
     expect(true).toBe(true);
   });

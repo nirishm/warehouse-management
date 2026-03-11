@@ -569,7 +569,7 @@ describe('sales: Zod validation contract', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('sales API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('sales API: HTTP contract (requires dev server + auth)', () => {
   it('POST /api/t/[slug]/sales with missing location_id returns 400', async () => {
     expect(true).toBe(true);
   });

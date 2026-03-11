@@ -445,7 +445,7 @@ describe('bulk import: DB-layer bulk insert', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('bulk-import API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('bulk-import API: HTTP contract (requires dev server + auth)', () => {
   it('POST /api/t/[slug]/bulk-import/purchases with valid CSV returns 200 with rows processed', async () => {
     expect(true).toBe(true);
   });

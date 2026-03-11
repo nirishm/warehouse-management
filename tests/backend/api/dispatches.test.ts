@@ -388,7 +388,7 @@ describe('dispatches: impact on stock_levels view', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('dispatches API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('dispatches API: HTTP contract (requires dev server + auth)', () => {
   it('POST /dispatches with same origin/dest returns 400', async () => {
     expect(true).toBe(true);
   });

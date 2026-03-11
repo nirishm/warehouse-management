@@ -46,7 +46,7 @@ async function apiRequest(
 // ---------------------------------------------------------------------------
 // 401: Missing auth headers
 // ---------------------------------------------------------------------------
-describe.skip('auth-guards: 401 Unauthorized (requires running dev server)', () => {
+describe.skipIf(!process.env.INTEGRATION)('auth-guards: 401 Unauthorized (requires running dev server)', () => {
   const tenantHeaders = {
     'x-tenant-id': TEST_TENANT.id,
     'x-tenant-schema': TEST_TENANT.schema_name,
@@ -130,7 +130,7 @@ describe.skip('auth-guards: 401 Unauthorized (requires running dev server)', () 
 // ---------------------------------------------------------------------------
 // 403: Missing permissions (requires running dev server + valid auth)
 // ---------------------------------------------------------------------------
-describe.skip('auth-guards: 403 Forbidden — missing permissions (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('auth-guards: 403 Forbidden — missing permissions (requires dev server + auth)', () => {
   it('[HIGH] GET /api/t/[slug]/purchases returns 403 when canPurchase=false', async () => {
     // This requires a valid JWT for a user with canPurchase=false
     // Skipping because test user creation requires auth.createUser() which needs additional setup
@@ -304,7 +304,7 @@ describe('requirePermission and requireModule logic', () => {
 // ---------------------------------------------------------------------------
 // API endpoint shape validation (requires dev server)
 // ---------------------------------------------------------------------------
-describe.skip('API shape validation (requires running dev server)', () => {
+describe.skipIf(!process.env.INTEGRATION)('API shape validation (requires running dev server)', () => {
   it('GET /api/t/[slug]/purchases returns { data: [] } shape', async () => {
     // With valid auth session + correct headers
     expect(true).toBe(true);

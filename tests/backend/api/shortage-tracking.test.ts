@@ -331,7 +331,7 @@ describe('shortage-tracking: shortage_percent calculated correctly', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('shortage-tracking API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('shortage-tracking API: HTTP contract (requires dev server + auth)', () => {
   it('GET /api/t/[slug]/dispatches?has_shortage=true returns dispatches with shortage', () => {
     expect(true).toBe(true);
   });

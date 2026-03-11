@@ -371,7 +371,7 @@ describe('analytics: stock_levels filter operators', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('analytics API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('analytics API: HTTP contract (requires dev server + auth)', () => {
   it('GET /api/t/[slug]/analytics/stock-levels returns 200 for authenticated user', () => {
     expect(true).toBe(true);
   });

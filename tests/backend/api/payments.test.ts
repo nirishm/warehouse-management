@@ -488,7 +488,7 @@ describe('payments: soft delete', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('payments API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('payments API: HTTP contract (requires dev server + auth)', () => {
   it('POST /api/t/[slug]/payments with missing amount returns 400', async () => {
     expect(true).toBe(true);
   });

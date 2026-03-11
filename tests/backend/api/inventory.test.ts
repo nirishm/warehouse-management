@@ -561,7 +561,7 @@ describe('units: table structure and defaults', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('inventory API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('inventory API: HTTP contract (requires dev server + auth)', () => {
   it('GET /api/t/[slug]/inventory returns stock_levels for authenticated user', async () => {
     expect(true).toBe(true);
   });

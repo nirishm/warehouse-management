@@ -575,7 +575,7 @@ describe('lots: initial_quantity constraint', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('lot-tracking API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('lot-tracking API: HTTP contract (requires dev server + auth)', () => {
   it('POST /api/t/[slug]/lots with missing lot_number returns 400', async () => {
     expect(true).toBe(true);
   });
