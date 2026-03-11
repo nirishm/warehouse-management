@@ -59,12 +59,14 @@ CREATE TABLE {schema}.contacts (
     email           TEXT,
     phone           TEXT,
     address         TEXT,
+    code            TEXT,
     is_active       BOOLEAN NOT NULL DEFAULT true,
     custom_fields   JSONB NOT NULL DEFAULT '{}',
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at      TIMESTAMPTZ
 );
+CREATE UNIQUE INDEX idx_contacts_code_active ON {schema}.contacts(code) WHERE deleted_at IS NULL AND code IS NOT NULL;
 
 -- Dispatches (inter-location movements)
 CREATE TABLE {schema}.dispatches (
@@ -209,7 +211,8 @@ CREATE TABLE {schema}.user_profiles (
     }',
     is_active           BOOLEAN NOT NULL DEFAULT true,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at          TIMESTAMPTZ
 );
 
 -- User-location assignments
@@ -258,7 +261,7 @@ CREATE TABLE {schema}.audit_log (
 CREATE TABLE {schema}.sequence_counters (
     id                  TEXT PRIMARY KEY,
     prefix              TEXT NOT NULL,
-    current_value       BIGINT NOT NULL DEFAULT 0
+    current_value       BIGINT NOT NULL DEFAULT 0 CHECK (current_value >= 0)
 );
 
 -- Stock levels view
@@ -369,7 +372,10 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON {schema}.sales
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON {schema}.user_profiles
     FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
--- Security: deny direct schema access to public roles
+-- Security: grant service_role full access, deny direct access to public roles
+GRANT USAGE ON SCHEMA {schema} TO service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA {schema} TO service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA {schema} TO service_role;
 REVOKE USAGE ON SCHEMA {schema} FROM anon, authenticated;
 REVOKE ALL ON ALL TABLES IN SCHEMA {schema} FROM anon, authenticated;
 

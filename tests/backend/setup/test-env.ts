@@ -125,5 +125,5 @@ export const MODULE_TABLES = {
   lots: true,
   payments: true,
   stockAlerts: true,
-  adjustments: false, // DDL not yet applied for this tenant
+  adjustments: true,
 } as const;
