@@ -325,7 +325,7 @@ export default function NewDispatchPage() {
       <div className="hidden md:block">
         <div className="space-y-6">
           <div className="flex items-center gap-4">
-            <Link href={`/t/${tenantSlug}/dispatches`}>
+            <Link prefetch={false} href={`/t/${tenantSlug}/dispatches`}>
               <Button variant="ghost" size="icon" className="text-[var(--text-muted)] hover:text-foreground">
                 <ArrowLeft className="size-5" />
               </Button>
@@ -572,7 +572,7 @@ export default function NewDispatchPage() {
 
             {/* Submit */}
             <div className="flex items-center justify-end gap-3">
-              <Link href={`/t/${tenantSlug}/dispatches`}>
+              <Link prefetch={false} href={`/t/${tenantSlug}/dispatches`}>
                 <Button
                   type="button"
                   variant="outline"

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { listSales } from '@/modules/sale/queries/sales';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,14 +14,8 @@ interface Props {
 export default async function SalesPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'sale', permission: 'canSale' });
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   const sales = await listSales(tenant.schema_name);
@@ -41,7 +35,7 @@ export default async function SalesPage({ params }: Props) {
             Record outgoing goods to customers
           </p>
         </div>
-        <Link href={`/t/${tenantSlug}/sales/new`}>
+        <Link prefetch={false} href={`/t/${tenantSlug}/sales/new`}>
           <Button variant="orange">
             New Sale
           </Button>

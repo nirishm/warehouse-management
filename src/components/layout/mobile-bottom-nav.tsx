@@ -61,6 +61,7 @@ export function MobileBottomNav({ tenantSlug, tenantName, navItems }: MobileBott
               <Link
                 key={tab.key}
                 href={href}
+                prefetch={false}
                 className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${
                   isActive
                     ? 'text-[var(--accent-color)]'

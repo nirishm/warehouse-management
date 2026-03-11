@@ -218,6 +218,7 @@ function NavLink({
   return (
     <Link
       href={href}
+      prefetch={false}
       className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-all ${
         active
           ? 'bg-[var(--accent-tint)] text-[var(--accent-color)] border-l-2 border-[var(--accent-color)] -ml-px pl-[11px]'

@@ -179,7 +179,7 @@ export default function NewAdjustmentPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href={`/t/${tenantSlug}/adjustments`}>
+        <Link prefetch={false} href={`/t/${tenantSlug}/adjustments`}>
           <Button variant="ghost" size="icon" className="text-[var(--text-muted)] hover:text-foreground">
             <ArrowLeft className="size-5" />
           </Button>
@@ -329,7 +329,7 @@ export default function NewAdjustmentPage() {
 
         {/* Submit */}
         <div className="flex items-center justify-end gap-3">
-          <Link href={`/t/${tenantSlug}/adjustments`}>
+          <Link prefetch={false} href={`/t/${tenantSlug}/adjustments`}>
             <Button
               type="button"
               variant="outline"

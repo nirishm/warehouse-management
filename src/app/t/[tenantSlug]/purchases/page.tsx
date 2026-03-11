@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { listPurchases } from '@/modules/purchase/queries/purchases';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,14 +14,8 @@ interface Props {
 export default async function PurchasesPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'purchase', permission: 'canPurchase' });
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   const purchases = await listPurchases(tenant.schema_name);
@@ -41,7 +35,7 @@ export default async function PurchasesPage({ params }: Props) {
             Record incoming goods from suppliers
           </p>
         </div>
-        <Link href={`/t/${tenantSlug}/purchases/new`}>
+        <Link prefetch={false} href={`/t/${tenantSlug}/purchases/new`}>
           <Button className="bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white font-medium">
             New Purchase
           </Button>

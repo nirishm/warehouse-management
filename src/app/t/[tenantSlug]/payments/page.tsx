@@ -1,5 +1,5 @@
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { listPayments } from '@/modules/payments/queries/payments';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PaymentsTable } from './payments-table';
@@ -11,14 +11,7 @@ interface Props {
 export default async function PaymentsPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'payments', permission: 'canManagePayments' });
-  const supabase = await createServerSupabaseClient();
-
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   const payments = await listPayments(tenant.schema_name);

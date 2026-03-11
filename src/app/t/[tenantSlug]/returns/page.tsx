@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { listReturns } from '@/modules/returns/queries/returns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,14 +14,7 @@ interface Props {
 export default async function ReturnsPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'returns', permission: 'canManageReturns' });
-  const supabase = await createServerSupabaseClient();
-
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) redirect(`/t/${tenantSlug}`);
   if (!tenant.enabled_modules?.includes('returns')) redirect(`/t/${tenantSlug}`);
 
@@ -34,7 +27,7 @@ export default async function ReturnsPage({ params }: Props) {
           <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight font-serif">Returns</h1>
           <p className="text-sm text-[var(--text-dim)] mt-1">Purchase and sale return management</p>
         </div>
-        <Link href={`/t/${tenantSlug}/returns/new`}>
+        <Link prefetch={false} href={`/t/${tenantSlug}/returns/new`}>
           <Button variant="orange">New Return</Button>
         </Link>
       </div>

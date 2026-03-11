@@ -1,5 +1,5 @@
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { listThresholds } from '@/modules/stock-alerts/queries/alerts';
 import { ThresholdsManager } from './thresholds-manager';
@@ -12,14 +12,8 @@ interface Props {
 export default async function ThresholdsPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'stock-alerts', permission: 'canManageAlerts' });
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) redirect(`/t/${tenantSlug}`);
   if (!tenant.enabled_modules?.includes('stock-alerts')) redirect(`/t/${tenantSlug}`);
 

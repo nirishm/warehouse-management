@@ -111,7 +111,7 @@ export function ThresholdsManager({
           </p>
         </div>
         <div className="flex gap-2">
-          <Link href={`/t/${tenantSlug}/stock-alerts`}>
+          <Link prefetch={false} href={`/t/${tenantSlug}/stock-alerts`}>
             <Button variant="outline" size="sm">← Alerts</Button>
           </Link>
           <Button size="sm" onClick={() => setOpen(true)}>

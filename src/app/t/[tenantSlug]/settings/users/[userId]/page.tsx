@@ -1,5 +1,5 @@
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
@@ -16,14 +16,8 @@ interface Props {
 export default async function UserDetailPage({ params }: Props) {
   const { tenantSlug, userId } = await params;
   await requirePageAccess({ tenantSlug, adminOnly: true });
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('id, schema_name')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   const tenantClient = createTenantClient(tenant.schema_name);

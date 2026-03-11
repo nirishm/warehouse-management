@@ -1,5 +1,5 @@
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { getDocumentConfig } from '@/modules/document-gen/queries/config';
 import { DocumentConfigForm } from './document-config-form';
 import { redirect } from 'next/navigation';
@@ -11,14 +11,8 @@ interface Props {
 export default async function DocumentSettingsPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'document-gen', permission: 'canGenerateDocuments' });
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) redirect(`/t/${tenantSlug}`);
   if (!tenant.enabled_modules?.includes('document-gen')) redirect(`/t/${tenantSlug}/settings`);
 

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { DownloadDocumentButton } from '@/components/document-gen/download-document-button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,14 +54,8 @@ function formatDateTime(dateStr: string | null): string {
 export default async function DispatchDetailPage({ params }: Props) {
   const { tenantSlug, id } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'dispatch', permission: 'canDispatch' });
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   const docGenEnabled = tenant.enabled_modules?.includes('document-gen') ?? false;
@@ -79,7 +73,7 @@ export default async function DispatchDetailPage({ params }: Props) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
         <p className="text-sm font-mono">Dispatch not found</p>
-        <Link href={`/t/${tenantSlug}/dispatches`}>
+        <Link prefetch={false} href={`/t/${tenantSlug}/dispatches`}>
           <Button variant="outline" className="mt-4 border-border text-[var(--text-body)]">
             Back to Dispatches
           </Button>
@@ -110,7 +104,7 @@ export default async function DispatchDetailPage({ params }: Props) {
       <RealtimeListener table="dispatches" />
       <RealtimeListener table="dispatch_items" />
       <div className="flex items-center gap-4 flex-wrap">
-        <Link href={`/t/${tenantSlug}/dispatches`}>
+        <Link prefetch={false} href={`/t/${tenantSlug}/dispatches`}>
           <Button variant="ghost" size="icon" className="text-[var(--text-muted)] hover:text-foreground">
             <ArrowLeft className="size-5" />
           </Button>
@@ -133,7 +127,7 @@ export default async function DispatchDetailPage({ params }: Props) {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {(d.status === 'dispatched' || d.status === 'in_transit') && (
-            <Link href={`/t/${tenantSlug}/dispatches/${id}/receive`}>
+            <Link prefetch={false} href={`/t/${tenantSlug}/dispatches/${id}/receive`}>
               <Button variant="orange" size="sm">
                 <Truck className="size-4 mr-1" />
                 Receive

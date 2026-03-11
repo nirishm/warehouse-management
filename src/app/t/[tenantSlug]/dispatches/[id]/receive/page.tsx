@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { ReceiveForm } from './receive-form';
 import { MobileReceiveForm } from '@/components/mobile/mobile-receive-form';
@@ -13,14 +13,7 @@ export default async function ReceiveDispatchPage({ params }: Props) {
   const { tenantSlug, id } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'dispatch', permission: 'canReceive' });
 
-  const supabase = await createServerSupabaseClient();
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .eq('status', 'active')
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) redirect(`/t/${tenantSlug}`);
 
   const barcodeEnabled = (tenant.enabled_modules ?? []).includes('barcode');

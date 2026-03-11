@@ -1,5 +1,5 @@
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import {
   getStockLevels,
   getLocationsForFilter,
@@ -19,13 +19,7 @@ export default async function StockLevelsPage({ params, searchParams }: Props) {
   await requirePageAccess({ tenantSlug, moduleId: 'inventory', permission: 'canViewStock' });
   const filters = await searchParams;
 
-  const supabase = await createServerSupabaseClient();
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, name')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   const [stockLevels, locations, commodities] = await Promise.all([

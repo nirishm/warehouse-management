@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { getStockAlerts } from '@/modules/stock-alerts/queries/alerts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,14 +14,7 @@ interface Props {
 export default async function StockAlertsPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'stock-alerts', permission: 'canManageAlerts' });
-  const supabase = await createServerSupabaseClient();
-
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) redirect(`/t/${tenantSlug}`);
 
   const alerts = await getStockAlerts(tenant.schema_name);
@@ -42,7 +35,7 @@ export default async function StockAlertsPage({ params }: Props) {
             Real-time stock levels vs configured thresholds
           </p>
         </div>
-        <Link href={`/t/${tenantSlug}/stock-alerts/thresholds`}>
+        <Link prefetch={false} href={`/t/${tenantSlug}/stock-alerts/thresholds`}>
           <Button variant="outline" size="sm">
             Configure Thresholds
           </Button>
@@ -80,7 +73,7 @@ export default async function StockAlertsPage({ params }: Props) {
             <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <p className="text-sm font-mono">No thresholds configured</p>
               <p className="text-xs mt-1">
-                <Link href={`/t/${tenantSlug}/stock-alerts/thresholds`} className="text-[var(--text-body)] underline">
+                <Link prefetch={false} href={`/t/${tenantSlug}/stock-alerts/thresholds`} className="text-[var(--text-body)] underline">
                   Add thresholds
                 </Link>{' '}
                 to start monitoring stock levels.

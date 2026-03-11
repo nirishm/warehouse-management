@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { BulkImportTabs } from './bulk-import-tabs';
 
 interface Props {
@@ -10,14 +10,8 @@ interface Props {
 export default async function BulkImportPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'bulk-import', permission: 'canImportData' });
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) redirect(`/t/${tenantSlug}`);
   if (!tenant.enabled_modules?.includes('bulk-import')) redirect(`/t/${tenantSlug}`);
 

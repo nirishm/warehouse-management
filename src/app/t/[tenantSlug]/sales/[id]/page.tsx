@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { requirePageAccess } from '@/core/auth/page-guard';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { getSaleById } from '@/modules/sale/queries/sales';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,16 +43,10 @@ function formatDate(dateStr: string): string {
 export default async function SaleDetailPage({ params }: Props) {
   const { tenantSlug, id } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'sale', permission: 'canSale' });
-  const supabase = await createServerSupabaseClient();
-
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
+  const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
   const tenantClient = createTenantClient(tenant.schema_name);
   const { data: profile } = user

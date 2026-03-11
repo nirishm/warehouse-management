@@ -1,5 +1,5 @@
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { listAuditEntries } from '@/modules/audit-trail/queries/audit-log';
 import { AuditTable } from './audit-table';
@@ -13,14 +13,8 @@ export default async function AuditLogPage({ params, searchParams }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'audit-trail', permission: 'canViewAuditLog' });
   const query = await searchParams;
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   const limit = parseInt(query.limit || '50', 10);
