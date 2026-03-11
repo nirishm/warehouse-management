@@ -420,16 +420,11 @@ describe(`${SCHEMA}.contacts`, () => {
     expect(error!.message).toMatch(/check|violates/i);
   });
 
-  it('[MEDIUM] GAP: no partial UNIQUE on contacts.code WHERE deleted_at IS NULL', async () => {
-    // contacts table has no code column at all — different from locations/commodities
-    // This means there is no deduplication mechanism for contacts
+  it('[MEDIUM] contacts.code column exists with partial UNIQUE index WHERE deleted_at IS NULL', async () => {
+    // F-NEW-04 fixed: code column + partial UNIQUE index added to contacts table
     const cols = await getTenantColumns('contacts');
     const names = cols.map((c) => c.column_name);
-    const hasCodeCol = names.includes('code');
-    if (!hasCodeCol) {
-      console.warn('[LOW GAP] contacts table has no code column. Unlike locations/commodities, contacts have no dedup key.');
-    }
-    expect(hasCodeCol).toBe(false); // Expected — contacts have no code column
+    expect(names).toContain('code');
   });
 });
 
