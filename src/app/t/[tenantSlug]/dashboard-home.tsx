@@ -10,7 +10,15 @@ import {
   MapPin,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
+import dynamic from 'next/dynamic';
+
+const DateRangePicker = dynamic(
+  () => import('@/components/ui/date-range-picker').then((m) => m.DateRangePicker),
+  {
+    ssr: false,
+    loading: () => <div className="h-9 w-48 bg-[var(--bg-off)] rounded-full" />,
+  }
+);
 import type {
   DashboardKpis,
   RecentTransaction,

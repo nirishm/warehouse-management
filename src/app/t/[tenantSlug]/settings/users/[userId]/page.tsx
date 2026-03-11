@@ -42,18 +42,11 @@ export default async function UserDetailPage({ params }: Props) {
     );
   }
 
-  const { data: locations } = await tenantClient
-    .from('user_locations')
-    .select('id, user_id, location_id')
-    .eq('user_id', userId);
-
   const publicClient = createAdminClient();
-  const { data: membership } = await publicClient
-    .from('user_tenants')
-    .select('role')
-    .eq('tenant_id', tenant.id)
-    .eq('user_id', userId)
-    .single();
+  const [{ data: locations }, { data: membership }] = await Promise.all([
+    tenantClient.from('user_locations').select('id, user_id, location_id').eq('user_id', userId),
+    publicClient.from('user_tenants').select('role').eq('tenant_id', tenant.id).eq('user_id', userId).single(),
+  ]);
 
   const user: UserWithLocations = {
     ...(profile as UserProfile),

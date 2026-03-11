@@ -121,13 +121,18 @@ export async function getDispatchAnalytics(
   const locIds = filters?.allowedLocationIds;
   const hasLocFilter = locIds !== null && locIds !== undefined && locIds.length > 0;
 
-  // Fetch all dispatches with items and location names
+  // Default to 90-day window to avoid unbounded full-table scans
+  const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+
+  // Fetch dispatches with items and location names (bounded to 90 days + 500 row guard)
   let dispatchQuery = client
     .from('dispatches')
     .select(
       'id, status, origin_location_id, dest_location_id, origin_location:locations!origin_location_id(name), dest_location:locations!dest_location_id(name)'
     )
-    .is('deleted_at', null);
+    .is('deleted_at', null)
+    .gte('created_at', defaultFrom)
+    .limit(500);
   if (hasLocFilter) dispatchQuery = dispatchQuery.in('origin_location_id', locIds!);
 
   const { data: dispatchRows, error: dispatchError } = await dispatchQuery;

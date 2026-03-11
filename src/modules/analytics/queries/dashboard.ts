@@ -114,18 +114,11 @@ export async function getDashboardKpis(
   const adminClient = createAdminClient();
   const { locationIds } = buildLocationFilter(filters);
 
-  // Total stock items (sum of current_stock)
+  // Build all queries synchronously (no data dependencies between them)
   let stockQuery = client.from('stock_levels').select('current_stock');
   if (locationIds) stockQuery = stockQuery.in('location_id', locationIds);
   if (filters.commodityId) stockQuery = stockQuery.eq('commodity_id', filters.commodityId);
-  const { data: stockRows } = await stockQuery;
 
-  const totalStockItems = (stockRows ?? []).reduce(
-    (sum, row) => sum + Number(row.current_stock ?? 0),
-    0
-  );
-
-  // Movements in range (count dispatches + purchases + sales)
   const dateFrom = filters.dateFrom ?? '1970-01-01';
   const dateTo = filters.dateTo ? `${filters.dateTo}T23:59:59` : '2099-12-31';
 
@@ -149,10 +142,6 @@ export async function getDashboardKpis(
     ) AS total
   `;
 
-  const { data: movResult } = await adminClient.rpc('exec_sql', { query: movementsQuery });
-  const movementsInRange = Number((movResult as unknown[])?.[0] && (movResult as unknown as Array<{ total: number }>)[0]?.total) || 0;
-
-  // Active alerts (CRITICAL + WARNING count)
   const alertQuery = `
     SELECT COUNT(*)::int AS cnt
     FROM "${schemaName}".stock_alert_thresholds t
@@ -165,14 +154,29 @@ export async function getDashboardKpis(
       ${locationIds ? `AND t.location_id IN (${locationIds.map((id) => `'${escapeLiteral(id)}'`).join(',')})` : ''}
   `;
 
-  const { data: alertResult } = await adminClient.rpc('exec_sql', { query: alertQuery });
-  const activeAlerts = Number((alertResult as unknown as Array<{ cnt: number }>)?.[0]?.cnt) || 0;
-
-  // Active locations (distinct locations with stock > 0)
   let locCountQuery = client.from('stock_levels').select('location_id');
   if (locationIds) locCountQuery = locCountQuery.in('location_id', locationIds);
   locCountQuery = locCountQuery.gt('current_stock', 0);
-  const { data: locRows } = await locCountQuery;
+
+  // Fire all 4 independent queries in parallel
+  const [
+    { data: stockRows },
+    { data: movResult },
+    { data: alertResult },
+    { data: locRows },
+  ] = await Promise.all([
+    stockQuery,
+    adminClient.rpc('exec_sql', { query: movementsQuery }),
+    adminClient.rpc('exec_sql', { query: alertQuery }),
+    locCountQuery,
+  ]);
+
+  const totalStockItems = (stockRows ?? []).reduce(
+    (sum, row) => sum + Number(row.current_stock ?? 0),
+    0
+  );
+  const movementsInRange = Number((movResult as unknown[])?.[0] && (movResult as unknown as Array<{ total: number }>)[0]?.total) || 0;
+  const activeAlerts = Number((alertResult as unknown as Array<{ cnt: number }>)?.[0]?.cnt) || 0;
   const activeLocations = new Set((locRows ?? []).map((r) => r.location_id)).size;
 
   return { totalStockItems, movementsInRange, activeAlerts, activeLocations };

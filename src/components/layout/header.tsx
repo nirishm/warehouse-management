@@ -1,11 +1,19 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useTenant } from './tenant-provider';
 import { Badge } from '@/components/ui/badge';
 import { RealtimeStatus } from '@/components/realtime/realtime-status';
 import { MobileSidebar } from './sidebar';
-import { GlobalSearch } from '@/components/search/global-search';
 import type { ModuleNavItem } from '@/core/modules/types';
+
+const GlobalSearch = dynamic(
+  () => import('@/components/search/global-search').then((m) => m.GlobalSearch),
+  {
+    ssr: false,
+    loading: () => <div className="w-64 h-9 bg-[var(--bg-off)] rounded-md" />,
+  }
+);
 
 interface HeaderProps {
   tenantSlug: string;
