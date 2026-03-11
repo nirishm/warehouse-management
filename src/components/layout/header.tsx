@@ -4,6 +4,7 @@ import { useTenant } from './tenant-provider';
 import { Badge } from '@/components/ui/badge';
 import { RealtimeStatus } from '@/components/realtime/realtime-status';
 import { MobileSidebar } from './sidebar';
+import { GlobalSearch } from '@/components/search/global-search';
 import type { ModuleNavItem } from '@/core/modules/types';
 
 interface HeaderProps {
@@ -24,6 +25,7 @@ export function Header({ tenantSlug, tenantName, navItems }: HeaderProps) {
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--accent-color)] mr-1"></span>WareOS
         </span>
       </div>
+      <GlobalSearch />
       <div className="flex items-center gap-3">
         <RealtimeStatus />
         <Badge variant="outline" className="border-border text-[var(--text-muted)] font-mono text-xs">
