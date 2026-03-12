@@ -18,6 +18,14 @@ export async function applyDocumentGenMigration(schemaName: string): Promise<voi
       );
       INSERT INTO "${schemaName}".document_config (company_name)
       SELECT '' WHERE NOT EXISTS (SELECT 1 FROM "${schemaName}".document_config);
+
+      ALTER TABLE "${schemaName}".document_config ENABLE ROW LEVEL SECURITY;
+
+      DO $$ BEGIN
+        CREATE POLICY "service_role_only" ON "${schemaName}".document_config
+          AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+      EXCEPTION WHEN duplicate_object THEN NULL;
+      END $$;
     `,
   });
   if (error) throw new Error(`Document gen migration failed: ${error.message}`);

@@ -24,6 +24,14 @@ export async function applyPaymentsMigration(schemaName: string): Promise<void> 
       CREATE INDEX IF NOT EXISTS idx_payments_txn
         ON "${schemaName}".payments(transaction_type, transaction_id)
         WHERE deleted_at IS NULL;
+
+      ALTER TABLE "${schemaName}".payments ENABLE ROW LEVEL SECURITY;
+
+      DO $$ BEGIN
+        CREATE POLICY "service_role_only" ON "${schemaName}".payments
+          AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+      EXCEPTION WHEN duplicate_object THEN NULL;
+      END $$;
     `,
   });
   if (error) throw new Error(`Payments migration failed: ${error.message}`);

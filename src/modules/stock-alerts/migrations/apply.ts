@@ -17,6 +17,14 @@ export async function applyStockAlertsMigration(schemaName: string): Promise<voi
         updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
         UNIQUE(commodity_id, location_id, unit_id)
       );
+
+      ALTER TABLE "${schemaName}".stock_alert_thresholds ENABLE ROW LEVEL SECURITY;
+
+      DO $$ BEGIN
+        CREATE POLICY "service_role_only" ON "${schemaName}".stock_alert_thresholds
+          AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
+      EXCEPTION WHEN duplicate_object THEN NULL;
+      END $$;
     `,
   });
   if (error) throw new Error(`Stock alerts migration failed: ${error.message}`);
