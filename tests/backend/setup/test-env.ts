@@ -4,13 +4,11 @@
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-export const SUPABASE_URL = 'https://elmfdrflziuicgnmmcig.supabase.co';
+export const SUPABASE_URL = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 
-export const SERVICE_ROLE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsbWZkcmZseml1aWNnbm1tY2lnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mjg4NTEyMSwiZXhwIjoyMDg4NDYxMTIxfQ.I25R8FrrxGPEVzmBElEhhwMphDlSCJ7eC8H4pYQ274A';
+export const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
 
-export const ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsbWZkcmZseml1aWNnbm1tY2lnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4ODUxMjEsImV4cCI6MjA4ODQ2MTEyMX0.BN-8lgqepFtbtFEflV3u41oRpLspeapQxoS6T5M239c';
+export const ANON_KEY = process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
 export const APP_URL = 'http://localhost:3000';
 
