@@ -5,6 +5,8 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
+import { ShortcutsProvider } from "@/components/keyboard-shortcuts/shortcuts-provider";
+import { ShortcutsHelp } from "@/components/keyboard-shortcuts/shortcuts-help";
 
 export default async function TenantLayout({
   children,
@@ -52,6 +54,10 @@ export default async function TenantLayout({
 
       {/* Onboarding wizard — renders as overlay when tenant has no data */}
       <OnboardingWizard />
+
+      {/* Global keyboard shortcuts */}
+      <ShortcutsProvider />
+      <ShortcutsHelp />
     </TenantProvider>
   );
 }
