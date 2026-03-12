@@ -2,7 +2,7 @@ const SCHEMA_NAME_RE = /^[a-z_][a-z0-9_]*$/;
 
 export function validateSchemaName(name: string): string {
   if (!SCHEMA_NAME_RE.test(name)) {
-    throw new Error(`Invalid schema name: ${name}`);
+    throw new Error('Invalid schema name');
   }
   return name;
 }

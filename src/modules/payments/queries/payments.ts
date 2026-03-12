@@ -83,6 +83,9 @@ export async function getBalance(
 ): Promise<TransactionBalance> {
   validateSchemaName(schemaName);
   validateUUID(transactionId, 'transaction ID');
+  if (transactionType !== 'purchase' && transactionType !== 'sale') {
+    throw new Error('Invalid transaction type');
+  }
   const adminClient = createAdminClient();
 
   // Compute total_value from items

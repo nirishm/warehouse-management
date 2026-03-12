@@ -1,5 +1,6 @@
 import { createTenantClient } from '@/core/db/tenant-query';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { validateSchemaName } from '@/core/db/validate-schema';
 import type {
   UpsertThresholdInput,
   StockAlertThreshold,
@@ -19,6 +20,7 @@ function computeAlertState(
 }
 
 export async function getStockAlerts(schemaName: string): Promise<StockAlert[]> {
+  validateSchemaName(schemaName);
   const adminClient = createAdminClient();
 
   const { data, error } = await adminClient.rpc('exec_sql', {
