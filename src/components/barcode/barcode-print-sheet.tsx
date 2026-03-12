@@ -16,7 +16,7 @@ export function BarcodePrintSheet({ commodities }: BarcodePrintSheetProps) {
   if (commodities.length === 0) {
     return (
       <p className="text-sm text-[var(--text-dim)] text-center py-8">
-        No commodities selected for printing.
+        No items selected for printing.
       </p>
     );
   }

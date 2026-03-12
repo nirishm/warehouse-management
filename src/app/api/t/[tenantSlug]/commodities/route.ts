@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withTenantContext, requirePermission, requireModule } from '@/core/auth/guards';
 import { listCommodities, createCommodity } from '@/modules/inventory/queries/commodities';
 import { createCommoditySchema } from '@/modules/inventory/validations/commodity';
+import { parsePagination } from '@/lib/pagination';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
@@ -19,8 +20,9 @@ export async function GET(request: NextRequest) {
       throw new Error('Missing permission: canManageCommodities');
     }
 
-    const commodities = await listCommodities(ctx.schemaName);
-    return NextResponse.json({ data: commodities });
+    const pagination = parsePagination(request.nextUrl.searchParams);
+    const result = await listCommodities(ctx.schemaName, { pagination });
+    return NextResponse.json(result);
   });
 }
 

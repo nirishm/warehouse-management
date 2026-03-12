@@ -1,5 +1,5 @@
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -20,14 +20,8 @@ interface Props {
 export default async function CommoditiesPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, permission: 'canManageCommodities' });
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('id, schema_name, name, enabled_modules, slug')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   const barcodeEnabled = (tenant.enabled_modules ?? []).includes('barcode');
@@ -58,9 +52,9 @@ export default async function CommoditiesPage({ params }: Props) {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">Commodities</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight font-serif">Items</h1>
           <p className="text-sm text-[var(--text-dim)] mt-1">
-            Manage the commodities tracked in your warehouse
+            Manage the items tracked in your warehouse
           </p>
         </div>
         <CommoditiesClient
@@ -74,7 +68,7 @@ export default async function CommoditiesPage({ params }: Props) {
       <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-3">
           <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
-            All Commodities
+            All Items
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

@@ -52,9 +52,9 @@ export function CommoditiesClient({
   if (initialData.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-sm text-[var(--text-dim)] font-mono">No commodities found</p>
+        <p className="text-sm text-[var(--text-dim)] font-mono">No items found</p>
         <p className="text-xs text-[var(--text-dim)] mt-1">
-          Create your first commodity to get started.
+          Create your first item to get started.
         </p>
       </div>
     );

@@ -10,7 +10,7 @@ import { parseCSV } from '@/modules/bulk-import/utils/csv-parser';
 import { purchaseRowSchema, PURCHASES_TEMPLATE_HEADERS } from '@/modules/bulk-import/schemas/purchases-csv';
 import { commodityRowSchema, COMMODITIES_TEMPLATE_HEADERS } from '@/modules/bulk-import/schemas/commodities-csv';
 import { contactRowSchema, CONTACTS_TEMPLATE_HEADERS } from '@/modules/bulk-import/schemas/contacts-csv';
-import { tenantClient, TEST_TENANT, DEMO_LOCATIONS, DEMO_COMMODITIES } from '../setup/test-env';
+import { tenantClient, TEST_TENANT, TW_LOCATIONS, TW_COMMODITIES } from '../setup/test-env';
 import { getDefaultUnit, runCleanup } from '../setup/seed-factories';
 
 const SCHEMA = TEST_TENANT.schema_name;
@@ -406,7 +406,7 @@ describe('bulk import: DB-layer bulk insert', () => {
       .from('purchases')
       .insert({
         purchase_number: purchaseNumber,
-        location_id: DEMO_LOCATIONS.WH_NORTH,
+        location_id: TW_LOCATIONS.LOC1,
         status: 'received',
         created_by: '00000000-0000-0000-0000-000000000099',
       })
@@ -417,7 +417,7 @@ describe('bulk import: DB-layer bulk insert', () => {
 
     const items = Array.from({ length: 100 }, () => ({
       purchase_id: purchase!.id,
-      commodity_id: DEMO_COMMODITIES.WHEAT,
+      commodity_id: TW_COMMODITIES.COMM1,
       unit_id: unit.id,
       quantity: 10,
     }));
@@ -445,7 +445,7 @@ describe('bulk import: DB-layer bulk insert', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('bulk-import API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('bulk-import API: HTTP contract (requires dev server + auth)', () => {
   it('POST /api/t/[slug]/bulk-import/purchases with valid CSV returns 200 with rows processed', async () => {
     expect(true).toBe(true);
   });

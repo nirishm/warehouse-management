@@ -40,7 +40,7 @@ const ENTITY_LABELS: Record<string, string> = {
   dispatch: 'Dispatch',
   purchase: 'Purchase',
   sale: 'Sale',
-  commodity: 'Commodity',
+  commodity: 'Item',
   location: 'Location',
   contact: 'Contact',
   dispatch_item: 'Dispatch Item',

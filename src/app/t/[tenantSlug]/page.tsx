@@ -1,5 +1,5 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
+import { getCurrentUser, getTenantBySlug, getMembership } from '@/core/auth/session';
 import {
   getDashboardKpis,
   getRecentTransactions,
@@ -24,29 +24,17 @@ export default async function TenantDashboard({ params, searchParams }: Props) {
   const { tenantSlug } = await params;
   const sp = await searchParams;
 
-  const supabase = await createServerSupabaseClient();
+  // Resolve tenant + user in parallel via request-scoped cache
+  const [user, tenant] = await Promise.all([
+    getCurrentUser(),
+    getTenantBySlug(tenantSlug),
+  ]);
 
-  // Resolve tenant
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('id, schema_name, name, slug, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
-  if (!tenant) return null;
-
-  // Resolve current user + location scope
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  if (!tenant || !user) return null;
 
   const tenantClient = createTenantClient(tenant.schema_name);
 
-  const { data: membership } = await supabase
-    .from('user_tenants')
-    .select('role')
-    .eq('user_id', user.id)
-    .eq('tenant_id', tenant.id)
-    .single();
+  const membership = await getMembership(user.id, tenant.id);
 
   let allowedLocationIds: string[] | null = null;
   if (membership?.role !== 'tenant_admin') {

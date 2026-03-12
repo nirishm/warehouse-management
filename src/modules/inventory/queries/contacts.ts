@@ -1,14 +1,16 @@
 import { createTenantClient } from '@/core/db/tenant-query';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type { CreateContactInput, UpdateContactInput, Contact, ContactType } from '../validations/contact';
 
 export async function listContacts(
   schemaName: string,
-  type?: ContactType
-): Promise<Contact[]> {
+  type?: ContactType,
+  options?: { pagination?: PaginationParams }
+): Promise<PaginatedResponse<Contact>> {
   const client = createTenantClient(schemaName);
   let query = client
     .from('contacts')
-    .select('*')
+    .select('*', { count: 'exact' })
     .is('deleted_at', null)
     .order('name');
 
@@ -16,10 +18,16 @@ export async function listContacts(
     query = query.eq('type', type);
   }
 
-  const { data, error } = await query;
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) throw new Error(`Failed to list contacts: ${error.message}`);
-  return (data ?? []) as Contact[];
+
+  const pagination = options?.pagination ?? { page: 1, pageSize: count ?? 0 };
+  return paginatedResult((data ?? []) as Contact[], count ?? 0, pagination);
 }
 
 export async function getContactById(

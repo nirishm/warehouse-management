@@ -1,4 +1,5 @@
 import { requirePageAccess } from '@/core/auth/page-guard';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { moduleRegistry } from '@/core/modules/registry';
@@ -17,12 +18,7 @@ export default async function TenantSettingsPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('id, name, slug, plan, status, enabled_modules, schema_name, created_at')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   // Resolve user role

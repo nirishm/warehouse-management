@@ -46,7 +46,7 @@ export async function importCommodities(
     const rowNum = i + 2;
 
     if (existingCodes.has(row.code.toLowerCase())) {
-      errors.push({ row: rowNum, field: 'code', message: `Commodity code "${row.code}" already exists` });
+      errors.push({ row: rowNum, field: 'code', message: `Item code "${row.code}" already exists` });
       continue;
     }
 

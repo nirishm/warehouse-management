@@ -1,11 +1,12 @@
 import { redirect } from 'next/navigation';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
+import { getCurrentUser, getTenantBySlug, getMembership } from '@/core/auth/session';
 import { moduleRegistry } from '@/core/modules/registry';
 import '@/modules'; // Register all modules
 import { TenantProvider } from '@/components/layout/tenant-provider';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
+import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import type { TenantContext, Permission } from '@/core/auth/types';
 
 interface Props {
@@ -15,37 +16,28 @@ interface Props {
 
 export default async function TenantLayout({ children, params }: Props) {
   const { tenantSlug } = await params;
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+
+  // Fetch user + tenant in parallel via request-scoped cache
+  const [user, tenant] = await Promise.all([
+    getCurrentUser(),
+    getTenantBySlug(tenantSlug),
+  ]);
+
   if (!user) redirect('/login');
-
-  // Resolve tenant
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('id, name, slug, schema_name, status, enabled_modules')
-    .eq('slug', tenantSlug)
-    .eq('status', 'active')
-    .single();
-
   if (!tenant) redirect('/');
 
-  // Check membership
-  const { data: membership } = await supabase
-    .from('user_tenants')
-    .select('role')
-    .eq('user_id', user.id)
-    .eq('tenant_id', tenant.id)
-    .single();
+  // Check membership + load permissions in parallel
+  const tenantClient = createTenantClient(tenant.schema_name);
+  const [membership, { data: profile }] = await Promise.all([
+    getMembership(user.id, tenant.id),
+    tenantClient
+      .from('user_profiles')
+      .select('permissions, display_name')
+      .eq('user_id', user.id)
+      .single(),
+  ]);
 
   if (!membership) redirect('/');
-
-  // Load permissions
-  const tenantClient = createTenantClient(tenant.schema_name);
-  const { data: profile } = await tenantClient
-    .from('user_profiles')
-    .select('permissions, display_name')
-    .eq('user_id', user.id)
-    .single();
 
   const role = membership.role as TenantContext['role'];
   const permissions = (profile?.permissions ?? {}) as Record<Permission, boolean>;
@@ -94,10 +86,11 @@ export default async function TenantLayout({ children, params }: Props) {
         />
         <div className="flex-1 flex flex-col min-w-0">
           <Header tenantSlug={tenantSlug} tenantName={tenant.name} navItems={navItems} />
-          <main className="flex-1 p-4 md:p-6">
+          <main className="flex-1 p-4 pb-20 md:p-6 md:pb-6">
             {children}
           </main>
         </div>
+        <MobileBottomNav tenantSlug={tenantSlug} tenantName={tenant.name} navItems={navItems} />
       </div>
     </TenantProvider>
   );

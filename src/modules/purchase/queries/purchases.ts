@@ -1,10 +1,13 @@
-import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
+import { createTenantClient } from '@/core/db/tenant-query';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
+import { applyLocationFilter } from '@/core/db/query-helpers';
 import type { CreatePurchaseInput, Purchase, PurchaseItem } from '../validations/purchase';
 
 export async function listPurchases(
   schemaName: string,
-  options?: { allowedLocationIds?: string[] | null }
-): Promise<Purchase[]> {
+  options?: { allowedLocationIds?: string[] | null; pagination?: PaginationParams }
+): Promise<PaginatedResponse<Purchase>> {
   const client = createTenantClient(schemaName);
   let query = client
     .from('purchases')
@@ -13,19 +16,22 @@ export async function listPurchases(
       location:locations!location_id(id, name, code),
       contact:contacts!contact_id(id, name),
       items:purchase_items(id)
-    `)
+    `, { count: 'exact' })
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
-  const ids = options?.allowedLocationIds;
-  if (ids !== null && ids !== undefined && ids.length > 0) {
-    query = query.in('location_id', ids);
+  query = applyLocationFilter(query, 'location_id', options?.allowedLocationIds ?? null);
+
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
   }
 
-  const { data, error } = await query;
+  const { data, error, count } = await query;
 
   if (error) throw new Error(`Failed to list purchases: ${error.message}`);
-  return (data ?? []) as Purchase[];
+
+  const pagination = options?.pagination ?? { page: 1, pageSize: count ?? 0 };
+  return paginatedResult((data ?? []) as Purchase[], count ?? 0, pagination);
 }
 
 export async function getPurchaseById(
@@ -61,47 +67,14 @@ export async function createPurchase(
   input: CreatePurchaseInput,
   userId: string
 ): Promise<Purchase> {
-  const client = createTenantClient(schemaName);
-  const purchaseNumber = await getNextSequenceNumber(schemaName, 'purchase');
-
-  // Insert purchase header
-  const { data: purchase, error: purchaseError } = await client
-    .from('purchases')
-    .insert({
-      purchase_number: purchaseNumber,
-      location_id: input.location_id,
-      contact_id: input.contact_id ?? null,
-      status: 'received',
-      transporter_name: input.transporter_name || null,
-      vehicle_number: input.vehicle_number || null,
-      driver_name: input.driver_name || null,
-      driver_phone: input.driver_phone || null,
-      notes: input.notes || null,
-      created_by: userId,
-      received_at: new Date().toISOString(),
-    })
-    .select('*')
-    .single();
-
-  if (purchaseError) throw new Error(`Failed to create purchase: ${purchaseError.message}`);
-
-  // Insert purchase items
-  const itemsToInsert = input.items.map((item) => ({
-    purchase_id: purchase.id,
-    commodity_id: item.commodity_id,
-    unit_id: item.unit_id,
-    quantity: item.quantity,
-    bags: item.bags ?? null,
-    unit_price: item.unit_price ?? null,
-  }));
-
-  const { error: itemsError } = await client
-    .from('purchase_items')
-    .insert(itemsToInsert);
-
-  if (itemsError) throw new Error(`Failed to create purchase items: ${itemsError.message}`);
-
-  return purchase as Purchase;
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient.rpc('create_purchase_txn', {
+    p_schema: schemaName,
+    p_input: input,
+    p_user_id: userId,
+  });
+  if (error) throw new Error(`Failed to create purchase: ${error.message}`);
+  return data as Purchase;
 }
 
 export async function cancelPurchase(

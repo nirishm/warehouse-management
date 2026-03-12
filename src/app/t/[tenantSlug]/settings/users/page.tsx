@@ -1,5 +1,5 @@
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,27 +39,17 @@ function countPermissions(permissions: Permissions | null): number {
 export default async function UsersPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, adminOnly: true });
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('id, schema_name')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   const tenantClient = createTenantClient(tenant.schema_name);
-  const { data: profiles } = await tenantClient
-    .from('user_profiles')
-    .select('*')
-    .order('display_name');
-
   const publicClient = createAdminClient();
-  const { data: memberships } = await publicClient
-    .from('user_tenants')
-    .select('user_id, role')
-    .eq('tenant_id', tenant.id);
+
+  const [{ data: profiles }, { data: memberships }] = await Promise.all([
+    tenantClient.from('user_profiles').select('*').order('display_name'),
+    publicClient.from('user_tenants').select('user_id, role').eq('tenant_id', tenant.id),
+  ]);
 
   const roleMap = new Map<string, string>();
   for (const m of memberships ?? []) {

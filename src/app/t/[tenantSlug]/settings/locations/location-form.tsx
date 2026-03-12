@@ -50,6 +50,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
   const [code, setCode] = useState(location?.code ?? '');
   const [type, setType] = useState<LocationType>(location?.type ?? 'warehouse');
   const [address, setAddress] = useState(location?.address ?? '');
+  const [gstin, setGstin] = useState((location as unknown as Record<string, unknown>)?.gstin as string ?? '');
 
   function resetForm() {
     if (!isEditing) {
@@ -57,6 +58,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
       setCode('');
       setType('warehouse');
       setAddress('');
+      setGstin('');
     }
     setError(null);
   }
@@ -71,6 +73,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
       code: code.toUpperCase(),
       type,
       ...(address ? { address } : {}),
+      ...(gstin ? { gstin } : {}),
     };
 
     try {
@@ -111,6 +114,7 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
             setCode(location.code);
             setType(location.type);
             setAddress(location.address ?? '');
+            setGstin((location as unknown as Record<string, unknown>).gstin as string ?? '');
           }
           setError(null);
         }
@@ -193,6 +197,22 @@ export function LocationForm({ tenantSlug, location, trigger }: LocationFormProp
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="loc-gstin" className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
+              GSTIN
+              <span className="text-[var(--text-dim)] normal-case font-sans ml-1">(optional)</span>
+            </Label>
+            <Input
+              id="loc-gstin"
+              value={gstin}
+              onChange={(e) => setGstin(e.target.value.toUpperCase())}
+              placeholder="22AAAAA0000A1Z5"
+              maxLength={15}
+              pattern="^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$"
+              className="bg-background border-border text-foreground font-mono placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
+            />
           </div>
 
           <div className="space-y-2">

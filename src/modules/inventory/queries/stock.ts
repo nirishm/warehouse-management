@@ -32,23 +32,19 @@ export async function getStockLevels(
     query = query.in('location_id', filters.allowedLocationIds);
   }
   if (filters?.commodityId) query = query.eq('commodity_id', filters.commodityId);
-  const { data: stockData, error } = await query;
+  const [
+    { data: stockData, error },
+    { data: locations },
+    { data: commodities },
+    { data: units },
+  ] = await Promise.all([
+    query,
+    client.from('locations').select('id, name, code').is('deleted_at', null),
+    client.from('commodities').select('id, name, code').is('deleted_at', null),
+    client.from('units').select('id, name, abbreviation'),
+  ]);
 
   if (error) throw new Error(`Failed to fetch stock levels: ${error.message}`);
-
-  const { data: locations } = await client
-    .from('locations')
-    .select('id, name, code')
-    .is('deleted_at', null);
-
-  const { data: commodities } = await client
-    .from('commodities')
-    .select('id, name, code')
-    .is('deleted_at', null);
-
-  const { data: units } = await client
-    .from('units')
-    .select('id, name, abbreviation');
 
   const locationMap = new Map(
     (locations ?? []).map((l: { id: string; name: string; code: string }) => [l.id, l])

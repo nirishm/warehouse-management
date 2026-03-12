@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import {
   getShortageOverview,
   getShortageByRoute,
@@ -16,17 +16,10 @@ interface Props {
 
 export default async function ShortageTrackingPage({ params }: Props) {
   const { tenantSlug } = await params;
-  await requirePageAccess({ tenantSlug, moduleId: 'shortage-tracking', permission: 'canViewAnalytics' });
-  const supabase = await createServerSupabaseClient();
+  await requirePageAccess({ tenantSlug, moduleId: 'shortage_tracking', permission: 'canViewAnalytics' });
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) redirect(`/t/${tenantSlug}`);
-  if (!tenant.enabled_modules?.includes('shortage_tracking')) redirect(`/t/${tenantSlug}`);
 
   const [overview, byRoute, byTransporter, byCommodity, recent] =
     await Promise.all([
@@ -45,7 +38,7 @@ export default async function ShortageTrackingPage({ params }: Props) {
         </h1>
         <p className="text-sm text-[var(--text-dim)] mt-1">
           Analyze dispatch shortages across routes, transporters, and
-          commodities
+          items
         </p>
       </div>
 

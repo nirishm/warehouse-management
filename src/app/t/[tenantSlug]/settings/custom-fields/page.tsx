@@ -1,5 +1,5 @@
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createTenantClient } from '@/core/db/tenant-query';
 import type { CustomFieldDefinition } from '@/modules/inventory/validations/custom-field';
 import { CustomFieldsClient } from './custom-fields-client';
@@ -11,14 +11,8 @@ interface Props {
 export default async function CustomFieldsPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, adminOnly: true });
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   const tenantClient = createTenantClient(tenant.schema_name);

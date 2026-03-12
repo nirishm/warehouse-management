@@ -8,6 +8,6 @@ export const purchaseManifest: ModuleManifest = {
   dependencies: ['inventory'],
   permissions: ['canPurchase'],
   navItems: [
-    { label: 'Purchases', href: 'purchases', icon: 'ShoppingCart', permission: 'canPurchase' },
+    { label: 'Purchases', href: 'purchases', icon: 'ShoppingCart', permission: 'canPurchase', group: 'operations' },
   ],
 };

@@ -8,6 +8,6 @@ export const auditTrailManifest: ModuleManifest = {
   dependencies: [],
   permissions: ['canViewAuditLog'],
   navItems: [
-    { label: 'Audit Log', href: 'audit-log', icon: 'ScrollText', permission: 'canViewAuditLog' },
+    { label: 'Audit Log', href: 'audit-log', icon: 'ScrollText', permission: 'canViewAuditLog', group: 'reports' },
   ],
 };

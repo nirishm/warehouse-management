@@ -1,16 +1,19 @@
-import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
+import { createTenantClient } from '@/core/db/tenant-query';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type { CreateReturnInput, Return, ReturnWithItems } from '../validations/return';
 
 export async function listReturns(
   schemaName: string,
-  options?: { allowedLocationIds?: string[] | null }
-): Promise<ReturnWithItems[]> {
+  options?: { allowedLocationIds?: string[] | null; pagination?: PaginationParams }
+): Promise<PaginatedResponse<ReturnWithItems>> {
   const client = createTenantClient(schemaName);
   let query = client
     .from('returns')
     .select(
       `*, location:locations(id,name,code), contact:contacts(id,name),
-       items:return_items(*, commodity:commodities(id,name,code), unit:units(id,name,abbreviation))`
+       items:return_items(*, commodity:commodities(id,name,code), unit:units(id,name,abbreviation))`,
+      { count: 'exact' }
     )
     .is('deleted_at', null)
     .order('return_date', { ascending: false });
@@ -20,10 +23,16 @@ export async function listReturns(
     query = query.in('location_id', ids);
   }
 
-  const { data, error } = await query;
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) throw new Error(`Failed to list returns: ${error.message}`);
-  return (data ?? []) as unknown as ReturnWithItems[];
+
+  const pagination = options?.pagination ?? { page: 1, pageSize: count ?? 0 };
+  return paginatedResult((data ?? []) as unknown as ReturnWithItems[], count ?? 0, pagination);
 }
 
 export async function getReturn(
@@ -109,7 +118,7 @@ async function validateReturnQuantities(
 
     if (originalQty === undefined) {
       throw new Error(
-        `Commodity ${item.commodity_id} with unit ${item.unit_id} not found in original transaction`
+        `Item ${item.commodity_id} with unit ${item.unit_id} not found in original transaction`
       );
     }
 
@@ -118,7 +127,7 @@ async function validateReturnQuantities(
 
     if (item.quantity > remaining) {
       throw new Error(
-        `Return quantity ${item.quantity} exceeds remaining returnable quantity ${remaining} for commodity ${item.commodity_id}`
+        `Return quantity ${item.quantity} exceeds remaining returnable quantity ${remaining} for item ${item.commodity_id}`
       );
     }
   }
@@ -129,44 +138,17 @@ export async function createReturn(
   input: CreateReturnInput,
   userId: string
 ): Promise<Return> {
-  // Validate quantities against original transaction
+  // Keep this validation — it's read-only, stays in TS
   await validateReturnQuantities(schemaName, input);
 
-  const client = createTenantClient(schemaName);
-  const returnNumber = await getNextSequenceNumber(schemaName, 'return');
-
-  const { data: ret, error: retErr } = await client
-    .from('returns')
-    .insert({
-      return_number: returnNumber,
-      return_type: input.return_type,
-      original_txn_id: input.original_txn_id,
-      location_id: input.location_id,
-      contact_id: input.contact_id ?? null,
-      return_date: input.return_date ?? new Date().toISOString(),
-      reason: input.reason ?? null,
-      notes: input.notes ?? null,
-      status: 'draft',
-      created_by: userId,
-    })
-    .select('*')
-    .single();
-
-  if (retErr) throw new Error(`Failed to create return: ${retErr.message}`);
-
-  const items = input.items.map((item) => ({
-    return_id: ret.id,
-    commodity_id: item.commodity_id,
-    unit_id: item.unit_id,
-    quantity: item.quantity,
-    lot_id: item.lot_id ?? null,
-    notes: item.notes ?? null,
-  }));
-
-  const { error: itemsErr } = await client.from('return_items').insert(items);
-  if (itemsErr) throw new Error(`Failed to create return items: ${itemsErr.message}`);
-
-  return ret as Return;
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient.rpc('create_return_txn', {
+    p_schema: schemaName,
+    p_input: input,
+    p_user_id: userId,
+  });
+  if (error) throw new Error(`Failed to create return: ${error.message}`);
+  return data as Return;
 }
 
 export async function confirmReturn(

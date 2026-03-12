@@ -8,6 +8,6 @@ export const dispatchManifest: ModuleManifest = {
   dependencies: ['inventory'],
   permissions: ['canDispatch', 'canReceive'],
   navItems: [
-    { label: 'Dispatches', href: 'dispatches', icon: 'Truck', permission: 'canDispatch' },
+    { label: 'Dispatches', href: 'dispatches', icon: 'Truck', permission: 'canDispatch', group: 'operations' },
   ],
 };

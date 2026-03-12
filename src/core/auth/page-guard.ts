@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createTenantClient } from '@/core/db/tenant-query';
+import { getCurrentUser, getTenantBySlug, getMembership } from './session';
 import type { Permission } from './types';
 
 interface PageGuardOptions {
@@ -16,6 +16,9 @@ interface PageGuardOptions {
 /**
  * Server-side page guard. Call at the top of any page.tsx to enforce
  * module + permission checks. Redirects to dashboard if unauthorized.
+ *
+ * Uses request-scoped cache() so tenant/user lookups are deduplicated
+ * when the page component also calls getTenantBySlug / getCurrentUser.
  */
 export async function requirePageAccess({
   tenantSlug,
@@ -23,26 +26,16 @@ export async function requirePageAccess({
   permission,
   adminOnly,
 }: PageGuardOptions): Promise<void> {
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Fetch user + tenant in parallel (both are independently cacheable)
+  const [user, tenant] = await Promise.all([
+    getCurrentUser(),
+    getTenantBySlug(tenantSlug),
+  ]);
+
   if (!user) redirect('/login');
-
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('id, schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .eq('status', 'active')
-    .single();
-
   if (!tenant) redirect('/');
 
-  const { data: membership } = await supabase
-    .from('user_tenants')
-    .select('role')
-    .eq('user_id', user.id)
-    .eq('tenant_id', tenant.id)
-    .single();
-
+  const membership = await getMembership(user.id, tenant.id);
   if (!membership) redirect('/');
 
   const role = membership.role;

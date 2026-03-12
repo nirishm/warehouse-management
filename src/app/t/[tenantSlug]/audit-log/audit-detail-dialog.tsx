@@ -35,7 +35,7 @@ const entityTypeLabels: Record<string, string> = {
   purchase: 'Purchase',
   sale: 'Sale',
   location: 'Location',
-  commodity: 'Commodity',
+  commodity: 'Item',
   user_profile: 'User Profile',
 };
 

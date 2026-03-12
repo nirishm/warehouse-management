@@ -22,7 +22,7 @@ interface Unit {
 
 const STEPS: { key: Step; label: string }[] = [
   { key: 'location', label: 'Location' },
-  { key: 'commodity', label: 'Commodity' },
+  { key: 'commodity', label: 'Item' },
   { key: 'invite', label: 'Invite' },
 ];
 
@@ -135,7 +135,7 @@ export function OnboardingWizard({ tenantSlug }: Props) {
 
     if (!res.ok) {
       const data = await res.json();
-      setError(data.error || 'Failed to create commodity');
+      setError(data.error || 'Failed to create item');
       setLoading(false);
       return;
     }
@@ -285,7 +285,7 @@ export function OnboardingWizard({ tenantSlug }: Props) {
         {/* ── Step 2: Commodity ─────────────────────────── */}
         {step === 'commodity' && (
           <>
-            <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-1">Add your first commodity</h2>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-1">Add your first item</h2>
             <p className="text-sm text-[var(--text-muted)] mb-6">
               What items do you track? Create a material, product, or part.
             </p>
@@ -345,7 +345,7 @@ export function OnboardingWizard({ tenantSlug }: Props) {
                   type="submit" disabled={loading}
                   className="flex-1 h-12 rounded-full bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold tracking-wide active:scale-[0.98] transition-all"
                 >
-                  {loading ? 'Creating...' : 'Create commodity'}
+                  {loading ? 'Creating...' : 'Create item'}
                 </Button>
               </div>
             </form>

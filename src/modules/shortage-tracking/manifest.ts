@@ -8,6 +8,6 @@ export const shortageTrackingManifest: ModuleManifest = {
   dependencies: ['inventory', 'dispatch'],
   permissions: ['canViewAnalytics'],
   navItems: [
-    { label: 'Shortages', href: 'shortage-tracking', icon: 'AlertTriangle', permission: 'canViewAnalytics' },
+    { label: 'Shortages', href: 'shortage-tracking', icon: 'AlertTriangle', permission: 'canViewAnalytics', group: 'inventory' },
   ],
 };

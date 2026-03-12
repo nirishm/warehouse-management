@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { getLot, getLotMovements } from '@/modules/lot-tracking/queries/lots';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -30,14 +30,8 @@ function formatDate(dateStr: string): string {
 export default async function LotDetailPage({ params }: Props) {
   const { tenantSlug, id } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'lot-tracking', permission: 'canManageLots' });
-  const supabase = await createServerSupabaseClient();
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) redirect(`/t/${tenantSlug}`);
   if (!tenant.enabled_modules?.includes('lot-tracking')) redirect(`/t/${tenantSlug}`);
 
@@ -71,7 +65,7 @@ export default async function LotDetailPage({ params }: Props) {
             {lot.lot_number}
           </h1>
           <p className="text-sm text-[var(--text-dim)] mt-1">
-            {lot.commodity?.name ?? 'Unknown commodity'} ·{' '}
+            {lot.commodity?.name ?? 'Unknown item'} ·{' '}
             Received {new Date(lot.received_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
           </p>
         </div>
@@ -91,7 +85,7 @@ export default async function LotDetailPage({ params }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <DetailRow label="Commodity">
+            <DetailRow label="Item">
               {lot.commodity ? (
                 <>
                   <span className="font-mono text-[var(--accent-color)] text-xs mr-2">{lot.commodity.code}</span>

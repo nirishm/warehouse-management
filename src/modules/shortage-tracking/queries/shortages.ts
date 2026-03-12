@@ -75,13 +75,16 @@ export async function getShortageOverview(
   schemaName: string
 ): Promise<ShortageOverview> {
   const client = createTenantClient(schemaName);
+  const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Get all received dispatches
+  // Get received dispatches within the last 90 days
   const { data: dispatches, error: dErr } = await client
     .from('dispatches')
     .select('id')
     .eq('status', 'received')
-    .is('deleted_at', null);
+    .is('deleted_at', null)
+    .gte('received_at', defaultFrom)
+    .limit(500);
 
   if (dErr) throw new Error(`Failed to fetch dispatches: ${dErr.message}`);
 
@@ -136,13 +139,16 @@ export async function getShortageByRoute(
   schemaName: string
 ): Promise<ShortageByRoute[]> {
   const client = createTenantClient(schemaName);
+  const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Get received dispatches with location info
+  // Get received dispatches within the last 90 days
   const { data: dispatches, error: dErr } = await client
     .from('dispatches')
     .select('id, origin_location_id, dest_location_id')
     .eq('status', 'received')
-    .is('deleted_at', null);
+    .is('deleted_at', null)
+    .gte('received_at', defaultFrom)
+    .limit(500);
 
   if (dErr) throw new Error(`Failed to fetch dispatches: ${dErr.message}`);
   if (!dispatches || dispatches.length === 0) return [];
@@ -255,13 +261,16 @@ export async function getShortageByTransporter(
   schemaName: string
 ): Promise<ShortageByTransporter[]> {
   const client = createTenantClient(schemaName);
+  const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Get received dispatches with transporter
+  // Get received dispatches within the last 90 days
   const { data: dispatches, error: dErr } = await client
     .from('dispatches')
     .select('id, transporter_name')
     .eq('status', 'received')
-    .is('deleted_at', null);
+    .is('deleted_at', null)
+    .gte('received_at', defaultFrom)
+    .limit(500);
 
   if (dErr) throw new Error(`Failed to fetch dispatches: ${dErr.message}`);
   if (!dispatches || dispatches.length === 0) return [];
@@ -333,13 +342,16 @@ export async function getShortageByCommodity(
   schemaName: string
 ): Promise<ShortageByCommodity[]> {
   const client = createTenantClient(schemaName);
+  const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Get received dispatches
+  // Get received dispatches within the last 90 days
   const { data: dispatches, error: dErr } = await client
     .from('dispatches')
     .select('id')
     .eq('status', 'received')
-    .is('deleted_at', null);
+    .is('deleted_at', null)
+    .gte('received_at', defaultFrom)
+    .limit(500);
 
   if (dErr) throw new Error(`Failed to fetch dispatches: ${dErr.message}`);
   if (!dispatches || dispatches.length === 0) return [];
@@ -364,7 +376,7 @@ export async function getShortageByCommodity(
     .select('id, name')
     .in('id', Array.from(commodityIds));
 
-  if (cErr) throw new Error(`Failed to fetch commodities: ${cErr.message}`);
+  if (cErr) throw new Error(`Failed to fetch items: ${cErr.message}`);
 
   const comMap = new Map(
     (commodities ?? []).map((c) => [c.id, c.name as string])
@@ -431,7 +443,9 @@ export async function getRecentShortages(
 ): Promise<RecentShortageItem[]> {
   const client = createTenantClient(schemaName);
 
-  // Get received dispatches ordered by received_at desc
+  const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+
+  // Get received dispatches ordered by received_at desc, bounded to 90 days
   const { data: dispatches, error: dErr } = await client
     .from('dispatches')
     .select(
@@ -439,7 +453,9 @@ export async function getRecentShortages(
     )
     .eq('status', 'received')
     .is('deleted_at', null)
-    .order('received_at', { ascending: false });
+    .gte('received_at', defaultFrom)
+    .order('received_at', { ascending: false })
+    .limit(500);
 
   if (dErr) throw new Error(`Failed to fetch dispatches: ${dErr.message}`);
   if (!dispatches || dispatches.length === 0) return [];
@@ -465,7 +481,7 @@ export async function getRecentShortages(
     .select('id, name')
     .in('id', Array.from(commodityIds));
 
-  if (cErr) throw new Error(`Failed to fetch commodities: ${cErr.message}`);
+  if (cErr) throw new Error(`Failed to fetch items: ${cErr.message}`);
 
   const comMap = new Map(
     (commodities ?? []).map((c) => [c.id, c.name as string])

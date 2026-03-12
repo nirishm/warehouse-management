@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { getReturn } from '@/modules/returns/queries/returns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -39,14 +39,7 @@ function formatDate(dateStr: string) {
 export default async function ReturnDetailPage({ params }: Props) {
   const { tenantSlug, id } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'returns', permission: 'canManageReturns' });
-  const supabase = await createServerSupabaseClient();
-
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) redirect(`/t/${tenantSlug}`);
   if (!tenant.enabled_modules?.includes('returns')) redirect(`/t/${tenantSlug}`);
 
@@ -124,7 +117,7 @@ export default async function ReturnDetailPage({ params }: Props) {
             <TableHeader>
               <TableRow className="border-[var(--border)] hover:bg-transparent">
                 <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] pl-6">
-                  Commodity
+                  Item
                 </TableHead>
                 <TableHead className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
                   Unit

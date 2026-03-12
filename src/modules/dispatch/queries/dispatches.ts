@@ -1,4 +1,6 @@
-import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
+import { createTenantClient } from '@/core/db/tenant-query';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type {
   CreateDispatchInput,
   DispatchWithLocations,
@@ -8,34 +10,47 @@ import type {
 
 export async function listDispatches(
   schemaName: string,
-  options?: { allowedLocationIds?: string[] | null }
-): Promise<DispatchWithLocations[]> {
+  options?: { allowedLocationIds?: string[] | null; pagination?: PaginationParams }
+): Promise<PaginatedResponse<DispatchWithLocations>> {
   const client = createTenantClient(schemaName);
   let query = client
     .from('dispatches')
     .select(
-      '*, origin_location:locations!origin_location_id(name), dest_location:locations!dest_location_id(name), dispatch_items(id)'
+      '*, origin_location:locations!origin_location_id(name), dest_location:locations!dest_location_id(name), dispatch_items(id)',
+      { count: 'exact' }
     )
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
   const ids = options?.allowedLocationIds;
-  if (ids !== null && ids !== undefined && ids.length > 0) {
-    const list = ids.join(',');
-    query = query.or(`origin_location_id.in.(${list}),dest_location_id.in.(${list})`);
+  if (ids !== null && ids !== undefined) {
+    if (ids.length === 0) {
+      // No locations assigned — match nothing
+      query = query.in('id', ['00000000-0000-0000-0000-000000000000']);
+    } else {
+      const list = ids.join(',');
+      query = query.or(`origin_location_id.in.(${list}),dest_location_id.in.(${list})`);
+    }
   }
 
-  const { data, error } = await query;
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) throw new Error(`Failed to list dispatches: ${error.message}`);
 
-  return ((data ?? []) as Record<string, unknown>[]).map((row) => {
+  const mapped = ((data ?? []) as Record<string, unknown>[]).map((row) => {
     const items = row.dispatch_items as { id: string }[] | null;
     return {
       ...row,
       item_count: items?.length ?? 0,
     } as DispatchWithLocations;
   });
+
+  const pagination = options?.pagination ?? { page: 1, pageSize: count ?? 0 };
+  return paginatedResult(mapped, count ?? 0, pagination);
 }
 
 export async function getDispatchById(
@@ -70,47 +85,14 @@ export async function createDispatch(
   input: CreateDispatchInput,
   userId: string
 ): Promise<Dispatch> {
-  const client = createTenantClient(schemaName);
-
-  const dispatchNumber = await getNextSequenceNumber(schemaName, 'dispatch');
-
-  const { data: dispatch, error: dispatchError } = await client
-    .from('dispatches')
-    .insert({
-      dispatch_number: dispatchNumber,
-      origin_location_id: input.origin_location_id,
-      dest_location_id: input.dest_location_id,
-      status: 'dispatched',
-      dispatched_at: new Date().toISOString(),
-      dispatched_by: userId,
-      transporter_name: input.transporter_name ?? null,
-      vehicle_number: input.vehicle_number ?? null,
-      driver_name: input.driver_name ?? null,
-      driver_phone: input.driver_phone ?? null,
-      notes: input.notes ?? null,
-    })
-    .select('*')
-    .single();
-
-  if (dispatchError)
-    throw new Error(`Failed to create dispatch: ${dispatchError.message}`);
-
-  const items = input.items.map((item) => ({
-    dispatch_id: dispatch.id,
-    commodity_id: item.commodity_id,
-    unit_id: item.unit_id,
-    sent_quantity: item.sent_quantity,
-    sent_bags: item.sent_bags ?? null,
-  }));
-
-  const { error: itemsError } = await client
-    .from('dispatch_items')
-    .insert(items);
-
-  if (itemsError)
-    throw new Error(`Failed to create dispatch items: ${itemsError.message}`);
-
-  return dispatch as Dispatch;
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient.rpc('create_dispatch_txn', {
+    p_schema: schemaName,
+    p_input: input,
+    p_user_id: userId,
+  });
+  if (error) throw new Error(`Failed to create dispatch: ${error.message}`);
+  return data as Dispatch;
 }
 
 export async function cancelDispatch(

@@ -37,6 +37,8 @@ interface CommodityFormData {
   description: string;
   category: string;
   default_unit_id: string;
+  hsn_code: string;
+  tax_rate: string;
 }
 
 interface CommodityFormProps {
@@ -58,6 +60,8 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
     description: '',
     category: '',
     default_unit_id: '',
+    hsn_code: '',
+    tax_rate: '',
   });
 
   const isEdit = !!commodity?.id;
@@ -72,9 +76,11 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
           description: commodity.description ?? '',
           category: commodity.category ?? '',
           default_unit_id: commodity.default_unit_id ?? '',
+          hsn_code: commodity.hsn_code ?? '',
+          tax_rate: commodity.tax_rate ?? '',
         });
       } else {
-        setForm({ name: '', code: '', description: '', category: '', default_unit_id: '' });
+        setForm({ name: '', code: '', description: '', category: '', default_unit_id: '', hsn_code: '', tax_rate: '' });
       }
       setError(null);
     }
@@ -104,6 +110,8 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
     if (form.description) payload.description = form.description;
     if (form.category) payload.category = form.category;
     if (form.default_unit_id) payload.default_unit_id = form.default_unit_id;
+    if (form.hsn_code) payload.hsn_code = form.hsn_code;
+    if (form.tax_rate) payload.tax_rate = parseFloat(form.tax_rate);
 
     try {
       const url = isEdit
@@ -139,7 +147,7 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
           trigger ?? (
             <Button variant="orange">
               <Plus className="size-4 mr-1" />
-              New Commodity
+              New Item
             </Button>
           )
         }
@@ -147,12 +155,12 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
       <DialogContent className="bg-background border border-border sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-foreground font-mono uppercase tracking-wider text-sm">
-            {isEdit ? 'Edit Commodity' : 'New Commodity'}
+            {isEdit ? 'Edit Item' : 'New Item'}
           </DialogTitle>
           <DialogDescription className="text-[var(--text-dim)] text-xs">
             {isEdit
-              ? 'Update the commodity details below.'
-              : 'Add a new commodity to your inventory.'}
+              ? 'Update the item details below.'
+              : 'Add a new item to your inventory.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -204,6 +212,37 @@ export function CommodityForm({ commodity, onSuccess, trigger }: CommodityFormPr
               placeholder="Grains"
               className="border-border bg-[var(--bg-off)] text-foreground placeholder:text-muted-foreground"
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="commodity-hsn" className="text-[var(--text-muted)] font-mono text-xs uppercase tracking-wider">
+                HSN Code
+              </Label>
+              <Input
+                id="commodity-hsn"
+                value={form.hsn_code}
+                onChange={(e) => setForm({ ...form, hsn_code: e.target.value })}
+                placeholder="1001"
+                className="border-border bg-[var(--bg-off)] text-foreground font-mono placeholder:text-muted-foreground"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="commodity-tax" className="text-[var(--text-muted)] font-mono text-xs uppercase tracking-wider">
+                Tax Rate (%)
+              </Label>
+              <Input
+                id="commodity-tax"
+                type="number"
+                min="0"
+                max="28"
+                step="0.01"
+                value={form.tax_rate}
+                onChange={(e) => setForm({ ...form, tax_rate: e.target.value })}
+                placeholder="5"
+                className="border-border bg-[var(--bg-off)] text-foreground font-mono placeholder:text-muted-foreground"
+              />
+            </div>
           </div>
 
           <div className="space-y-1.5">

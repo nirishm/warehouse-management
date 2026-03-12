@@ -10,7 +10,15 @@ import {
   MapPin,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
+import dynamic from 'next/dynamic';
+
+const DateRangePicker = dynamic(
+  () => import('@/components/ui/date-range-picker').then((m) => m.DateRangePicker),
+  {
+    ssr: false,
+    loading: () => <div className="h-9 w-48 bg-[var(--bg-off)] rounded-full" />,
+  }
+);
 import type {
   DashboardKpis,
   RecentTransaction,
@@ -203,7 +211,7 @@ export function DashboardHome({
             onChange={(e) => updateFilter('commodityId', e.target.value)}
             className="h-8 rounded-full border border-border bg-[var(--bg-base)] px-3 text-xs font-medium text-[var(--text-body)] outline-none transition-colors hover:border-[var(--accent-color)] focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)]/10"
           >
-            <option value="">All Commodities</option>
+            <option value="">All Items</option>
             {commodities.map((com) => (
               <option key={com.id} value={com.id}>
                 {com.name}
@@ -285,7 +293,7 @@ export function DashboardHome({
                       Status
                     </th>
                     <th className="px-4 py-2.5 text-left font-mono text-[10px] uppercase tracking-wider text-[var(--text-dim)] border-b border-border hidden md:table-cell">
-                      Commodity
+                      Item
                     </th>
                     <th className="px-4 py-2.5 text-right font-mono text-[10px] uppercase tracking-wider text-[var(--text-dim)] border-b border-border hidden md:table-cell">
                       Qty
@@ -386,7 +394,7 @@ export function DashboardHome({
                         )}
                       </span>
                       <span className="text-[11.5px] text-[var(--text-dim)]">
-                        {formatNumber(loc.totalStock)} items · {loc.commodityCount} {loc.commodityCount === 1 ? 'commodity' : 'commodities'}
+                        {formatNumber(loc.totalStock)} items · {loc.commodityCount} {loc.commodityCount === 1 ? 'item' : 'items'}
                       </span>
                     </div>
                     <div className="h-1 bg-[var(--bg-off)] rounded-full overflow-hidden">

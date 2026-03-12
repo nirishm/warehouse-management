@@ -1,4 +1,5 @@
 import { createTenantClient } from '@/core/db/tenant-query';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type { CreateCommodityInput, UpdateCommodityInput } from '../validations/commodity';
 
 export interface Commodity {
@@ -17,18 +18,27 @@ export interface Commodity {
   unit_abbreviation?: string | null;
 }
 
-export async function listCommodities(schemaName: string): Promise<Commodity[]> {
+export async function listCommodities(
+  schemaName: string,
+  options?: { pagination?: PaginationParams }
+): Promise<PaginatedResponse<Commodity>> {
   const client = createTenantClient(schemaName);
 
-  const { data, error } = await client
+  let query = client
     .from('commodities')
-    .select('*, units:default_unit_id(name, abbreviation)')
+    .select('*, units:default_unit_id(name, abbreviation)', { count: 'exact' })
     .is('deleted_at', null)
     .order('name', { ascending: true });
 
-  if (error) throw new Error(`Failed to list commodities: ${error.message}`);
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
+  }
 
-  return (data ?? []).map((row: Record<string, unknown>) => {
+  const { data, error, count } = await query;
+
+  if (error) throw new Error(`Failed to list items: ${error.message}`);
+
+  const mapped = (data ?? []).map((row: Record<string, unknown>) => {
     const unit = row.units as { name: string; abbreviation: string } | null;
     return {
       ...row,
@@ -36,6 +46,9 @@ export async function listCommodities(schemaName: string): Promise<Commodity[]> 
       unit_abbreviation: unit?.abbreviation ?? null,
     } as Commodity;
   });
+
+  const pagination = options?.pagination ?? { page: 1, pageSize: count ?? 0 };
+  return paginatedResult(mapped, count ?? 0, pagination);
 }
 
 export async function getCommodityById(
@@ -53,7 +66,7 @@ export async function getCommodityById(
 
   if (error) {
     if (error.code === 'PGRST116') return null;
-    throw new Error(`Failed to get commodity: ${error.message}`);
+    throw new Error(`Failed to get item: ${error.message}`);
   }
 
   const unit = (data as Record<string, unknown>).units as { name: string; abbreviation: string } | null;
@@ -80,7 +93,7 @@ export async function createCommodity(
     .select()
     .single();
 
-  if (error) throw new Error(`Failed to create commodity: ${error.message}`);
+  if (error) throw new Error(`Failed to create item: ${error.message}`);
   return data as Commodity;
 }
 
@@ -99,7 +112,7 @@ export async function updateCommodity(
     .select()
     .single();
 
-  if (error) throw new Error(`Failed to update commodity: ${error.message}`);
+  if (error) throw new Error(`Failed to update item: ${error.message}`);
   return data as Commodity;
 }
 
@@ -115,5 +128,5 @@ export async function softDeleteCommodity(
     .eq('id', id)
     .is('deleted_at', null);
 
-  if (error) throw new Error(`Failed to delete commodity: ${error.message}`);
+  if (error) throw new Error(`Failed to delete item: ${error.message}`);
 }

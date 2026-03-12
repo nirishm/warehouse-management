@@ -1,61 +1,22 @@
 import Link from 'next/link';
 import { requirePageAccess } from '@/core/auth/page-guard';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createTenantClient } from '@/core/db/tenant-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import type { DispatchWithLocations } from '@/modules/dispatch/validations/dispatch';
 import { RealtimeListener } from '@/components/realtime/realtime-listener';
+import { DispatchesTable } from './dispatches-table';
 
 interface Props {
   params: Promise<{ tenantSlug: string }>;
 }
 
-const statusColors: Record<string, string> = {
-  draft: 'bg-muted text-muted-foreground border-border',
-  dispatched: 'bg-[var(--accent-tint)] text-[var(--accent-color)] border-[var(--accent-color)]/20',
-  in_transit: 'bg-[var(--blue-bg)] text-[var(--blue)] border-[var(--blue)]/20',
-  received: 'bg-[var(--green-bg)] text-[var(--green)] border-[var(--green)]/20',
-  cancelled: 'bg-[var(--red-bg)] text-[var(--red)] border-[var(--red)]/20',
-};
-
-const statusLabels: Record<string, string> = {
-  draft: 'Draft',
-  dispatched: 'Dispatched',
-  in_transit: 'In Transit',
-  received: 'Received',
-  cancelled: 'Cancelled',
-};
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '--';
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
 export default async function DispatchesPage({ params }: Props) {
   const { tenantSlug } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'dispatch', permission: 'canDispatch' });
-  const supabase = await createServerSupabaseClient();
-
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
   const tenantClient = createTenantClient(tenant.schema_name);
@@ -84,10 +45,10 @@ export default async function DispatchesPage({ params }: Props) {
             Dispatches
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Track commodity dispatches between locations
+            Track item dispatches between locations
           </p>
         </div>
-        <Link href={`/t/${tenantSlug}/dispatches/new`}>
+        <Link prefetch={false} href={`/t/${tenantSlug}/dispatches/new`}>
           <Button variant="orange">
             <Plus className="size-4 mr-1" />
             New Dispatch
@@ -96,7 +57,7 @@ export default async function DispatchesPage({ params }: Props) {
       </div>
 
       <Card className="border-border bg-[var(--bg-off)]">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-0">
           <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
             All Dispatches ({items.length})
           </CardTitle>
@@ -110,68 +71,7 @@ export default async function DispatchesPage({ params }: Props) {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border hover:bg-transparent">
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground pl-6">
-                    Dispatch #
-                  </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                    Origin &rarr; Destination
-                  </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                    Status
-                  </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                    Date
-                  </TableHead>
-                  <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground text-right pr-6">
-                    Items
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((dispatch) => (
-                  <TableRow
-                    key={dispatch.id}
-                    className="border-border hover:bg-muted/30"
-                  >
-                    <TableCell className="pl-6">
-                      <Link
-                        href={`/t/${tenantSlug}/dispatches/${dispatch.id}`}
-                        className="font-mono text-sm text-[var(--accent-color)] font-medium hover:text-[var(--accent-color)] underline-offset-4 hover:underline"
-                      >
-                        {dispatch.dispatch_number}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="text-sm text-foreground">
-                      <span className="text-[var(--text-body)]">
-                        {dispatch.origin_location?.name ?? 'Unknown'}
-                      </span>
-                      <span className="text-[var(--text-dim)] mx-2">&rarr;</span>
-                      <span className="text-[var(--text-body)]">
-                        {dispatch.dest_location?.name ?? 'Unknown'}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-mono font-medium ${statusColors[dispatch.status] ?? 'bg-muted text-muted-foreground border-border'}`}
-                      >
-                        {statusLabels[dispatch.status] ?? dispatch.status}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-sm text-[var(--text-muted)] font-mono">
-                      {formatDate(dispatch.dispatched_at ?? dispatch.created_at)}
-                    </TableCell>
-                    <TableCell className="text-sm text-[var(--text-muted)] font-mono text-right pr-6">
-                      {dispatch.item_count ?? 0}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            </div>
+            <DispatchesTable data={items} tenantSlug={tenantSlug} />
           )}
         </CardContent>
       </Card>

@@ -3,20 +3,22 @@ import { withTenantContext, requireModule, requirePermission } from '@/core/auth
 import { listContacts, createContact } from '@/modules/inventory/queries/contacts';
 import { createContactSchema } from '@/modules/inventory/validations/contact';
 import type { ContactType } from '@/modules/inventory/validations/contact';
+import { parsePagination } from '@/lib/pagination';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
     requireModule(ctx, 'inventory');
     requirePermission(ctx, 'canManageContacts');
 
-    const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type') as ContactType | null;
+    const type = request.nextUrl.searchParams.get('type') as ContactType | null;
+    const pagination = parsePagination(request.nextUrl.searchParams);
 
-    const contacts = await listContacts(
+    const result = await listContacts(
       ctx.schemaName,
-      type && ['supplier', 'customer', 'both'].includes(type) ? type : undefined
+      type && ['supplier', 'customer', 'both'].includes(type) ? type : undefined,
+      { pagination }
     );
-    return NextResponse.json({ data: contacts });
+    return NextResponse.json(result);
   });
 }
 

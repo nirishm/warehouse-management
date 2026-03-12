@@ -2,17 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withTenantContext, requireModule, requirePermission, requireLocationAccess } from '@/core/auth/guards';
 import { listSales, createSale } from '@/modules/sale/queries/sales';
 import { createSaleSchema } from '@/modules/sale/validations/sale';
-import { createAuditEntry } from '@/modules/audit-trail/queries/audit-log';
+import { parsePagination } from '@/lib/pagination';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
     requireModule(ctx, 'sale');
     requirePermission(ctx, 'canSale');
 
-    const sales = await listSales(ctx.schemaName, {
+    const pagination = parsePagination(request.nextUrl.searchParams);
+    const result = await listSales(ctx.schemaName, {
       allowedLocationIds: ctx.allowedLocationIds,
+      pagination,
     });
-    return NextResponse.json({ data: sales });
+    return NextResponse.json(result);
   });
 }
 
@@ -38,15 +40,6 @@ export async function POST(request: NextRequest) {
     }
 
     const sale = await createSale(ctx.schemaName, parsed.data, ctx.userId);
-
-    createAuditEntry(ctx.schemaName, {
-      user_id: ctx.userId,
-      user_name: ctx.userName,
-      action: 'create',
-      entity_type: 'sale',
-      entity_id: sale.id,
-      new_data: sale as unknown as Record<string, unknown>,
-    }).catch((e) => console.error('Audit log error:', e));
 
     return NextResponse.json({ data: sale }, { status: 201 });
   });

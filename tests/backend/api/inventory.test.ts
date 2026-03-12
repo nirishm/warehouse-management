@@ -9,8 +9,8 @@ import { describe, it, expect, afterEach } from 'vitest';
 import {
   tenantClient,
   TEST_TENANT,
-  DEMO_LOCATIONS,
-  DEMO_COMMODITIES,
+  TW_LOCATIONS,
+  TW_COMMODITIES,
 } from '../setup/test-env';
 import {
   createTestPurchase,
@@ -105,16 +105,16 @@ describe('stock_levels: location-scoped access', () => {
     // ARRANGE
     const client = tenantClient(SCHEMA);
 
-    // ACT: stock at WH_NORTH only
+    // ACT: stock at LOC1 only
     const { data, error } = await client
       .from('stock_levels')
       .select('commodity_id, location_id, current_stock')
-      .eq('location_id', DEMO_LOCATIONS.WH_NORTH);
+      .eq('location_id', TW_LOCATIONS.LOC1);
 
-    // ASSERT: all rows belong to WH_NORTH
+    // ASSERT: all rows belong to LOC1
     expect(error).toBeNull();
     for (const row of data ?? []) {
-      expect(row.location_id).toBe(DEMO_LOCATIONS.WH_NORTH);
+      expect(row.location_id).toBe(TW_LOCATIONS.LOC1);
     }
   });
 
@@ -122,18 +122,18 @@ describe('stock_levels: location-scoped access', () => {
     // ARRANGE
     const client = tenantClient(SCHEMA);
 
-    // ACT: find wheat stock at WH_NORTH
+    // ACT: find COMM1 stock at LOC1
     const { data, error } = await client
       .from('stock_levels')
       .select('commodity_id, location_id, current_stock')
-      .eq('commodity_id', DEMO_COMMODITIES.WHEAT)
-      .eq('location_id', DEMO_LOCATIONS.WH_NORTH);
+      .eq('commodity_id', TW_COMMODITIES.COMM1)
+      .eq('location_id', TW_LOCATIONS.LOC1);
 
     // ASSERT: at most one row (unique combination in the view)
     expect(error).toBeNull();
     if (data && data.length > 0) {
-      expect(data[0].commodity_id).toBe(DEMO_COMMODITIES.WHEAT);
-      expect(data[0].location_id).toBe(DEMO_LOCATIONS.WH_NORTH);
+      expect(data[0].commodity_id).toBe(TW_COMMODITIES.COMM1);
+      expect(data[0].location_id).toBe(TW_LOCATIONS.LOC1);
     }
   });
 
@@ -158,129 +158,134 @@ describe('stock_levels: location-scoped access', () => {
 // ---------------------------------------------------------------------------
 describe('stock_levels: impact of purchase creation', () => {
   it('creating a received purchase increases total_in at that location', async () => {
-    // ARRANGE: snapshot stock before
+    // ARRANGE: use a fresh isolated commodity so concurrent worker cleanup cannot
+    // lower the before-baseline below our insertion (parallel files share LOC1+COMM1).
     const client = tenantClient(SCHEMA);
     const unit = await getDefaultUnit(SCHEMA);
+    const isolatedCommodity = await createTestCommodity(SCHEMA, {
+      name: `ReceivedPurchase Commodity ${Date.now()}`,
+      code: `RPC-${Date.now()}`,
+    });
 
-    const { data: before } = await client
-      .from('stock_levels')
-      .select('total_in')
-      .eq('location_id', DEMO_LOCATIONS.WH_NORTH)
-      .eq('commodity_id', DEMO_COMMODITIES.WHEAT);
-
-    const totalInBefore = before?.[0] ? Number(before[0].total_in) : 0;
-
-    // ACT: create a received purchase with 50 units
+    // ACT: create a received purchase with 50 units for the isolated commodity
     await createTestPurchase(SCHEMA, {
-      locationId: DEMO_LOCATIONS.WH_NORTH,
-      commodityId: DEMO_COMMODITIES.WHEAT,
+      locationId: TW_LOCATIONS.LOC1,
+      commodityId: isolatedCommodity.id,
       unitId: unit.id,
       quantity: 50,
       status: 'received',
     });
 
-    // ASSERT: total_in increased by 50
+    // ASSERT: total_in equals exactly 50 (baseline is 0 — no other test uses this commodity)
     const { data: after } = await client
       .from('stock_levels')
       .select('total_in')
-      .eq('location_id', DEMO_LOCATIONS.WH_NORTH)
-      .eq('commodity_id', DEMO_COMMODITIES.WHEAT);
+      .eq('location_id', TW_LOCATIONS.LOC1)
+      .eq('commodity_id', isolatedCommodity.id);
 
     const totalInAfter = after?.[0] ? Number(after[0].total_in) : 0;
-    expect(totalInAfter).toBe(totalInBefore + 50);
+    expect(totalInAfter).toBe(50);
   });
 
   it('[MEDIUM] draft purchase does NOT appear in total_in (only received purchases count)', async () => {
-    // ARRANGE: snapshot total_in before
+    // ARRANGE: use a freshly-created commodity so the baseline is definitively 0 and
+    // no concurrent test can interfere (parallel workers may insert received purchases
+    // at shared LOC+COMM slots which would make a snapshot-based assertion flaky).
     const client = tenantClient(SCHEMA);
     const unit = await getDefaultUnit(SCHEMA);
+    const isolatedCommodity = await createTestCommodity(SCHEMA, {
+      name: `Draft-Test Commodity ${Date.now()}`,
+      code: `DTC-${Date.now()}`,
+    });
 
-    const { data: before } = await client
-      .from('stock_levels')
-      .select('total_in')
-      .eq('location_id', DEMO_LOCATIONS.WH_NORTH)
-      .eq('commodity_id', DEMO_COMMODITIES.RICE);
-
-    const totalInBefore = before?.[0] ? Number(before[0].total_in) : 0;
-
-    // ACT: create a DRAFT purchase (not received)
+    // ACT: create a DRAFT purchase (not received) for the isolated commodity
     await createTestPurchase(SCHEMA, {
-      locationId: DEMO_LOCATIONS.WH_NORTH,
-      commodityId: DEMO_COMMODITIES.RICE,
+      locationId: TW_LOCATIONS.LOC1,
+      commodityId: isolatedCommodity.id,
       unitId: unit.id,
       quantity: 100,
       status: 'draft',
     });
 
-    // ASSERT: total_in unchanged (draft purchases excluded from VIEW)
+    // ASSERT: total_in is still 0 (draft purchases excluded from VIEW).
+    // Because no other test uses this brand-new commodity, the baseline is always 0.
     const { data: after } = await client
       .from('stock_levels')
       .select('total_in')
-      .eq('location_id', DEMO_LOCATIONS.WH_NORTH)
-      .eq('commodity_id', DEMO_COMMODITIES.RICE);
+      .eq('location_id', TW_LOCATIONS.LOC1)
+      .eq('commodity_id', isolatedCommodity.id);
 
     const totalInAfter = after?.[0] ? Number(after[0].total_in) : 0;
 
     // GAP [MEDIUM]: verify the VIEW's WHERE clause for purchases.status
     // If the VIEW counts all purchases (not just received), this will fail.
     // Expected: draft purchases should NOT count toward total_in.
-    expect(totalInAfter).toBe(totalInBefore);
+    expect(totalInAfter).toBe(0);
   });
 });
 
 describe('stock_levels: impact of dispatch creation', () => {
   it('received dispatch increases total_in at dest_location', async () => {
-    // ARRANGE: snapshot total_in at YD_SOUTH for WHEAT before
+    // ARRANGE: use an isolated commodity so the baseline is always 0 — avoids concurrent
+    // worker interference on shared (location_id, commodity_id) slots in the VIEW.
     const client = tenantClient(SCHEMA);
     const unit = await getDefaultUnit(SCHEMA);
+    const isolatedCommodity = await createTestCommodity(SCHEMA, {
+      name: `ReceivedDispatch Commodity ${Date.now()}`,
+      code: `RDC-${Date.now()}`,
+    });
 
-    const { data: before } = await client
-      .from('stock_levels')
-      .select('total_in')
-      .eq('location_id', DEMO_LOCATIONS.YD_SOUTH)
-      .eq('commodity_id', DEMO_COMMODITIES.WHEAT);
-
-    const totalInBefore = before?.[0] ? Number(before[0].total_in) : 0;
-
-    // ACT: create a received dispatch from WH_NORTH to YD_SOUTH
+    // ACT: create a received dispatch from LOC1 to LOC2 for the isolated commodity
     await createTestDispatch(SCHEMA, {
-      originLocationId: DEMO_LOCATIONS.WH_NORTH,
-      destLocationId: DEMO_LOCATIONS.YD_SOUTH,
-      commodityId: DEMO_COMMODITIES.WHEAT,
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: isolatedCommodity.id,
       unitId: unit.id,
       sentQuantity: 30,
       status: 'received',
     });
 
-    // ASSERT: total_in at YD_SOUTH increased
+    // ASSERT: total_in at LOC2 is exactly 30 (isolated commodity guarantees zero baseline)
     const { data: after } = await client
       .from('stock_levels')
       .select('total_in')
-      .eq('location_id', DEMO_LOCATIONS.YD_SOUTH)
-      .eq('commodity_id', DEMO_COMMODITIES.WHEAT);
+      .eq('location_id', TW_LOCATIONS.LOC2)
+      .eq('commodity_id', isolatedCommodity.id);
 
     const totalInAfter = after?.[0] ? Number(after[0].total_in) : 0;
-    expect(totalInAfter).toBeGreaterThanOrEqual(totalInBefore + 30);
+    expect(totalInAfter).toBe(30);
   });
 
   it('in_transit dispatch appears in in_transit column at dest_location', async () => {
-    // ARRANGE: snapshot in_transit at YD_SOUTH before
+    // ARRANGE: the stock_levels VIEW uses FULL JOIN(inbound, outbound) LEFT JOIN in_transit.
+    // A commodity+location pair only appears in the view if it has inbound OR outbound data.
+    // To make the in_transit value visible at LOC2+COMM2, first create a received purchase
+    // at LOC2 to establish the LOC2+COMM2 base row, then create the in_transit dispatch.
     const client = tenantClient(SCHEMA);
     const unit = await getDefaultUnit(SCHEMA);
+
+    // Seed: received purchase at LOC2 so LOC2+COMM2 row exists in the view
+    await createTestPurchase(SCHEMA, {
+      locationId: TW_LOCATIONS.LOC2,
+      commodityId: TW_COMMODITIES.COMM2,
+      unitId: unit.id,
+      quantity: 1,
+      status: 'received',
+    });
 
     const { data: before } = await client
       .from('stock_levels')
       .select('in_transit')
-      .eq('location_id', DEMO_LOCATIONS.YD_SOUTH)
-      .eq('commodity_id', DEMO_COMMODITIES.CORN);
+      .eq('location_id', TW_LOCATIONS.LOC2)
+      .eq('commodity_id', TW_COMMODITIES.COMM2);
 
     const inTransitBefore = before?.[0] ? Number(before[0].in_transit) : 0;
 
-    // ACT: create an in_transit dispatch
+    // ACT: create an in_transit dispatch from LOC1 to LOC2
     await createTestDispatch(SCHEMA, {
-      originLocationId: DEMO_LOCATIONS.WH_NORTH,
-      destLocationId: DEMO_LOCATIONS.YD_SOUTH,
-      commodityId: DEMO_COMMODITIES.CORN,
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: TW_COMMODITIES.COMM2,
       unitId: unit.id,
       sentQuantity: 20,
       status: 'in_transit',
@@ -290,8 +295,8 @@ describe('stock_levels: impact of dispatch creation', () => {
     const { data: after } = await client
       .from('stock_levels')
       .select('in_transit')
-      .eq('location_id', DEMO_LOCATIONS.YD_SOUTH)
-      .eq('commodity_id', DEMO_COMMODITIES.CORN);
+      .eq('location_id', TW_LOCATIONS.LOC2)
+      .eq('commodity_id', TW_COMMODITIES.COMM2);
 
     const inTransitAfter = after?.[0] ? Number(after[0].in_transit) : 0;
     expect(inTransitAfter).toBeGreaterThanOrEqual(inTransitBefore + 20);
@@ -300,36 +305,33 @@ describe('stock_levels: impact of dispatch creation', () => {
 
 describe('stock_levels: impact of sale creation', () => {
   it('dispatched sale increases total_out at origin location', async () => {
-    // ARRANGE: snapshot total_out at WH_NORTH before
+    // ARRANGE: use a fresh isolated commodity so concurrent worker cleanup cannot
+    // lower the before-baseline (parallel files share LOC1+COMM2 for sale tests).
     const client = tenantClient(SCHEMA);
     const unit = await getDefaultUnit(SCHEMA);
+    const isolatedCommodity = await createTestCommodity(SCHEMA, {
+      name: `DispatchedSale Commodity ${Date.now()}`,
+      code: `DSC-${Date.now()}`,
+    });
 
-    const { data: before } = await client
-      .from('stock_levels')
-      .select('total_out')
-      .eq('location_id', DEMO_LOCATIONS.WH_NORTH)
-      .eq('commodity_id', DEMO_COMMODITIES.RICE);
-
-    const totalOutBefore = before?.[0] ? Number(before[0].total_out) : 0;
-
-    // ACT: create a dispatched sale
+    // ACT: create a dispatched sale for the isolated commodity
     await createTestSale(SCHEMA, {
-      locationId: DEMO_LOCATIONS.WH_NORTH,
-      commodityId: DEMO_COMMODITIES.RICE,
+      locationId: TW_LOCATIONS.LOC1,
+      commodityId: isolatedCommodity.id,
       unitId: unit.id,
       quantity: 25,
       status: 'dispatched',
     });
 
-    // ASSERT: total_out increased at WH_NORTH
+    // ASSERT: total_out equals exactly 25 (baseline is 0 — no other test uses this commodity)
     const { data: after } = await client
       .from('stock_levels')
       .select('total_out')
-      .eq('location_id', DEMO_LOCATIONS.WH_NORTH)
-      .eq('commodity_id', DEMO_COMMODITIES.RICE);
+      .eq('location_id', TW_LOCATIONS.LOC1)
+      .eq('commodity_id', isolatedCommodity.id);
 
     const totalOutAfter = after?.[0] ? Number(after[0].total_out) : 0;
-    expect(totalOutAfter).toBeGreaterThanOrEqual(totalOutBefore + 25);
+    expect(totalOutAfter).toBe(25);
   });
 });
 
@@ -559,7 +561,7 @@ describe('units: table structure and defaults', () => {
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('inventory API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('inventory API: HTTP contract (requires dev server + auth)', () => {
   it('GET /api/t/[slug]/inventory returns stock_levels for authenticated user', async () => {
     expect(true).toBe(true);
   });

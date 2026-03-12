@@ -20,7 +20,7 @@ interface BarcodeScannerInputProps {
 export function BarcodeScannerInput({
   value,
   onChange,
-  placeholder = 'Commodity code',
+  placeholder = 'Item code',
   className,
 }: BarcodeScannerInputProps) {
   const fileRef = useRef<HTMLInputElement>(null);

@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
 });
 
 interface SaleItem {
-  commodity: { name: string; code: string } | null;
+  commodity: { name: string; code: string; hsn_code?: string | null; tax_rate?: number | null } | null;
   unit: { name: string; abbreviation: string } | null;
   quantity: number;
   unit_price?: number | null;
@@ -101,22 +101,34 @@ export function DeliveryNoteDocument({ data, config }: Props) {
     year: 'numeric',
   });
 
-  const rows = data.sale_items.map((item) => [
-    item.commodity?.name ?? '',
-    item.commodity?.code ?? '',
-    item.quantity,
-    item.unit?.abbreviation ?? '',
-    item.bags ?? '-',
-    item.unit_price != null ? `₹${Number(item.unit_price).toFixed(2)}` : '-',
-    item.unit_price != null
-      ? `₹${(Number(item.unit_price) * Number(item.quantity)).toFixed(2)}`
-      : '-',
-  ]);
+  const rows = data.sale_items.map((item) => {
+    const amount = item.unit_price != null ? Number(item.unit_price) * Number(item.quantity) : 0;
+    const taxRate = item.commodity?.tax_rate ?? 0;
+    const taxAmount = amount * (taxRate / 100);
+    return [
+      item.commodity?.name ?? '',
+      item.commodity?.hsn_code ?? '-',
+      item.quantity,
+      item.unit?.abbreviation ?? '',
+      item.bags ?? '-',
+      item.unit_price != null ? `₹${Number(item.unit_price).toFixed(2)}` : '-',
+      item.unit_price != null ? `₹${amount.toFixed(2)}` : '-',
+      taxRate > 0 ? `${taxRate}%` : '-',
+      taxAmount > 0 ? `₹${taxAmount.toFixed(2)}` : '-',
+    ];
+  });
 
-  const total = data.sale_items.reduce(
+  const subtotal = data.sale_items.reduce(
     (sum, i) => sum + (i.unit_price != null ? Number(i.unit_price) * Number(i.quantity) : 0),
     0
   );
+
+  const totalTax = data.sale_items.reduce((sum, i) => {
+    const amount = i.unit_price != null ? Number(i.unit_price) * Number(i.quantity) : 0;
+    return sum + amount * ((i.commodity?.tax_rate ?? 0) / 100);
+  }, 0);
+
+  const grandTotal = subtotal + totalTax;
 
   return (
     <Document>
@@ -147,21 +159,35 @@ export function DeliveryNoteDocument({ data, config }: Props) {
 
         <PdfTable
           columns={[
-            { label: 'Commodity', width: '22%' },
-            { label: 'Code', width: '12%' },
-            { label: 'Qty', width: '8%', align: 'right' },
-            { label: 'Unit', width: '8%' },
-            { label: 'Bags', width: '8%', align: 'right' },
-            { label: 'Unit Price', width: '14%', align: 'right' },
-            { label: 'Amount', width: '14%', align: 'right' },
+            { label: 'Item', width: '18%' },
+            { label: 'HSN', width: '8%' },
+            { label: 'Qty', width: '7%', align: 'right' },
+            { label: 'Unit', width: '6%' },
+            { label: 'Bags', width: '6%', align: 'right' },
+            { label: 'Rate', width: '12%', align: 'right' },
+            { label: 'Amount', width: '13%', align: 'right' },
+            { label: 'GST', width: '6%', align: 'right' },
+            { label: 'Tax', width: '10%', align: 'right' },
           ]}
           rows={rows}
         />
 
-        {total > 0 && (
-          <View style={styles.total}>
-            <Text style={styles.totalLabel}>Total:</Text>
-            <Text style={styles.totalValue}>₹{total.toFixed(2)}</Text>
+        {subtotal > 0 && (
+          <View style={{ marginTop: 8, alignItems: 'flex-end' }}>
+            <View style={styles.total}>
+              <Text style={styles.totalLabel}>Subtotal:</Text>
+              <Text style={styles.totalValue}>₹{subtotal.toFixed(2)}</Text>
+            </View>
+            {totalTax > 0 && (
+              <View style={styles.total}>
+                <Text style={styles.totalLabel}>Tax:</Text>
+                <Text style={styles.totalValue}>₹{totalTax.toFixed(2)}</Text>
+              </View>
+            )}
+            <View style={styles.total}>
+              <Text style={styles.totalLabel}>Grand Total:</Text>
+              <Text style={styles.totalValue}>₹{grandTotal.toFixed(2)}</Text>
+            </View>
           </View>
         )}
 

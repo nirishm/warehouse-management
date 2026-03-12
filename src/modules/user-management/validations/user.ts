@@ -36,7 +36,7 @@ export const PERMISSION_LABELS: Record<keyof Permissions, string> = {
   canSale: 'Sale',
   canViewStock: 'View Stock',
   canManageLocations: 'Manage Locations',
-  canManageCommodities: 'Manage Commodities',
+  canManageCommodities: 'Manage Items',
   canManageContacts: 'Manage Contacts',
   canViewAnalytics: 'View Analytics',
   canExportData: 'Export Data',

@@ -8,6 +8,6 @@ export const saleManifest: ModuleManifest = {
   dependencies: ['inventory'],
   permissions: ['canSale'],
   navItems: [
-    { label: 'Sales', href: 'sales', icon: 'Receipt', permission: 'canSale' },
+    { label: 'Sales', href: 'sales', icon: 'Receipt', permission: 'canSale', group: 'operations' },
   ],
 };

@@ -7,12 +7,13 @@ import { describe, it, expect, afterEach } from 'vitest';
 import {
   tenantClient,
   TEST_TENANT,
-  DEMO_LOCATIONS,
-  DEMO_COMMODITIES,
-  DEMO_DISPATCHES,
+  TW_LOCATIONS,
+  TW_COMMODITIES,
 } from '../setup/test-env';
 import {
   createTestDispatch,
+  createTestCommodity,
+  createTestPurchase,
   getDefaultUnit,
   runCleanup,
 } from '../setup/seed-factories';
@@ -27,25 +28,28 @@ afterEach(async () => {
 // Dispatch: read existing data
 // ---------------------------------------------------------------------------
 describe('dispatches: read operations', () => {
-  it('demo tenant has 6 seeded dispatches with correct statuses', async () => {
+  it('test-warehouse has dispatches', async () => {
     const client = tenantClient(SCHEMA);
     const { data, error } = await client
       .from('dispatches')
       .select('id, dispatch_number, status');
 
     expect(error).toBeNull();
-    expect(data!.length).toBe(6);
-
-    const statusMap = Object.fromEntries(data!.map((d) => [d.dispatch_number, d.status]));
-    expect(statusMap['DSP-000001']).toBe('received');
-    expect(statusMap['DSP-000002']).toBe('in_transit');
-    expect(statusMap['DSP-000003']).toBe('dispatched');
-    expect(statusMap['DSP-000004']).toBe('draft');
-    expect(statusMap['DSP-000005']).toBe('received');
-    expect(statusMap['DSP-000006']).toBe('cancelled');
+    expect(data!.length).toBeGreaterThanOrEqual(1);
   });
 
   it('can fetch dispatch with items using JOIN', async () => {
+    // ARRANGE: create a dispatch via factory
+    const unit = await getDefaultUnit(SCHEMA);
+    const dispatch = await createTestDispatch(SCHEMA, {
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: TW_COMMODITIES.COMM1,
+      unitId: unit.id,
+      sentQuantity: 50,
+      status: 'dispatched',
+    });
+
     const client = tenantClient(SCHEMA);
     const { data, error } = await client
       .from('dispatches')
@@ -55,12 +59,13 @@ describe('dispatches: read operations', () => {
           id, commodity_id, sent_quantity, received_quantity, shortage, shortage_percent
         )
       `)
-      .eq('id', DEMO_DISPATCHES.DSP_001)
+      .eq('id', dispatch.id)
       .single();
 
     expect(error).toBeNull();
-    expect(data!.status).toBe('received');
+    expect(data!.status).toBe('dispatched');
     expect(Array.isArray(data!.items)).toBe(true);
+    expect(data!.items.length).toBeGreaterThan(0);
   });
 
   it('can filter dispatches by status', async () => {
@@ -86,9 +91,9 @@ describe('dispatches: create operations', () => {
     const unit = await getDefaultUnit(SCHEMA);
 
     const dispatch = await createTestDispatch(SCHEMA, {
-      originLocationId: DEMO_LOCATIONS.WH_NORTH,
-      destLocationId: DEMO_LOCATIONS.YD_SOUTH,
-      commodityId: DEMO_COMMODITIES.WHEAT,
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: TW_COMMODITIES.COMM1,
       unitId: unit.id,
       sentQuantity: 50,
       status: 'draft',
@@ -99,17 +104,30 @@ describe('dispatches: create operations', () => {
   });
 
   it('dispatch_number must be unique (duplicate rejected)', async () => {
+    // ARRANGE: create a dispatch first to have an existing number
     const client = tenantClient(SCHEMA);
+    const unit = await getDefaultUnit(SCHEMA);
+    const dispatch = await createTestDispatch(SCHEMA, {
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: TW_COMMODITIES.COMM1,
+      unitId: unit.id,
+      sentQuantity: 10,
+      status: 'draft',
+    });
+
+    // ACT: try to insert another with the same dispatch_number
     const { error } = await client
       .from('dispatches')
       .insert({
-        dispatch_number: 'DSP-000001', // existing
-        origin_location_id: DEMO_LOCATIONS.WH_NORTH,
-        dest_location_id: DEMO_LOCATIONS.YD_SOUTH,
+        dispatch_number: dispatch.dispatch_number, // duplicate!
+        origin_location_id: TW_LOCATIONS.LOC1,
+        dest_location_id: TW_LOCATIONS.LOC2,
         status: 'draft',
         dispatched_by: '00000000-0000-0000-0000-000000000099',
       });
 
+    // ASSERT: unique constraint violation
     expect(error).not.toBeNull();
     expect(error!.message).toMatch(/unique|duplicate/i);
   });
@@ -120,8 +138,8 @@ describe('dispatches: create operations', () => {
       .from('dispatches')
       .insert({
         dispatch_number: `DSP-SAME-${Date.now()}`,
-        origin_location_id: DEMO_LOCATIONS.WH_NORTH,
-        dest_location_id: DEMO_LOCATIONS.WH_NORTH, // same!
+        origin_location_id: TW_LOCATIONS.LOC1,
+        dest_location_id: TW_LOCATIONS.LOC1, // same!
         status: 'draft',
         dispatched_by: '00000000-0000-0000-0000-000000000099',
       });
@@ -140,9 +158,9 @@ describe('dispatches: status transitions', () => {
     const unit = await getDefaultUnit(SCHEMA);
 
     const dispatch = await createTestDispatch(SCHEMA, {
-      originLocationId: DEMO_LOCATIONS.WH_NORTH,
-      destLocationId: DEMO_LOCATIONS.YD_SOUTH,
-      commodityId: DEMO_COMMODITIES.WHEAT,
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: TW_COMMODITIES.COMM1,
       unitId: unit.id,
       sentQuantity: 25,
       status: 'draft',
@@ -160,30 +178,47 @@ describe('dispatches: status transitions', () => {
   });
 
   it('dispatch can transition from dispatched → in_transit', async () => {
+    // ARRANGE: create a dispatched dispatch via factory
     const client = tenantClient(SCHEMA);
+    const unit = await getDefaultUnit(SCHEMA);
+
+    const dispatch = await createTestDispatch(SCHEMA, {
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: TW_COMMODITIES.COMM1,
+      unitId: unit.id,
+      sentQuantity: 30,
+      status: 'dispatched',
+    });
+
     const { data, error } = await client
       .from('dispatches')
       .update({ status: 'in_transit' })
-      .eq('id', DEMO_DISPATCHES.DSP_003)
+      .eq('id', dispatch.id)
       .select('status')
       .single();
 
     expect(error).toBeNull();
     expect(data!.status).toBe('in_transit');
-
-    // Restore original status
-    await client
-      .from('dispatches')
-      .update({ status: 'dispatched' })
-      .eq('id', DEMO_DISPATCHES.DSP_003);
   });
 
   it('invalid status transition is rejected by CHECK constraint', async () => {
+    // ARRANGE: create a draft dispatch via factory
+    const unit = await getDefaultUnit(SCHEMA);
+    const dispatch = await createTestDispatch(SCHEMA, {
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: TW_COMMODITIES.COMM1,
+      unitId: unit.id,
+      sentQuantity: 20,
+      status: 'draft',
+    });
+
     const client = tenantClient(SCHEMA);
     const { error } = await client
       .from('dispatches')
       .update({ status: 'completed' }) // invalid
-      .eq('id', DEMO_DISPATCHES.DSP_004);
+      .eq('id', dispatch.id);
 
     expect(error).not.toBeNull();
     expect(error!.message).toMatch(/check|violates/i);
@@ -200,9 +235,9 @@ describe('dispatches: receive flow', () => {
     const unit = await getDefaultUnit(SCHEMA);
 
     const dispatch = await createTestDispatch(SCHEMA, {
-      originLocationId: DEMO_LOCATIONS.WH_NORTH,
-      destLocationId: DEMO_LOCATIONS.YD_SOUTH,
-      commodityId: DEMO_COMMODITIES.WHEAT,
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: TW_COMMODITIES.COMM1,
       unitId: unit.id,
       sentQuantity: 100,
       status: 'dispatched',
@@ -237,9 +272,9 @@ describe('dispatches: receive flow', () => {
     const unit = await getDefaultUnit(SCHEMA);
 
     const dispatch = await createTestDispatch(SCHEMA, {
-      originLocationId: DEMO_LOCATIONS.WH_NORTH,
-      destLocationId: DEMO_LOCATIONS.YD_SOUTH,
-      commodityId: DEMO_COMMODITIES.WHEAT,
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: TW_COMMODITIES.COMM1,
       unitId: unit.id,
       sentQuantity: 50,
       status: 'dispatched',
@@ -260,9 +295,9 @@ describe('dispatches: receive flow', () => {
     const unit = await getDefaultUnit(SCHEMA);
 
     const dispatch = await createTestDispatch(SCHEMA, {
-      originLocationId: DEMO_LOCATIONS.WH_NORTH,
-      destLocationId: DEMO_LOCATIONS.YD_SOUTH,
-      commodityId: DEMO_COMMODITIES.WHEAT,
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: TW_COMMODITIES.COMM1,
       unitId: unit.id,
       sentQuantity: 100,
       status: 'dispatched',
@@ -305,29 +340,55 @@ describe('dispatches: impact on stock_levels view', () => {
   });
 
   it('in_transit dispatches appear in in_transit column but not total_in', async () => {
-    // DSP-000002 is in_transit — should NOT add to total_in at dest, only in_transit
+    // ARRANGE: the stock_levels VIEW only generates a row for a (location, commodity) pair
+    // when at least one received purchase or confirmed/dispatched sale exists. Seed a minimal
+    // received purchase at LOC2 to create the VIEW row, then create the in_transit dispatch.
+    // Using an isolated commodity ensures zero interference from concurrent test workers.
     const client = tenantClient(SCHEMA);
-    const { data: dispatch } = await client
-      .from('dispatches')
-      .select('dest_location_id, id')
-      .eq('id', DEMO_DISPATCHES.DSP_002)
-      .single();
+    const unit = await getDefaultUnit(SCHEMA);
+    const isolatedCommodity = await createTestCommodity(SCHEMA, {
+      name: `InTransit Commodity ${Date.now()}`,
+      code: `ITC-${Date.now()}`,
+    });
 
-    const { data: stockRows } = await client
+    // Seed: received purchase at LOC2 to establish VIEW row for the isolated commodity
+    await createTestPurchase(SCHEMA, {
+      locationId: TW_LOCATIONS.LOC2,
+      commodityId: isolatedCommodity.id,
+      unitId: unit.id,
+      quantity: 5,
+      status: 'received',
+    });
+
+    // ACT: create an in_transit dispatch from LOC1 to LOC2
+    await createTestDispatch(SCHEMA, {
+      originLocationId: TW_LOCATIONS.LOC1,
+      destLocationId: TW_LOCATIONS.LOC2,
+      commodityId: isolatedCommodity.id,
+      unitId: unit.id,
+      sentQuantity: 40,
+      status: 'in_transit',
+    });
+
+    // ASSERT: in_transit == 40; total_in == 5 (seed only — in_transit does NOT count toward total_in)
+    const { data: after } = await client
       .from('stock_levels')
-      .select('in_transit, total_in, location_id')
-      .eq('location_id', dispatch!.dest_location_id);
+      .select('in_transit, total_in')
+      .eq('location_id', TW_LOCATIONS.LOC2)
+      .eq('commodity_id', isolatedCommodity.id);
 
-    // There should be in_transit > 0 for at least one commodity at this dest location
-    const hasInTransit = (stockRows ?? []).some((r) => Number(r.in_transit) > 0);
-    expect(hasInTransit).toBe(true);
+    const inTransitAfter = after?.[0] ? Number(after[0].in_transit) : 0;
+    const totalInAfter = after?.[0] ? Number(after[0].total_in) : 0;
+
+    expect(inTransitAfter).toBe(40);
+    expect(totalInAfter).toBe(5); // total_in unchanged by in_transit dispatch
   });
 });
 
 // ---------------------------------------------------------------------------
 // API-layer tests (require running dev server)
 // ---------------------------------------------------------------------------
-describe.skip('dispatches API: HTTP contract (requires dev server + auth)', () => {
+describe.skipIf(!process.env.INTEGRATION)('dispatches API: HTTP contract (requires dev server + auth)', () => {
   it('POST /dispatches with same origin/dest returns 400', async () => {
     expect(true).toBe(true);
   });

@@ -11,7 +11,7 @@ export async function getFIFOLotsForAllocation(
   schemaName: string,
   commodityId: string
 ): Promise<LotStockLevel[]> {
-  if (!UUID_RE.test(commodityId)) throw new Error('Invalid commodity ID');
+  if (!UUID_RE.test(commodityId)) throw new Error('Invalid item ID');
   const adminClient = createAdminClient();
   const { data, error } = await adminClient.rpc('exec_sql', {
     query: `

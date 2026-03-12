@@ -8,9 +8,9 @@ export const inventoryManifest: ModuleManifest = {
   dependencies: [],
   permissions: ['canViewStock', 'canManageLocations', 'canManageCommodities', 'canManageContacts'],
   navItems: [
-    { label: 'Stock Levels', href: 'inventory', icon: 'Package', permission: 'canViewStock' },
-    { label: 'Locations', href: 'settings/locations', icon: 'MapPin', permission: 'canManageLocations' },
-    { label: 'Commodities', href: 'settings/commodities', icon: 'Wheat', permission: 'canManageCommodities' },
-    { label: 'Contacts', href: 'settings/contacts', icon: 'Users', permission: 'canManageContacts' },
+    { label: 'Stock Levels', href: 'inventory', icon: 'Package', permission: 'canViewStock', group: 'inventory' },
+    { label: 'Locations', href: 'settings/locations', icon: 'MapPin', permission: 'canManageLocations', group: 'settings' },
+    { label: 'Items', href: 'settings/commodities', icon: 'Wheat', permission: 'canManageCommodities', group: 'settings' },
+    { label: 'Contacts', href: 'settings/contacts', icon: 'Users', permission: 'canManageContacts', group: 'settings' },
   ],
 };

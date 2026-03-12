@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { requirePageAccess } from '@/core/auth/page-guard';
+import { getTenantBySlug } from '@/core/auth/session';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { getPurchaseById } from '@/modules/purchase/queries/purchases';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,16 +43,10 @@ function formatDate(dateStr: string): string {
 export default async function PurchaseDetailPage({ params }: Props) {
   const { tenantSlug, id } = await params;
   await requirePageAccess({ tenantSlug, moduleId: 'purchase', permission: 'canPurchase' });
-  const supabase = await createServerSupabaseClient();
-
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('schema_name, enabled_modules')
-    .eq('slug', tenantSlug)
-    .single();
-
+  const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
+  const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
   const tenantClient = createTenantClient(tenant.schema_name);
   const { data: profile } = user
@@ -192,7 +187,7 @@ export default async function PurchaseDetailPage({ params }: Props) {
             <TableHeader>
               <TableRow className="border-border hover:bg-transparent">
                 <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground pl-6">
-                  Commodity
+                  Item
                 </TableHead>
                 <TableHead className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   Unit

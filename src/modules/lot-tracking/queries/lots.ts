@@ -47,8 +47,49 @@ export async function listLots(schemaName: string): Promise<LotWithDetails[]> {
 }
 
 export async function getLot(schemaName: string, id: string): Promise<LotWithDetails | null> {
-  const lots = await listLots(schemaName);
-  return lots.find((l) => l.id === id) ?? null;
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient.rpc('exec_sql', {
+    query: `
+      SELECT
+        l.id, l.lot_number, l.commodity_id, l.source_purchase_id,
+        l.received_date, l.expiry_date, l.initial_quantity, l.unit_id,
+        l.notes, l.created_at, l.updated_at,
+        c.name AS commodity_name, c.code AS commodity_code,
+        u.name AS unit_name, u.abbreviation AS unit_abbreviation,
+        COALESCE(sl.current_quantity, l.initial_quantity) AS current_quantity
+      FROM "${schemaName}".lots l
+      LEFT JOIN "${schemaName}".commodities c ON c.id = l.commodity_id
+      LEFT JOIN "${schemaName}".units u ON u.id = l.unit_id
+      LEFT JOIN "${schemaName}".lot_stock_levels sl ON sl.lot_id = l.id
+      WHERE l.id = '${id}' AND l.deleted_at IS NULL
+      LIMIT 1
+    `,
+  });
+  if (error) throw new Error(`Failed to get lot: ${error.message}`);
+  const rows = data as Record<string, unknown>[] | null;
+  if (!rows || rows.length === 0) return null;
+  const row = rows[0];
+  return {
+    id: row.id as string,
+    lot_number: row.lot_number as string,
+    commodity_id: row.commodity_id as string,
+    source_purchase_id: (row.source_purchase_id as string) ?? null,
+    received_date: row.received_date as string,
+    expiry_date: (row.expiry_date as string) ?? null,
+    initial_quantity: Number(row.initial_quantity),
+    unit_id: row.unit_id as string,
+    notes: (row.notes as string) ?? null,
+    created_at: row.created_at as string,
+    updated_at: row.updated_at as string,
+    deleted_at: null,
+    commodity: row.commodity_name
+      ? { id: row.commodity_id as string, name: row.commodity_name as string, code: row.commodity_code as string }
+      : null,
+    unit: row.unit_name
+      ? { id: row.unit_id as string, name: row.unit_name as string, abbreviation: (row.unit_abbreviation as string) ?? null }
+      : null,
+    current_quantity: Number(row.current_quantity ?? row.initial_quantity),
+  };
 }
 
 export async function createLot(

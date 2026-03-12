@@ -2,15 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withTenantContext, requireModule, requirePermission, requireLocationAccess } from '@/core/auth/guards';
 import { listReturns, createReturn } from '@/modules/returns/queries/returns';
 import { createReturnSchema } from '@/modules/returns/validations/return';
-import { createAuditEntry } from '@/modules/audit-trail/queries/audit-log';
+import { parsePagination } from '@/lib/pagination';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
     requireModule(ctx, 'returns');
     requirePermission(ctx, 'canManageReturns');
 
-    const returns = await listReturns(ctx.schemaName, { allowedLocationIds: ctx.allowedLocationIds });
-    return NextResponse.json({ data: returns });
+    const pagination = parsePagination(request.nextUrl.searchParams);
+    const result = await listReturns(ctx.schemaName, {
+      allowedLocationIds: ctx.allowedLocationIds,
+      pagination,
+    });
+    return NextResponse.json(result);
   });
 }
 
@@ -35,15 +39,6 @@ export async function POST(request: NextRequest) {
     }
 
     const ret = await createReturn(ctx.schemaName, parsed.data, ctx.userId);
-
-    createAuditEntry(ctx.schemaName, {
-      user_id: ctx.userId,
-      user_name: ctx.userName,
-      action: 'create',
-      entity_type: 'return',
-      entity_id: ret.id,
-      new_data: ret as unknown as Record<string, unknown>,
-    }).catch((e) => console.error('Audit log error:', e));
 
     return NextResponse.json({ data: ret }, { status: 201 });
   });

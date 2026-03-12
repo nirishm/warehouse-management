@@ -14,6 +14,7 @@ import { lotTrackingManifest } from './lot-tracking/manifest';
 import { returnsManifest } from './returns/manifest';
 import { bulkImportManifest } from './bulk-import/manifest';
 import { barcodeManifest } from './barcode/manifest';
+import { adjustmentsManifest } from './adjustments/manifest';
 
 // Register all modules
 moduleRegistry.register(inventoryManifest);
@@ -31,6 +32,7 @@ moduleRegistry.register(lotTrackingManifest);
 moduleRegistry.register(returnsManifest);
 moduleRegistry.register(bulkImportManifest);
 moduleRegistry.register(barcodeManifest);
+moduleRegistry.register(adjustmentsManifest);
 
 export {
   inventoryManifest,
@@ -48,4 +50,5 @@ export {
   returnsManifest,
   bulkImportManifest,
   barcodeManifest,
+  adjustmentsManifest,
 };
