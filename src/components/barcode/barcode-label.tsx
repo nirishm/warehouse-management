@@ -1,6 +1,7 @@
 'use client';
 
-import QRCode from 'react-qr-code';
+import QRCode from 'qrcode';
+import { useEffect, useState } from 'react';
 
 interface BarcodeLabelProps {
   commodityCode: string;
@@ -13,15 +14,31 @@ export function BarcodeLabel({
   commodityName,
   size = 96,
 }: BarcodeLabelProps) {
+  const [dataUrl, setDataUrl] = useState<string>('');
+
+  useEffect(() => {
+    QRCode.toDataURL(commodityCode, {
+      width: size,
+      margin: 1,
+      color: {
+        dark: '#000000',
+        light: '#ffffff',
+      },
+      errorCorrectionLevel: 'M',
+    }).then(setDataUrl).catch(() => setDataUrl(''));
+  }, [commodityCode, size]);
+
   return (
     <div className="flex flex-col items-center gap-1.5 p-3 border border-zinc-300 rounded bg-white print:border-black">
-      <QRCode
-        value={commodityCode}
-        size={size}
-        bgColor="#ffffff"
-        fgColor="#000000"
-        level="M"
-      />
+      {dataUrl && (
+        <img
+          src={dataUrl}
+          alt={`QR code for ${commodityCode}`}
+          width={size}
+          height={size}
+          style={{ imageRendering: 'pixelated' }}
+        />
+      )}
       <p className="text-xs font-mono font-bold text-black leading-tight text-center">
         {commodityCode}
       </p>
