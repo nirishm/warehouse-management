@@ -1,17 +1,17 @@
 import { createAdminClient } from '@/lib/supabase/admin';
+import { validateSchemaName, validateUUID } from '@/core/db/validate-schema';
 import type { LotStockLevel } from '../validations/lot';
 
 /**
  * Returns available lots for a commodity+location in FIFO order (oldest first).
  * Used by dispatch and sale forms to suggest which lots to consume from.
  */
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 export async function getFIFOLotsForAllocation(
   schemaName: string,
   commodityId: string
 ): Promise<LotStockLevel[]> {
-  if (!UUID_RE.test(commodityId)) throw new Error('Invalid item ID');
+  validateSchemaName(schemaName);
+  validateUUID(commodityId, 'commodity ID');
   const adminClient = createAdminClient();
   const { data, error } = await adminClient.rpc('exec_sql', {
     query: `

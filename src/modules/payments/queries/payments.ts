@@ -1,5 +1,6 @@
 import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { validateSchemaName, validateUUID } from '@/core/db/validate-schema';
 import type { CreatePaymentInput, Payment, TransactionBalance } from '../validations/payment';
 
 export async function listPayments(schemaName: string): Promise<Payment[]> {
@@ -80,6 +81,8 @@ export async function getBalance(
   transactionType: 'purchase' | 'sale',
   transactionId: string
 ): Promise<TransactionBalance> {
+  validateSchemaName(schemaName);
+  validateUUID(transactionId, 'transaction ID');
   const adminClient = createAdminClient();
 
   // Compute total_value from items
