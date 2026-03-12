@@ -8,6 +8,7 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import type { TenantContext, Permission } from '@/core/auth/types';
+import { getAdminPermissions } from '@/core/auth/permissions';
 
 interface Props {
   children: React.ReactNode;
@@ -44,9 +45,7 @@ export default async function TenantLayout({ children, params }: Props) {
   const userName = profile?.display_name ?? user.email ?? user.id;
 
   if (role === 'tenant_admin') {
-    Object.keys(permissions).forEach(k => {
-      (permissions as Record<string, boolean>)[k] = true;
-    });
+    Object.assign(permissions, getAdminPermissions());
   }
 
   let allowedLocationIds: string[] | null = null;

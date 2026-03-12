@@ -125,7 +125,7 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
       />
       <DialogContent className="bg-[var(--bg-off)] border border-border text-foreground sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-foreground font-semibold">
+          <DialogTitle className="text-foreground font-bold">
             {isEditing ? 'Edit Contact' : 'New Contact'}
           </DialogTitle>
           <DialogDescription className="text-[var(--text-dim)]">
@@ -137,13 +137,13 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="rounded-md border border-[var(--red)]/30 bg-[var(--red)]/10 px-3 py-2 text-sm text-[var(--red)]">
+            <div className="rounded-md border border-[var(--red)]/30 bg-[var(--red-bg)] px-3 py-2 text-sm text-[var(--red)]">
               {error}
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="contact-name" className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
+            <Label htmlFor="contact-name" className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)]">
               Name
             </Label>
             <Input
@@ -157,7 +157,7 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
+            <Label className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)]">
               Type
             </Label>
             <Select value={type} onValueChange={(val) => setType(val as ContactType)}>
@@ -175,9 +175,24 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="contact-email" className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
+            <Label htmlFor="contact-phone" className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)]">
+              Phone
+              <span className="text-[var(--text-dim)] normal-case font-normal ml-1">(optional)</span>
+            </Label>
+            <Input
+              id="contact-phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+1 (555) 123-4567"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contact-email" className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)]">
               Email
-              <span className="text-[var(--text-dim)] normal-case font-sans ml-1">(optional)</span>
+              <span className="text-[var(--text-dim)] normal-case font-normal ml-1">(optional)</span>
             </Label>
             <Input
               id="contact-email"
@@ -190,24 +205,9 @@ export function ContactForm({ tenantSlug, contact, trigger }: ContactFormProps) 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="contact-phone" className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
-              Phone
-              <span className="text-[var(--text-dim)] normal-case font-sans ml-1">(optional)</span>
-            </Label>
-            <Input
-              id="contact-phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+1 (555) 123-4567"
-              className="bg-background border-border text-foreground font-mono placeholder:text-muted-foreground focus-visible:border-[var(--accent-color)] focus-visible:ring-[var(--accent-color)]/20"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="contact-address" className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
+            <Label htmlFor="contact-address" className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)]">
               Address
-              <span className="text-[var(--text-dim)] normal-case font-sans ml-1">(optional)</span>
+              <span className="text-[var(--text-dim)] normal-case font-normal ml-1">(optional)</span>
             </Label>
             <Textarea
               id="contact-address"

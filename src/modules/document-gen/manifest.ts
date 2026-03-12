@@ -11,5 +11,7 @@ export const documentGenManifest: ModuleManifest = {
   icon: 'FileText',
   dependencies: ['inventory'],
   permissions: ['canGenerateDocuments'],
-  navItems: [],
+  navItems: [
+    { label: 'Documents', href: 'settings/documents', icon: 'FileText', permission: 'canGenerateDocuments', group: 'settings' },
+  ],
 };

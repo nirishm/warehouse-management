@@ -1,7 +1,6 @@
 'use client';
 
 import { type ReactElement, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,19 +21,34 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Plus, Loader2 } from 'lucide-react';
-import {
-  ENTITY_TYPES,
-  FIELD_TYPES,
-  type CustomFieldDefinition,
-  type EntityType,
-  type FieldType,
-} from '@/modules/inventory/validations/custom-field';
+import type { CustomField } from './custom-fields-page';
 
-interface CustomFieldFormProps {
-  tenantSlug: string;
-  definition?: CustomFieldDefinition;
-  trigger?: ReactElement;
-}
+type EntityType =
+  | 'dispatch'
+  | 'purchase'
+  | 'sale'
+  | 'commodity'
+  | 'location'
+  | 'contact'
+  | 'dispatch_item'
+  | 'purchase_item'
+  | 'sale_item';
+
+type FieldType = 'text' | 'number' | 'date' | 'boolean' | 'select' | 'multiselect';
+
+const ENTITY_TYPES: EntityType[] = [
+  'dispatch',
+  'purchase',
+  'sale',
+  'commodity',
+  'location',
+  'contact',
+  'dispatch_item',
+  'purchase_item',
+  'sale_item',
+];
+
+const FIELD_TYPES: FieldType[] = ['text', 'number', 'date', 'boolean', 'select', 'multiselect'];
 
 const ENTITY_LABELS: Record<string, string> = {
   dispatch: 'Dispatch',
@@ -57,6 +71,13 @@ const FIELD_TYPE_LABELS: Record<string, string> = {
   multiselect: 'Multi-select',
 };
 
+interface CustomFieldFormProps {
+  tenantSlug: string;
+  field?: CustomField;
+  trigger?: ReactElement;
+  onSaved?: () => void;
+}
+
 function slugify(str: string): string {
   return str
     .toLowerCase()
@@ -66,33 +87,24 @@ function slugify(str: string): string {
     .replace(/^_|_$/g, '');
 }
 
-export function CustomFieldForm({
-  tenantSlug,
-  definition,
-  trigger,
-}: CustomFieldFormProps) {
-  const router = useRouter();
-  const isEditing = !!definition;
+export function CustomFieldForm({ tenantSlug, field, trigger, onSaved }: CustomFieldFormProps) {
+  const isEditing = !!field;
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [entityType, setEntityType] = useState<EntityType>(
-    definition?.entity_type ?? 'dispatch'
+    (field?.entity_type as EntityType) ?? 'dispatch'
   );
-  const [fieldKey, setFieldKey] = useState(definition?.field_key ?? '');
-  const [fieldLabel, setFieldLabel] = useState(definition?.field_label ?? '');
+  const [fieldKey, setFieldKey] = useState(field?.field_key ?? '');
+  const [fieldLabel, setFieldLabel] = useState(field?.field_label ?? '');
   const [fieldType, setFieldType] = useState<FieldType>(
-    definition?.field_type ?? 'text'
+    (field?.field_type as FieldType) ?? 'text'
   );
-  const [optionsText, setOptionsText] = useState(
-    definition?.options?.join(', ') ?? ''
-  );
-  const [isRequired, setIsRequired] = useState(
-    definition?.is_required ?? false
-  );
-  const [sortOrder, setSortOrder] = useState(definition?.sort_order ?? 0);
+  const [optionsText, setOptionsText] = useState(field?.options?.join(', ') ?? '');
+  const [isRequired, setIsRequired] = useState(field?.is_required ?? false);
+  const [sortOrder, setSortOrder] = useState(field?.sort_order ?? 0);
 
   // Auto-generate field_key from label when creating
   const [autoKey, setAutoKey] = useState(!isEditing);
@@ -143,7 +155,7 @@ export function CustomFieldForm({
 
     try {
       const url = isEditing
-        ? `/api/t/${tenantSlug}/custom-fields/${definition.id}`
+        ? `/api/t/${tenantSlug}/custom-fields/${field.id}`
         : `/api/t/${tenantSlug}/custom-fields`;
 
       const res = await fetch(url, {
@@ -159,7 +171,7 @@ export function CustomFieldForm({
 
       setOpen(false);
       resetForm();
-      router.refresh();
+      onSaved?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
@@ -172,14 +184,14 @@ export function CustomFieldForm({
       open={open}
       onOpenChange={(nextOpen) => {
         setOpen(nextOpen);
-        if (nextOpen && isEditing && definition) {
-          setEntityType(definition.entity_type);
-          setFieldKey(definition.field_key);
-          setFieldLabel(definition.field_label);
-          setFieldType(definition.field_type);
-          setOptionsText(definition.options?.join(', ') ?? '');
-          setIsRequired(definition.is_required);
-          setSortOrder(definition.sort_order);
+        if (nextOpen && isEditing && field) {
+          setEntityType(field.entity_type as EntityType);
+          setFieldKey(field.field_key);
+          setFieldLabel(field.field_label);
+          setFieldType(field.field_type as FieldType);
+          setOptionsText(field.options?.join(', ') ?? '');
+          setIsRequired(field.is_required);
+          setSortOrder(field.sort_order);
           setAutoKey(false);
         }
         if (nextOpen && !isEditing) {
@@ -202,7 +214,7 @@ export function CustomFieldForm({
       />
       <DialogContent className="bg-[var(--bg-off)] border border-border text-foreground sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-foreground font-semibold">
+          <DialogTitle className="text-foreground font-bold">
             {isEditing ? 'Edit Custom Field' : 'New Custom Field'}
           </DialogTitle>
           <DialogDescription className="text-[var(--text-dim)]">
@@ -220,7 +232,7 @@ export function CustomFieldForm({
           )}
 
           <div className="space-y-2">
-            <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
+            <Label className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)]">
               Entity Type
             </Label>
             <Select
@@ -247,7 +259,7 @@ export function CustomFieldForm({
           <div className="space-y-2">
             <Label
               htmlFor="cf-label"
-              className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]"
+              className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)]"
             >
               Field Label
             </Label>
@@ -264,7 +276,7 @@ export function CustomFieldForm({
           <div className="space-y-2">
             <Label
               htmlFor="cf-key"
-              className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]"
+              className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)]"
             >
               Field Key
             </Label>
@@ -286,7 +298,7 @@ export function CustomFieldForm({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
+            <Label className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)]">
               Field Type
             </Label>
             <Select
@@ -314,7 +326,7 @@ export function CustomFieldForm({
             <div className="space-y-2">
               <Label
                 htmlFor="cf-options"
-                className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]"
+                className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)]"
               >
                 Options
               </Label>
@@ -339,11 +351,11 @@ export function CustomFieldForm({
                 id="cf-required"
                 checked={isRequired}
                 onChange={(e) => setIsRequired(e.target.checked)}
-                className="size-4 rounded border-border bg-background text-[var(--accent-color)] focus:ring-[var(--accent-color)]/20 accent-[var(--accent-color)]"
+                className="size-4 rounded border-border bg-background accent-[var(--accent-color)]"
               />
               <Label
                 htmlFor="cf-required"
-                className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)] cursor-pointer"
+                className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)] cursor-pointer"
               >
                 Required
               </Label>
@@ -352,7 +364,7 @@ export function CustomFieldForm({
             <div className="flex items-center gap-2 ml-auto">
               <Label
                 htmlFor="cf-sort"
-                className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]"
+                className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-dim)]"
               >
                 Sort Order
               </Label>
@@ -368,11 +380,7 @@ export function CustomFieldForm({
           </div>
 
           <DialogFooter className="bg-background/50 border-border">
-            <Button
-              type="submit"
-              disabled={loading}
-              variant="orange"
-            >
+            <Button type="submit" disabled={loading} variant="orange">
               {loading && <Loader2 className="size-4 mr-1 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Field'}
             </Button>

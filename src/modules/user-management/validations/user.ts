@@ -12,6 +12,13 @@ export const permissionsSchema = z.object({
   canViewAnalytics: z.boolean(),
   canExportData: z.boolean(),
   canViewAuditLog: z.boolean(),
+  canManagePayments: z.boolean(),
+  canManageAlerts: z.boolean(),
+  canGenerateDocuments: z.boolean(),
+  canManageLots: z.boolean(),
+  canManageReturns: z.boolean(),
+  canImportData: z.boolean(),
+  canManageAdjustments: z.boolean(),
 });
 
 export const updateUserProfileSchema = z.object({
@@ -41,6 +48,13 @@ export const PERMISSION_LABELS: Record<keyof Permissions, string> = {
   canViewAnalytics: 'View Analytics',
   canExportData: 'Export Data',
   canViewAuditLog: 'View Audit Log',
+  canManagePayments: 'Manage Payments',
+  canManageAlerts: 'Manage Alerts',
+  canGenerateDocuments: 'Generate Documents',
+  canManageLots: 'Manage Lots',
+  canManageReturns: 'Manage Returns',
+  canImportData: 'Import Data',
+  canManageAdjustments: 'Manage Adjustments',
 };
 
 export interface UserProfile {

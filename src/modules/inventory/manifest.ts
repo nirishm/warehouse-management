@@ -10,7 +10,8 @@ export const inventoryManifest: ModuleManifest = {
   navItems: [
     { label: 'Stock Levels', href: 'inventory', icon: 'Package', permission: 'canViewStock', group: 'inventory' },
     { label: 'Locations', href: 'settings/locations', icon: 'MapPin', permission: 'canManageLocations', group: 'settings' },
-    { label: 'Items', href: 'settings/commodities', icon: 'Wheat', permission: 'canManageCommodities', group: 'settings' },
+    { label: 'Items', href: 'settings/items', icon: 'Wheat', permission: 'canManageCommodities', group: 'settings' },
     { label: 'Contacts', href: 'settings/contacts', icon: 'Users', permission: 'canManageContacts', group: 'settings' },
+    { label: 'Custom Fields', href: 'settings/custom-fields', icon: 'SlidersHorizontal', group: 'settings' },
   ],
 };
