@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION create_dispatch_txn(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   v_dispatch_number TEXT;
@@ -22,7 +22,7 @@ DECLARE
   v_item            JSONB;
 BEGIN
   -- Get next sequence number
-  v_dispatch_number := get_next_sequence(p_schema, 'dispatch');
+  v_dispatch_number := public.get_next_sequence(p_schema, 'dispatch');
 
   -- Insert dispatch header
   EXECUTE format(
@@ -89,7 +89,7 @@ CREATE OR REPLACE FUNCTION create_purchase_txn(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   v_purchase_number TEXT;
@@ -98,7 +98,7 @@ DECLARE
   v_item            JSONB;
   v_status          TEXT;
 BEGIN
-  v_purchase_number := get_next_sequence(p_schema, 'purchase');
+  v_purchase_number := public.get_next_sequence(p_schema, 'purchase');
   v_status := COALESCE(p_input->>'status', 'received');
 
   EXECUTE format(
@@ -166,7 +166,7 @@ CREATE OR REPLACE FUNCTION create_sale_txn(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   v_sale_number TEXT;
@@ -174,7 +174,7 @@ DECLARE
   v_sale_row    JSONB;
   v_item        JSONB;
 BEGIN
-  v_sale_number := get_next_sequence(p_schema, 'sale');
+  v_sale_number := public.get_next_sequence(p_schema, 'sale');
 
   EXECUTE format(
     'INSERT INTO %I.sales (
@@ -238,7 +238,7 @@ CREATE OR REPLACE FUNCTION create_return_txn(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   v_return_number TEXT;
@@ -246,7 +246,7 @@ DECLARE
   v_return_row    JSONB;
   v_item          JSONB;
 BEGIN
-  v_return_number := get_next_sequence(p_schema, 'return');
+  v_return_number := public.get_next_sequence(p_schema, 'return');
 
   EXECUTE format(
     'INSERT INTO %I.returns (
@@ -316,7 +316,7 @@ CREATE OR REPLACE FUNCTION create_adjustment_txn(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   v_adjustment_number TEXT;
@@ -331,7 +331,7 @@ BEGIN
 
   FOR v_item IN SELECT * FROM jsonb_array_elements(p_input->'items')
   LOOP
-    v_adjustment_number := get_next_sequence(p_schema, 'adjustment');
+    v_adjustment_number := public.get_next_sequence(p_schema, 'adjustment');
 
     EXECUTE format(
       'INSERT INTO %I.adjustments (
@@ -387,7 +387,7 @@ CREATE OR REPLACE FUNCTION receive_dispatch_txn(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   v_status       TEXT;
