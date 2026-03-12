@@ -24,7 +24,7 @@ function ResetPasswordForm() {
 
     if (tokenHash && type === 'recovery') {
       // OTP flow: verify the token hash directly
-      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error }) => {
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error }: { error: { message: string } | null }) => {
         if (error) {
           setError('This reset link is invalid or has expired. Please request a new one.');
         } else {
@@ -34,13 +34,13 @@ function ResetPasswordForm() {
     } else if (code) {
       // PKCE flow: exchange the ?code= param for a session
       // Subscribe BEFORE exchange so we catch PASSWORD_RECOVERY if it fires
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string) => {
         if (event === 'PASSWORD_RECOVERY') {
           setReady(true);
         }
       });
 
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+      supabase.auth.exchangeCodeForSession(code).then(({ error }: { error: { message: string } | null }) => {
         if (error) {
           setError('This reset link is invalid or has expired. Please request a new one.');
         } else {
@@ -52,27 +52,41 @@ function ResetPasswordForm() {
 
       return () => subscription.unsubscribe();
     } else {
-      // Implicit flow: Supabase dashboard recovery link lands on root with
+      // Implicit flow: Supabase redirects to /reset-password with
       // #access_token=...&type=recovery in the hash. The Supabase JS client
-      // parses the hash automatically and fires PASSWORD_RECOVERY. Listen for
-      // it here, and also check if there's already an active recovery session.
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      // parses the hash asynchronously and fires PASSWORD_RECOVERY.
+      // getSession() may return null in the same tick before the hash is
+      // processed, so we wait for the event and use a timeout as fallback.
+      let resolved = false;
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string) => {
         if (event === 'PASSWORD_RECOVERY') {
+          resolved = true;
           setReady(true);
         }
       });
 
-      // Also check if a recovery session is already established (user navigated
-      // here after the hash was parsed on another page)
+      // Also handle the case where the user navigated here after the hash was
+      // already parsed on another page (session exists in storage).
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
+          resolved = true;
           setReady(true);
-        } else {
-          setError('This reset link is invalid. Please request a new password reset from the sign in page.');
         }
       });
 
-      return () => subscription.unsubscribe();
+      // If neither a session nor a PASSWORD_RECOVERY event arrives within 4s,
+      // the link is genuinely invalid/expired.
+      const timeout = setTimeout(() => {
+        if (!resolved) {
+          setError('This reset link is invalid or has expired. Please request a new one.');
+        }
+      }, 4000);
+
+      return () => {
+        subscription.unsubscribe();
+        clearTimeout(timeout);
+      };
     }
   }, [searchParams]);
 

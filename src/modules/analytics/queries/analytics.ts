@@ -124,11 +124,12 @@ export async function getDispatchAnalytics(
   // Default to 90-day window to avoid unbounded full-table scans
   const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Fetch dispatches with items and location names (bounded to 90 days + 500 row guard)
+  // Fetch dispatches with nested items and location names in a single query
+  // (bounded to 90 days + 500 row guard)
   let dispatchQuery = client
     .from('dispatches')
     .select(
-      'id, status, origin_location_id, dest_location_id, origin_location:locations!origin_location_id(name), dest_location:locations!dest_location_id(name)'
+      'id, status, origin_location_id, dest_location_id, origin_location:locations!origin_location_id(name), dest_location:locations!dest_location_id(name), dispatch_items(dispatch_id, sent_quantity, received_quantity)'
     )
     .is('deleted_at', null)
     .gte('created_at', defaultFrom)
@@ -147,6 +148,11 @@ export async function getDispatchAnalytics(
     dest_location_id: string;
     origin_location: { name: string } | null;
     dest_location: { name: string } | null;
+    dispatch_items: Array<{
+      dispatch_id: string;
+      sent_quantity: number | null;
+      received_quantity: number | null;
+    }>;
   }>;
 
   // Status breakdown
@@ -158,27 +164,14 @@ export async function getDispatchAnalytics(
     statusMap.entries()
   ).map(([status, count]) => ({ status, count }));
 
-  // Fetch dispatch items for the filtered dispatches
-  const dispatchIds = allDispatches.map((d) => d.id);
-  let itemQuery = client
-    .from('dispatch_items')
-    .select('dispatch_id, sent_quantity, received_quantity');
-  if (dispatchIds.length > 0) {
-    itemQuery = itemQuery.in('dispatch_id', dispatchIds);
-  }
-
-  const { data: itemRows, error: itemError } = dispatchIds.length > 0
-    ? await itemQuery
-    : { data: [], error: null };
-
-  if (itemError)
-    throw new Error(`Failed to fetch dispatch items: ${itemError.message}`);
-
-  const allItems = (itemRows ?? []) as Array<{
-    dispatch_id: string;
-    sent_quantity: number | null;
-    received_quantity: number | null;
-  }>;
+  // Extract items from nested result — no second round-trip needed
+  const allItems = allDispatches.flatMap((d) =>
+    (d.dispatch_items ?? []) as Array<{
+      dispatch_id: string;
+      sent_quantity: number | null;
+      received_quantity: number | null;
+    }>
+  );
 
   let totalSentQuantity = 0;
   let totalReceivedQuantity = 0;
