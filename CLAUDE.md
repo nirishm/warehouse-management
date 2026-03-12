@@ -93,7 +93,7 @@ Required in `.env.local`:
 - `blueprint/wareos_v2_final_part{1,2,3}.md` — v2 architecture blueprint
 
 ## Reference
-- v1 source code is in `v1-archive/` — use it for stock_levels VIEW logic and state machines.
+- v1 source code is in `v1-archive/` — **NEVER reference automatically**. Always ask the user first if v1 code would be helpful. Only consult v1-archive after explicit user approval.
 - Design tokens are in `src/app/globals.css`.
 - Zoho feature reference is in `docs/zoho-inventory-features.pdf`.
 
