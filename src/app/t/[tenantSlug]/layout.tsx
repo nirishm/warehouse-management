@@ -4,6 +4,7 @@ import { TenantProvider } from "@/components/layout/tenant-provider";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
+import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
 
 export default async function TenantLayout({
   children,
@@ -48,6 +49,9 @@ export default async function TenantLayout({
         {/* Mobile bottom nav */}
         <MobileBottomNav />
       </div>
+
+      {/* Onboarding wizard — renders as overlay when tenant has no data */}
+      <OnboardingWizard />
     </TenantProvider>
   );
 }
