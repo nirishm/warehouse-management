@@ -18,7 +18,7 @@ export default async function PurchasesPage({ params }: Props) {
   const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
-  const purchases = await listPurchases(tenant.schema_name);
+  const { data: purchases, total: purchasesTotal } = await listPurchases(tenant.schema_name);
 
   const totalReceived = purchases.filter((p) => p.status === 'received').length;
   const totalOrdered = purchases.filter((p) => p.status === 'ordered').length;
@@ -44,7 +44,7 @@ export default async function PurchasesPage({ params }: Props) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { label: 'Total Purchases', value: purchases.length },
+          { label: 'Total Purchases', value: purchasesTotal },
           { label: 'Received', value: totalReceived },
           { label: 'Ordered', value: totalOrdered },
         ].map((stat) => (
@@ -66,7 +66,7 @@ export default async function PurchasesPage({ params }: Props) {
       <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-0">
           <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-            All Purchases ({purchases.length})
+            All Purchases ({purchasesTotal})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

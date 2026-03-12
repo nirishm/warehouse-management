@@ -1,10 +1,11 @@
 import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type { CreateSaleInput, Sale } from '../validations/sale';
 
 export async function listSales(
   schemaName: string,
-  options?: { allowedLocationIds?: string[] | null }
-): Promise<Sale[]> {
+  options?: { allowedLocationIds?: string[] | null; pagination?: PaginationParams }
+): Promise<PaginatedResponse<Sale>> {
   const client = createTenantClient(schemaName);
   let query = client
     .from('sales')
@@ -13,7 +14,7 @@ export async function listSales(
       location:locations!location_id(id, name, code),
       contact:contacts!contact_id(id, name),
       items:sale_items(id)
-    `)
+    `, { count: 'exact' })
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
@@ -22,10 +23,16 @@ export async function listSales(
     query = query.in('location_id', ids);
   }
 
-  const { data, error } = await query;
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) throw new Error(`Failed to list sales: ${error.message}`);
-  return (data ?? []) as Sale[];
+
+  const pagination = options?.pagination ?? { page: 1, pageSize: count ?? 0 };
+  return paginatedResult((data ?? []) as Sale[], count ?? 0, pagination);
 }
 
 export async function getSaleById(

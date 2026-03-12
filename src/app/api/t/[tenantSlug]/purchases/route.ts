@@ -3,16 +3,19 @@ import { withTenantContext, requireModule, requirePermission, requireLocationAcc
 import { listPurchases, createPurchase } from '@/modules/purchase/queries/purchases';
 import { createPurchaseSchema } from '@/modules/purchase/validations/purchase';
 import { createAuditEntry } from '@/modules/audit-trail/queries/audit-log';
+import { parsePagination } from '@/lib/pagination';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
     requireModule(ctx, 'purchase');
     requirePermission(ctx, 'canPurchase');
 
-    const purchases = await listPurchases(ctx.schemaName, {
+    const pagination = parsePagination(request.nextUrl.searchParams);
+    const result = await listPurchases(ctx.schemaName, {
       allowedLocationIds: ctx.allowedLocationIds,
+      pagination,
     });
-    return NextResponse.json({ data: purchases });
+    return NextResponse.json(result);
   });
 }
 

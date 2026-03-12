@@ -1,10 +1,11 @@
 import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type { CreatePurchaseInput, Purchase, PurchaseItem } from '../validations/purchase';
 
 export async function listPurchases(
   schemaName: string,
-  options?: { allowedLocationIds?: string[] | null }
-): Promise<Purchase[]> {
+  options?: { allowedLocationIds?: string[] | null; pagination?: PaginationParams }
+): Promise<PaginatedResponse<Purchase>> {
   const client = createTenantClient(schemaName);
   let query = client
     .from('purchases')
@@ -13,7 +14,7 @@ export async function listPurchases(
       location:locations!location_id(id, name, code),
       contact:contacts!contact_id(id, name),
       items:purchase_items(id)
-    `)
+    `, { count: 'exact' })
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
@@ -22,10 +23,16 @@ export async function listPurchases(
     query = query.in('location_id', ids);
   }
 
-  const { data, error } = await query;
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) throw new Error(`Failed to list purchases: ${error.message}`);
-  return (data ?? []) as Purchase[];
+
+  const pagination = options?.pagination ?? { page: 1, pageSize: count ?? 0 };
+  return paginatedResult((data ?? []) as Purchase[], count ?? 0, pagination);
 }
 
 export async function getPurchaseById(

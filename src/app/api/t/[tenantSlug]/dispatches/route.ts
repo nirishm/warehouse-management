@@ -3,16 +3,19 @@ import { withTenantContext, requireModule, requirePermission, requireLocationAcc
 import { listDispatches, createDispatch } from '@/modules/dispatch/queries/dispatches';
 import { createDispatchSchema } from '@/modules/dispatch/validations/dispatch';
 import { createAuditEntry } from '@/modules/audit-trail/queries/audit-log';
+import { parsePagination } from '@/lib/pagination';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
     requireModule(ctx, 'dispatch');
     requirePermission(ctx, 'canDispatch');
 
-    const dispatches = await listDispatches(ctx.schemaName, {
+    const pagination = parsePagination(request.nextUrl.searchParams);
+    const result = await listDispatches(ctx.schemaName, {
       allowedLocationIds: ctx.allowedLocationIds,
+      pagination,
     });
-    return NextResponse.json({ data: dispatches });
+    return NextResponse.json(result);
   });
 }
 

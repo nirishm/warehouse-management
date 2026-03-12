@@ -1,16 +1,28 @@
 import { createTenantClient } from '@/core/db/tenant-query';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type { CreateLocationInput, UpdateLocationInput, Location } from '../validations/location';
 
-export async function listLocations(schemaName: string): Promise<Location[]> {
+export async function listLocations(
+  schemaName: string,
+  options?: { pagination?: PaginationParams }
+): Promise<PaginatedResponse<Location>> {
   const client = createTenantClient(schemaName);
-  const { data, error } = await client
+  let query = client
     .from('locations')
-    .select('*')
+    .select('*', { count: 'exact' })
     .is('deleted_at', null)
     .order('name');
 
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
+  }
+
+  const { data, error, count } = await query;
+
   if (error) throw new Error(`Failed to list locations: ${error.message}`);
-  return (data ?? []) as Location[];
+
+  const pagination = options?.pagination ?? { page: 1, pageSize: count ?? 0 };
+  return paginatedResult((data ?? []) as Location[], count ?? 0, pagination);
 }
 
 export async function getLocationById(

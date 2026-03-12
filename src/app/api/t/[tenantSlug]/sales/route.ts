@@ -3,16 +3,19 @@ import { withTenantContext, requireModule, requirePermission, requireLocationAcc
 import { listSales, createSale } from '@/modules/sale/queries/sales';
 import { createSaleSchema } from '@/modules/sale/validations/sale';
 import { createAuditEntry } from '@/modules/audit-trail/queries/audit-log';
+import { parsePagination } from '@/lib/pagination';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
     requireModule(ctx, 'sale');
     requirePermission(ctx, 'canSale');
 
-    const sales = await listSales(ctx.schemaName, {
+    const pagination = parsePagination(request.nextUrl.searchParams);
+    const result = await listSales(ctx.schemaName, {
       allowedLocationIds: ctx.allowedLocationIds,
+      pagination,
     });
-    return NextResponse.json({ data: sales });
+    return NextResponse.json(result);
   });
 }
 

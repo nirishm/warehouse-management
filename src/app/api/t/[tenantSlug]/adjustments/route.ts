@@ -3,16 +3,19 @@ import { withTenantContext, requireModule, requirePermission, requireLocationAcc
 import { listAdjustments, createAdjustment } from '@/modules/adjustments/queries/adjustments';
 import { createAdjustmentSchema } from '@/modules/adjustments/validations/adjustment';
 import { createAuditEntry } from '@/modules/audit-trail/queries/audit-log';
+import { parsePagination } from '@/lib/pagination';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
     requireModule(ctx, 'adjustments');
     requirePermission(ctx, 'canManageAdjustments');
 
-    const adjustments = await listAdjustments(ctx.schemaName, {
+    const pagination = parsePagination(request.nextUrl.searchParams);
+    const result = await listAdjustments(ctx.schemaName, {
       allowedLocationIds: ctx.allowedLocationIds,
+      pagination,
     });
-    return NextResponse.json({ data: adjustments });
+    return NextResponse.json(result);
   });
 }
 

@@ -1,4 +1,5 @@
 import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type {
   CreateAdjustmentInput,
   Adjustment,
@@ -9,13 +10,14 @@ import type {
 
 export async function listAdjustments(
   schemaName: string,
-  options?: { allowedLocationIds?: string[] | null }
-): Promise<AdjustmentWithRelations[]> {
+  options?: { allowedLocationIds?: string[] | null; pagination?: PaginationParams }
+): Promise<PaginatedResponse<AdjustmentWithRelations>> {
   const client = createTenantClient(schemaName);
   let query = client
     .from('adjustments')
     .select(
-      '*, location:locations(name), commodity:commodities(name, code), unit:units(name, abbreviation), reason:adjustment_reasons(name, direction)'
+      '*, location:locations(name), commodity:commodities(name, code), unit:units(name, abbreviation), reason:adjustment_reasons(name, direction)',
+      { count: 'exact' }
     )
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
@@ -25,10 +27,16 @@ export async function listAdjustments(
     query = query.in('location_id', ids);
   }
 
-  const { data, error } = await query;
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) throw new Error(`Failed to list adjustments: ${error.message}`);
-  return (data ?? []) as unknown as AdjustmentWithRelations[];
+
+  const pagination = options?.pagination ?? { page: 1, pageSize: count ?? 0 };
+  return paginatedResult((data ?? []) as unknown as AdjustmentWithRelations[], count ?? 0, pagination);
 }
 
 export async function getAdjustmentById(

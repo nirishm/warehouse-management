@@ -1,16 +1,18 @@
 import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type { CreateReturnInput, Return, ReturnWithItems } from '../validations/return';
 
 export async function listReturns(
   schemaName: string,
-  options?: { allowedLocationIds?: string[] | null }
-): Promise<ReturnWithItems[]> {
+  options?: { allowedLocationIds?: string[] | null; pagination?: PaginationParams }
+): Promise<PaginatedResponse<ReturnWithItems>> {
   const client = createTenantClient(schemaName);
   let query = client
     .from('returns')
     .select(
       `*, location:locations(id,name,code), contact:contacts(id,name),
-       items:return_items(*, commodity:commodities(id,name,code), unit:units(id,name,abbreviation))`
+       items:return_items(*, commodity:commodities(id,name,code), unit:units(id,name,abbreviation))`,
+      { count: 'exact' }
     )
     .is('deleted_at', null)
     .order('return_date', { ascending: false });
@@ -20,10 +22,16 @@ export async function listReturns(
     query = query.in('location_id', ids);
   }
 
-  const { data, error } = await query;
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) throw new Error(`Failed to list returns: ${error.message}`);
-  return (data ?? []) as unknown as ReturnWithItems[];
+
+  const pagination = options?.pagination ?? { page: 1, pageSize: count ?? 0 };
+  return paginatedResult((data ?? []) as unknown as ReturnWithItems[], count ?? 0, pagination);
 }
 
 export async function getReturn(

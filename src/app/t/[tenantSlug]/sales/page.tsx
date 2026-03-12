@@ -18,7 +18,7 @@ export default async function SalesPage({ params }: Props) {
   const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
-  const sales = await listSales(tenant.schema_name);
+  const { data: sales, total: salesTotal } = await listSales(tenant.schema_name);
 
   const totalConfirmed = sales.filter((s) => s.status === 'confirmed').length;
   const totalDispatched = sales.filter((s) => s.status === 'dispatched').length;
@@ -44,7 +44,7 @@ export default async function SalesPage({ params }: Props) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { label: 'Total Sales', value: sales.length },
+          { label: 'Total Sales', value: salesTotal },
           { label: 'Confirmed', value: totalConfirmed },
           { label: 'Dispatched', value: totalDispatched },
         ].map((stat) => (
@@ -66,7 +66,7 @@ export default async function SalesPage({ params }: Props) {
       <Card className="border-border bg-card">
         <CardHeader className="pb-0">
           <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-            All Sales ({sales.length})
+            All Sales ({salesTotal})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

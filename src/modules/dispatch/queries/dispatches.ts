@@ -1,4 +1,5 @@
 import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type {
   CreateDispatchInput,
   DispatchWithLocations,
@@ -8,13 +9,14 @@ import type {
 
 export async function listDispatches(
   schemaName: string,
-  options?: { allowedLocationIds?: string[] | null }
-): Promise<DispatchWithLocations[]> {
+  options?: { allowedLocationIds?: string[] | null; pagination?: PaginationParams }
+): Promise<PaginatedResponse<DispatchWithLocations>> {
   const client = createTenantClient(schemaName);
   let query = client
     .from('dispatches')
     .select(
-      '*, origin_location:locations!origin_location_id(name), dest_location:locations!dest_location_id(name), dispatch_items(id)'
+      '*, origin_location:locations!origin_location_id(name), dest_location:locations!dest_location_id(name), dispatch_items(id)',
+      { count: 'exact' }
     )
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
@@ -25,17 +27,24 @@ export async function listDispatches(
     query = query.or(`origin_location_id.in.(${list}),dest_location_id.in.(${list})`);
   }
 
-  const { data, error } = await query;
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) throw new Error(`Failed to list dispatches: ${error.message}`);
 
-  return ((data ?? []) as Record<string, unknown>[]).map((row) => {
+  const mapped = ((data ?? []) as Record<string, unknown>[]).map((row) => {
     const items = row.dispatch_items as { id: string }[] | null;
     return {
       ...row,
       item_count: items?.length ?? 0,
     } as DispatchWithLocations;
   });
+
+  const pagination = options?.pagination ?? { page: 1, pageSize: count ?? 0 };
+  return paginatedResult(mapped, count ?? 0, pagination);
 }
 
 export async function getDispatchById(

@@ -18,7 +18,7 @@ export default async function ReturnsPage({ params }: Props) {
   if (!tenant) redirect(`/t/${tenantSlug}`);
   if (!tenant.enabled_modules?.includes('returns')) redirect(`/t/${tenantSlug}`);
 
-  const returns = await listReturns(tenant.schema_name);
+  const { data: returns, total: returnsTotal } = await listReturns(tenant.schema_name);
 
   return (
     <div className="space-y-6">
@@ -35,7 +35,7 @@ export default async function ReturnsPage({ params }: Props) {
       <Card className="border-border bg-[var(--bg-off)]">
         <CardHeader className="pb-0">
           <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-            All Returns ({returns.length})
+            All Returns ({returnsTotal})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

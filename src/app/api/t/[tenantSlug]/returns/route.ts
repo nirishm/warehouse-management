@@ -3,14 +3,19 @@ import { withTenantContext, requireModule, requirePermission, requireLocationAcc
 import { listReturns, createReturn } from '@/modules/returns/queries/returns';
 import { createReturnSchema } from '@/modules/returns/validations/return';
 import { createAuditEntry } from '@/modules/audit-trail/queries/audit-log';
+import { parsePagination } from '@/lib/pagination';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
     requireModule(ctx, 'returns');
     requirePermission(ctx, 'canManageReturns');
 
-    const returns = await listReturns(ctx.schemaName, { allowedLocationIds: ctx.allowedLocationIds });
-    return NextResponse.json({ data: returns });
+    const pagination = parsePagination(request.nextUrl.searchParams);
+    const result = await listReturns(ctx.schemaName, {
+      allowedLocationIds: ctx.allowedLocationIds,
+      pagination,
+    });
+    return NextResponse.json(result);
   });
 }
 
