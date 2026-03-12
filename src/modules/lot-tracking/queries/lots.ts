@@ -1,13 +1,11 @@
-import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { execSql } from '@/core/db/exec-sql';
 import { validateSchemaName, validateUUID } from '@/core/db/validate-schema';
 import type { CreateLotInput, Lot, LotWithDetails, LotMovement } from '../validations/lot';
 
 export async function listLots(schemaName: string): Promise<LotWithDetails[]> {
   validateSchemaName(schemaName);
-  const adminClient = createAdminClient();
-  const { data, error } = await adminClient.rpc('exec_sql', {
-    query: `
+  const data = await execSql<Record<string, unknown>>(`
       SELECT
         l.id, l.lot_number, l.commodity_id, l.source_purchase_id,
         l.received_date, l.expiry_date, l.initial_quantity, l.unit_id,
@@ -21,11 +19,9 @@ export async function listLots(schemaName: string): Promise<LotWithDetails[]> {
       LEFT JOIN "${schemaName}".lot_stock_levels sl ON sl.lot_id = l.id
       WHERE l.deleted_at IS NULL
       ORDER BY l.received_date DESC
-    `,
-  });
-  if (error) throw new Error(`Failed to list lots: ${error.message}`);
+    `);
 
-  return (data ?? []).map((row: Record<string, unknown>) => ({
+  return data.map((row: Record<string, unknown>) => ({
     id: row.id as string,
     lot_number: row.lot_number as string,
     commodity_id: row.commodity_id as string,
@@ -51,9 +47,7 @@ export async function listLots(schemaName: string): Promise<LotWithDetails[]> {
 export async function getLot(schemaName: string, id: string): Promise<LotWithDetails | null> {
   validateSchemaName(schemaName);
   validateUUID(id, 'lot ID');
-  const adminClient = createAdminClient();
-  const { data, error } = await adminClient.rpc('exec_sql', {
-    query: `
+  const rows = await execSql<Record<string, unknown>>(`
       SELECT
         l.id, l.lot_number, l.commodity_id, l.source_purchase_id,
         l.received_date, l.expiry_date, l.initial_quantity, l.unit_id,
@@ -67,10 +61,7 @@ export async function getLot(schemaName: string, id: string): Promise<LotWithDet
       LEFT JOIN "${schemaName}".lot_stock_levels sl ON sl.lot_id = l.id
       WHERE l.id = '${id}' AND l.deleted_at IS NULL
       LIMIT 1
-    `,
-  });
-  if (error) throw new Error(`Failed to get lot: ${error.message}`);
-  const rows = data as Record<string, unknown>[] | null;
+    `);
   if (!rows || rows.length === 0) return null;
   const row = rows[0];
   return {
@@ -101,26 +92,13 @@ export async function createLot(
   input: CreateLotInput,
   userId: string
 ): Promise<Lot> {
-  const client = createTenantClient(schemaName);
-  const lotNumber = input.lot_number ?? (await getNextSequenceNumber(schemaName, 'lot'));
-
-  const { data, error } = await client
-    .from('lots')
-    .insert({
-      lot_number: lotNumber,
-      commodity_id: input.commodity_id,
-      source_purchase_id: input.source_purchase_id ?? null,
-      received_date: input.received_date ?? new Date().toISOString(),
-      expiry_date: input.expiry_date ?? null,
-      initial_quantity: input.initial_quantity,
-      unit_id: input.unit_id,
-      notes: input.notes ?? null,
-    })
-    .select('*')
-    .single();
-
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient.rpc('create_lot_txn', {
+    p_schema: schemaName,
+    p_input: input,
+    p_user_id: userId,
+  });
   if (error) throw new Error(`Failed to create lot: ${error.message}`);
-  void userId; // reserved for audit log
   return data as Lot;
 }
 
@@ -130,9 +108,7 @@ export async function getLotMovements(
 ): Promise<LotMovement[]> {
   validateSchemaName(schemaName);
   validateUUID(lotId, 'lot ID');
-  const adminClient = createAdminClient();
-  const { data, error } = await adminClient.rpc('exec_sql', {
-    query: `
+  const data = await execSql<Record<string, unknown>>(`
       SELECT 'dispatch' AS movement_type, d.dispatch_number AS reference_number,
              di.sent_quantity AS quantity, d.dispatched_at AS movement_date, di.id
       FROM "${schemaName}".dispatch_items di
@@ -148,11 +124,9 @@ export async function getLotMovements(
       WHERE si.lot_id = '${lotId}' AND s.deleted_at IS NULL
 
       ORDER BY movement_date DESC
-    `,
-  });
-  if (error) throw new Error(`Failed to get lot movements: ${error.message}`);
+    `);
 
-  return (data ?? []).map((row: Record<string, unknown>) => ({
+  return data.map((row: Record<string, unknown>) => ({
     id: row.id as string,
     movement_type: row.movement_type as 'dispatch' | 'sale',
     reference_number: row.reference_number as string,

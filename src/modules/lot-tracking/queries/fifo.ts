@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { execSql } from '@/core/db/exec-sql';
 import { validateSchemaName, validateUUID } from '@/core/db/validate-schema';
 import type { LotStockLevel } from '../validations/lot';
 
@@ -12,9 +12,7 @@ export async function getFIFOLotsForAllocation(
 ): Promise<LotStockLevel[]> {
   validateSchemaName(schemaName);
   validateUUID(commodityId, 'commodity ID');
-  const adminClient = createAdminClient();
-  const { data, error } = await adminClient.rpc('exec_sql', {
-    query: `
+  const data = await execSql<Record<string, unknown>>(`
       SELECT lot_id, lot_number, commodity_id, unit_id,
              received_date, expiry_date, initial_quantity, current_quantity
       FROM "${schemaName}".lot_stock_levels
@@ -22,11 +20,9 @@ export async function getFIFOLotsForAllocation(
         AND current_quantity > 0
         AND (expiry_date IS NULL OR expiry_date > NOW())
       ORDER BY received_date ASC
-    `,
-  });
-  if (error) throw new Error(`Failed to get FIFO lots: ${error.message}`);
+    `);
 
-  return (data ?? []).map((row: Record<string, unknown>) => ({
+  return data.map((row: Record<string, unknown>) => ({
     lot_id: row.lot_id as string,
     lot_number: row.lot_number as string,
     commodity_id: row.commodity_id as string,

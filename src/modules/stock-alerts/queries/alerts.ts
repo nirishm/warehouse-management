@@ -1,5 +1,5 @@
 import { createTenantClient } from '@/core/db/tenant-query';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { execSql } from '@/core/db/exec-sql';
 import { validateSchemaName } from '@/core/db/validate-schema';
 import type {
   UpsertThresholdInput,
@@ -21,10 +21,8 @@ function computeAlertState(
 
 export async function getStockAlerts(schemaName: string): Promise<StockAlert[]> {
   validateSchemaName(schemaName);
-  const adminClient = createAdminClient();
 
-  const { data, error } = await adminClient.rpc('exec_sql', {
-    query: `
+  const data = await execSql(`
       SELECT
         t.id AS threshold_id,
         t.commodity_id,
@@ -47,12 +45,9 @@ export async function getStockAlerts(schemaName: string): Promise<StockAlert[]> 
         AND sl.unit_id = t.unit_id
       WHERE t.is_active = true
       ORDER BY c.name, l.name
-    `,
-  });
+    `);
 
-  if (error) throw new Error(`Failed to get stock alerts: ${error.message}`);
-
-  return ((data as unknown[]) ?? []).map((row: unknown) => {
+  return (data ?? []).map((row: unknown) => {
     const r = row as {
       threshold_id: string;
       commodity_id: string;

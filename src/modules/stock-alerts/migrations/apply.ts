@@ -1,9 +1,7 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { execSql } from '@/core/db/exec-sql';
 
 export async function applyStockAlertsMigration(schemaName: string): Promise<void> {
-  const client = createAdminClient();
-  const { error } = await client.rpc('exec_sql', {
-    query: `
+  await execSql(`
       CREATE TABLE IF NOT EXISTS "${schemaName}".stock_alert_thresholds (
         id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         commodity_id  UUID NOT NULL REFERENCES "${schemaName}".commodities(id),
@@ -25,7 +23,5 @@ export async function applyStockAlertsMigration(schemaName: string): Promise<voi
           AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
       EXCEPTION WHEN duplicate_object THEN NULL;
       END $$;
-    `,
-  });
-  if (error) throw new Error(`Stock alerts migration failed: ${error.message}`);
+    `);
 }

@@ -1,12 +1,9 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { execSql } from '@/core/db/exec-sql';
 import { buildLotStockLevelsViewSQL } from '@/modules/returns/migrations/apply';
 
 export async function applyLotTrackingMigration(schemaName: string): Promise<void> {
-  const client = createAdminClient();
-
   // Step 1: Create lots table + add lot columns to item tables
-  const { error } = await client.rpc('exec_sql', {
-    query: `
+  await execSql(`
       CREATE TABLE IF NOT EXISTS "${schemaName}".lots (
         id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         lot_number          TEXT NOT NULL UNIQUE,
@@ -28,25 +25,18 @@ export async function applyLotTrackingMigration(schemaName: string): Promise<voi
       ALTER TABLE "${schemaName}".dispatch_items  ADD COLUMN IF NOT EXISTS lot_number TEXT;
       ALTER TABLE "${schemaName}".sale_items      ADD COLUMN IF NOT EXISTS lot_id UUID REFERENCES "${schemaName}".lots(id);
       ALTER TABLE "${schemaName}".sale_items      ADD COLUMN IF NOT EXISTS lot_number TEXT;
-    `,
-  });
-  if (error) throw new Error(`Lot tracking migration failed: ${error.message}`);
+    `);
 
   // Step 2: Check if returns table exists to include return adjustments in the VIEW
-  const { data: returnsCheck } = await client.rpc('exec_sql', {
-    query: `
+  const returnsCheck = await execSql<{ table_exists: boolean }>(`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.tables
         WHERE table_schema = '${schemaName}' AND table_name = 'returns'
       ) AS table_exists
-    `,
-  });
+    `);
 
-  const returnsExist = (returnsCheck as unknown as Array<{ table_exists: boolean }>)?.[0]?.table_exists === true;
+  const returnsExist = returnsCheck?.[0]?.table_exists === true;
 
   // Step 3: Create lot_stock_levels VIEW (with or without return adjustments)
-  const { error: viewError } = await client.rpc('exec_sql', {
-    query: buildLotStockLevelsViewSQL(schemaName, returnsExist),
-  });
-  if (viewError) throw new Error(`Lot stock levels VIEW creation failed: ${viewError.message}`);
+  await execSql(buildLotStockLevelsViewSQL(schemaName, returnsExist));
 }

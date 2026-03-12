@@ -1,5 +1,6 @@
 import { createTenantClient } from '@/core/db/tenant-query';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { execSql } from '@/core/db/exec-sql';
 import { validateSchemaName, validateUUID } from '@/core/db/validate-schema';
 import type { CreatePaymentInput, Payment, TransactionBalance } from '../validations/payment';
 import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
@@ -85,20 +86,16 @@ export async function getBalance(
   if (transactionType !== 'purchase' && transactionType !== 'sale') {
     throw new Error('Invalid transaction type');
   }
-  const adminClient = createAdminClient();
 
   // Compute total_value from items
   const itemsTable = transactionType === 'purchase' ? 'purchase_items' : 'sale_items';
   const fkColumn = transactionType === 'purchase' ? 'purchase_id' : 'sale_id';
 
-  const { data: valueData, error: valueError } = await adminClient.rpc('exec_sql', {
-    query: `
+  const valueData = await execSql<{ total_value: string }>(`
       SELECT COALESCE(SUM(quantity * COALESCE(unit_price, 0)), 0) AS total_value
       FROM "${schemaName}"."${itemsTable}"
       WHERE ${fkColumn} = '${transactionId}'
-    `,
-  });
-  if (valueError) throw new Error(`Failed to compute total value: ${valueError.message}`);
+    `);
 
   const totalValue = Number(valueData?.[0]?.total_value ?? 0);
 

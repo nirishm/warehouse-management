@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { execSql } from './exec-sql';
 import { buildStockLevelsViewSQL } from './stock-levels-view';
 
 // NOTE: This SQL is derived from supabase/migrations/00002_tenant_template.sql
@@ -372,22 +372,15 @@ export async function provisionTenantSchema(tenantSlug: string): Promise<string>
     throw new Error(`Invalid tenant slug: "${tenantSlug}"`);
   }
   const schemaName = `tenant_${tenantSlug.replace(/-/g, '_')}`;
-  const admin = createAdminClient();
 
   const sql = TENANT_SCHEMA_SQL.replace(/{schema}/g, schemaName);
 
-  const { error: schemaError } = await admin.rpc('exec_sql', {
-    query: `CREATE SCHEMA IF NOT EXISTS "${schemaName}";`
-  });
-  if (schemaError) throw new Error(`Failed to create schema: ${schemaError.message}`);
-
-  const { error: templateError } = await admin.rpc('exec_sql', { query: sql });
-  if (templateError) throw new Error(`Failed to provision tenant: ${templateError.message}`);
+  await execSql(`CREATE SCHEMA IF NOT EXISTS "${schemaName}";`);
+  await execSql(sql);
 
   // Create the stock_levels VIEW using the shared builder (base only: no returns, no adjustments)
   const viewSql = buildStockLevelsViewSQL(schemaName, { includeReturns: false, includeAdjustments: false });
-  const { error: viewError } = await admin.rpc('exec_sql', { query: viewSql });
-  if (viewError) throw new Error(`Failed to create stock_levels VIEW: ${viewError.message}`);
+  await execSql(viewSql);
 
   return schemaName;
 }

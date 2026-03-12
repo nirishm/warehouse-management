@@ -1,12 +1,9 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { execSql } from '@/core/db/exec-sql';
 import { rebuildStockLevelsView } from '@/core/db/stock-levels-view';
 
 export async function applyReturnsMigration(schemaName: string): Promise<void> {
-  const client = createAdminClient();
-
   // Step 1: Create returns tables
-  const { error: tableError } = await client.rpc('exec_sql', {
-    query: `
+  await execSql(`
       CREATE TABLE IF NOT EXISTS "${schemaName}".returns (
         id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         return_number    TEXT NOT NULL UNIQUE,
@@ -54,9 +51,7 @@ export async function applyReturnsMigration(schemaName: string): Promise<void> {
           AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
       EXCEPTION WHEN duplicate_object THEN NULL;
       END $$;
-    `,
-  });
-  if (tableError) throw new Error(`Returns migration failed: ${tableError.message}`);
+    `);
 
   // Step 2: Rebuild stock_levels VIEW to include returns.
   // Sale returns = inbound (goods come back from customer)
@@ -66,21 +61,16 @@ export async function applyReturnsMigration(schemaName: string): Promise<void> {
   await rebuildStockLevelsView(schemaName, { includeReturns: true });
 
   // Step 3: If lot-tracking tables exist, rebuild lot_stock_levels with returns
-  const { data: lotsCheck } = await client.rpc('exec_sql', {
-    query: `
+  const lotsCheck = await execSql<{ table_exists: boolean }>(`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.tables
         WHERE table_schema = '${schemaName}' AND table_name = 'lots'
       ) AS table_exists
-    `,
-  });
+    `);
 
-  const lotsExist = (lotsCheck as unknown as Array<{ table_exists: boolean }>)?.[0]?.table_exists === true;
+  const lotsExist = lotsCheck?.[0]?.table_exists === true;
   if (lotsExist) {
-    const { error: lotViewError } = await client.rpc('exec_sql', {
-      query: buildLotStockLevelsViewSQL(schemaName, true),
-    });
-    if (lotViewError) throw new Error(`Returns lot_stock_levels VIEW rebuild failed: ${lotViewError.message}`);
+    await execSql(buildLotStockLevelsViewSQL(schemaName, true));
   }
 }
 

@@ -1,9 +1,7 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { execSql } from '@/core/db/exec-sql';
 
 export async function applyPaymentsMigration(schemaName: string): Promise<void> {
-  const client = createAdminClient();
-  const { error } = await client.rpc('exec_sql', {
-    query: `
+  await execSql(`
       CREATE TABLE IF NOT EXISTS "${schemaName}".payments (
         id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         payment_number   TEXT NOT NULL UNIQUE,
@@ -32,7 +30,5 @@ export async function applyPaymentsMigration(schemaName: string): Promise<void> 
           AS RESTRICTIVE FOR ALL TO PUBLIC USING (false);
       EXCEPTION WHEN duplicate_object THEN NULL;
       END $$;
-    `,
-  });
-  if (error) throw new Error(`Payments migration failed: ${error.message}`);
+    `);
 }
