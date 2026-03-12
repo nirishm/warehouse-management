@@ -18,13 +18,14 @@ Multi-tenant SaaS Warehouse Management System built with Next.js + Supabase.
 ## Architecture
 - `src/app/` — Next.js App Router pages and API routes
 - `src/core/` — Core framework (auth, db, modules, permissions)
-- `src/modules/` — 16 feature modules (inventory, dispatch, purchase, sale, analytics, shortage-tracking, user-management, audit-trail, payments, stock-alerts, document-gen, lot-tracking, returns, bulk-import, barcode)
+- `src/modules/` — 16 feature modules (inventory, adjustments, dispatch, purchase, sale, analytics, shortage-tracking, user-management, audit-trail, payments, stock-alerts, document-gen, lot-tracking, returns, bulk-import, barcode)
 - `src/components/` — Shared UI components
 - `src/lib/` — Utilities and helpers
 - `supabase/migrations/` — Database migrations
 - `.claude/agents/` — Custom subagents (e.g. `design-review` for visual QA)
 - `.claude/commands/` — Slash commands (e.g. `/design-review`)
 - `.claude/context/` — Reference docs: `design-principles.md`, `design_reference.html` (WareOS spec)
+- `docs/plans/` — active planning docs; `docs/archive/` — historical plans and reports
 
 ## Multi-Tenancy
 - Schema-per-tenant: each tenant gets `tenant_{slug}` Postgres schema
@@ -61,8 +62,10 @@ Required in `.env.local`:
 - Custom fields stored as JSONB, validated against `custom_field_definitions` table
 - All mutations create audit log entries
 - Soft deletes (`deleted_at` column) on all entity tables
-- Sequence counters for auto-numbering (DSP-000001, PUR-000001, SAL-000001)
-- Permission types: canPurchase, canDispatch, canReceive, canSale, canViewStock, canManageLocations, canManageCommodities, canManageContacts, canViewAnalytics, canExportData, canViewAuditLog, canManagePayments, canManageAlerts, canGenerateDocuments, canManageLots, canManageReturns, canImportData
+- Sequence counters for auto-numbering (DSP-000001, PUR-000001, SAL-000001, ADJ-000001)
+- Permission types: canPurchase, canDispatch, canReceive, canSale, canViewStock, canManageLocations, canManageCommodities, canManageContacts, canViewAnalytics, canExportData, canViewAuditLog, canManagePayments, canManageAlerts, canGenerateDocuments, canManageLots, canManageReturns, canImportData, canManageAdjustments
+- Table extraction pattern: list `page.tsx` (Server Component, fetches data) + `[entity]-table.tsx` (Client Component, `'use client'`, uses `DataTable` + TanStack Table `ColumnDef`)
+- Form hook pattern: complex transaction forms extract logic into `src/lib/hooks/use-*-form.ts` (e.g., `use-dispatch-form.ts`, `use-purchase-form.ts`, `use-sale-form.ts`)
 
 ## Auth Pages & Flow
 - `/login` — Combined sign-in + forgot-password (3 views: `login`, `forgot`, `forgot-sent`)
@@ -82,6 +85,7 @@ Required in `.env.local`:
 - Layout tokens: `--header-h` (60px), `--sidebar-w` (240px), `--content-px` (28px)
 - Mobile receive form: `src/components/mobile/mobile-receive-form.tsx` — card layout, inputMode, sticky submit button
 - Responsive dual-form pattern on `/dispatches/[id]/receive`: mobile form (`block md:hidden`) + desktop form (`hidden md:block`)
+- Global search: `src/components/search/global-search.tsx` — Cmd+K / Ctrl+K shortcut, 300ms debounce, mounted in `src/components/layout/header.tsx`; searches dispatches, purchases, sales, commodities (max 5 results/type, module-aware)
 
 ## Visual Development & Testing
 

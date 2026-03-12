@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TenantProvisionButton } from './provision-button';
 import { TenantModulesManager } from './modules-manager';
 import { InviteForm } from './invite-form';
+import '@/modules';
+import { moduleRegistry } from '@/core/modules/registry';
 
 const statusColors: Record<string, string> = {
   active: 'bg-[var(--green-bg)] text-[var(--green)] border-[var(--green)]/20',
@@ -29,6 +31,8 @@ export default async function TenantDetailPage({
     .single();
 
   if (!tenant) notFound();
+
+  const allModules = moduleRegistry.getAll().map(m => ({ id: m.id, name: m.name }));
 
   // Fetch tenant members
   const { data: members } = await supabase
@@ -87,7 +91,7 @@ export default async function TenantDetailPage({
       <TenantModulesManager
         tenantId={id}
         enabledModules={tenant.enabled_modules ?? []}
-        modules={[]}
+        allModules={allModules}
       />
 
       {members && members.length > 0 && (

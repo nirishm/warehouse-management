@@ -146,8 +146,9 @@ export async function rebuildStockLevelsView(
   const rows = await execSql<{ table_name: string }>(
     `SELECT table_name
      FROM information_schema.tables
-     WHERE table_schema = '${schemaName}'
-       AND table_name IN ('return_items', 'adjustment_items', 'adjustments')`
+     WHERE table_schema = $1
+       AND table_name = ANY($2)`,
+    [schemaName, ['return_items', 'adjustment_items', 'adjustments']]
   );
   const existingTables = new Set(rows.map((r) => r.table_name));
 

@@ -6,20 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-const ALL_MODULES = [
-  'inventory', 'dispatch', 'purchase', 'sale',
-  'analytics', 'shortage_tracking', 'user_management', 'audit_trail',
-  'payments', 'stock-alerts', 'document-gen', 'lot-tracking',
-  'returns', 'bulk-import', 'barcode',
-];
-
 interface Props {
   tenantId: string;
   enabledModules: string[];
-  modules: Array<{ module_id: string; status: string }>;
+  allModules: Array<{ id: string; name: string }>;
 }
 
-export function TenantModulesManager({ tenantId, enabledModules, modules }: Props) {
+export function TenantModulesManager({ tenantId, enabledModules, allModules }: Props) {
   const [enabled, setEnabled] = useState<string[]>(enabledModules);
   const [saving, setSaving] = useState(false);
   const router = useRouter();
@@ -58,20 +51,20 @@ export function TenantModulesManager({ tenantId, enabledModules, modules }: Prop
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {ALL_MODULES.map((mod) => (
+          {allModules.map((mod) => (
             <button
-              key={mod}
-              onClick={() => toggleModule(mod)}
+              key={mod.id}
+              onClick={() => toggleModule(mod.id)}
               className={`p-3 rounded-lg border text-left text-sm transition-all ${
-                enabled.includes(mod)
+                enabled.includes(mod.id)
                   ? 'border-[var(--accent-color)]/30 bg-[var(--accent-tint)] text-foreground'
                   : 'border-border bg-muted/50 text-muted-foreground hover:border-border'
               }`}
             >
               <span className="font-mono text-xs uppercase tracking-wider">
-                {mod.replace(/_/g, ' ')}
+                {mod.name}
               </span>
-              {enabled.includes(mod) && (
+              {enabled.includes(mod.id) && (
                 <Badge className="mt-2 bg-[var(--accent-tint)] text-[var(--accent-color)] border-[var(--accent-color)]/20 text-[10px]">
                   Active
                 </Badge>

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenantContext, requireModule } from '@/core/auth/guards';
+import { withTenantContext, requireModule, requirePermission } from '@/core/auth/guards';
 import { listLots, createLot } from '@/modules/lot-tracking/queries/lots';
 import { createLotSchema } from '@/modules/lot-tracking/validations/lot';
 
@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
     requireModule(ctx, 'lot-tracking');
+    requirePermission(ctx, 'canManageLots');
 
     const body = await request.json();
     const parsed = createLotSchema.safeParse(body);

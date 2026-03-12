@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withTenantContext, requireModule, requirePermission } from '@/core/auth/guards';
 import { listLocations, createLocation } from '@/modules/inventory/queries/locations';
 import { createLocationSchema } from '@/modules/inventory/validations/location';
+import { PermissionError } from '@/core/errors';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
       ctx.permissions.canSale ||
       ctx.permissions.canViewStock;
     if (!canRead) {
-      throw new Error('Missing permission: canManageLocations');
+      throw new PermissionError('canManageLocations');
     }
 
     const locations = await listLocations(ctx.schemaName);

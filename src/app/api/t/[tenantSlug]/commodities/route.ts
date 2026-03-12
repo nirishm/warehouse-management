@@ -3,6 +3,7 @@ import { withTenantContext, requirePermission, requireModule } from '@/core/auth
 import { listCommodities, createCommodity } from '@/modules/inventory/queries/commodities';
 import { createCommoditySchema } from '@/modules/inventory/validations/commodity';
 import { parsePagination } from '@/lib/pagination';
+import { PermissionError } from '@/core/errors';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
       ctx.permissions.canSale ||
       ctx.permissions.canViewStock;
     if (!canRead) {
-      throw new Error('Missing permission: canManageCommodities');
+      throw new PermissionError('canManageCommodities');
     }
 
     const pagination = parsePagination(request.nextUrl.searchParams);
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Validation failed', issues: parsed.error.issues },
+        { error: 'Validation failed', details: parsed.error.flatten() },
         { status: 400 }
       );
     }

@@ -17,6 +17,7 @@ export function BarcodeLabel({
   const [dataUrl, setDataUrl] = useState<string>('');
 
   useEffect(() => {
+    let cancelled = false;
     QRCode.toDataURL(commodityCode, {
       width: size,
       margin: 1,
@@ -25,7 +26,10 @@ export function BarcodeLabel({
         light: '#ffffff',
       },
       errorCorrectionLevel: 'M',
-    }).then(setDataUrl).catch(() => setDataUrl(''));
+    })
+      .then((url: string) => { if (!cancelled) setDataUrl(url); })
+      .catch(() => { if (!cancelled) setDataUrl(''); });
+    return () => { cancelled = true; };
   }, [commodityCode, size]);
 
   return (
