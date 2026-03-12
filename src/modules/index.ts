@@ -4,6 +4,9 @@ import { dispatchManifest } from './dispatch/manifest';
 import { purchaseManifest } from './purchase/manifest';
 import { saleManifest } from './sale/manifest';
 import { analyticsManifest } from './analytics/manifest';
+// NOTE: shortage_tracking, user_management, audit_trail use underscore IDs.
+// These are stored in tenants.enabled_modules and must NOT be renamed
+// without a coordinated DB migration to update all tenant rows.
 import { shortageTrackingManifest } from './shortage-tracking/manifest';
 import { userManagementManifest } from './user-management/manifest';
 import { auditTrailManifest } from './audit-trail/manifest';
@@ -33,22 +36,3 @@ moduleRegistry.register(returnsManifest);
 moduleRegistry.register(bulkImportManifest);
 moduleRegistry.register(barcodeManifest);
 moduleRegistry.register(adjustmentsManifest);
-
-export {
-  inventoryManifest,
-  dispatchManifest,
-  purchaseManifest,
-  saleManifest,
-  analyticsManifest,
-  shortageTrackingManifest,
-  userManagementManifest,
-  auditTrailManifest,
-  paymentsManifest,
-  stockAlertsManifest,
-  documentGenManifest,
-  lotTrackingManifest,
-  returnsManifest,
-  bulkImportManifest,
-  barcodeManifest,
-  adjustmentsManifest,
-};

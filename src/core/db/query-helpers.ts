@@ -12,9 +12,3 @@ export function applyLocationFilter<T extends { in: (col: string, vals: string[]
   if (locationIds.length === 0) return query.in(column, [IMPOSSIBLE_UUID]);
   return query.in(column, locationIds);
 }
-
-export function applySoftDeleteFilter<T extends { is: (col: string, val: null) => T }>(
-  query: T
-): T {
-  return query.is('deleted_at', null);
-}

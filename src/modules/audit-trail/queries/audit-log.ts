@@ -101,23 +101,3 @@ export async function createAuditEntry(
 
   return data as AuditEntry;
 }
-
-export async function getAuditEntry(
-  schemaName: string,
-  id: string
-): Promise<AuditEntry | null> {
-  const client = createTenantClient(schemaName);
-
-  const { data, error } = await client
-    .from('audit_log')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    throw new Error(`Failed to get audit entry: ${error.message}`);
-  }
-
-  return data as AuditEntry;
-}

@@ -15,10 +15,6 @@ export const ALL_PERMISSIONS: Permission[] = [
   'canImportData', 'canManageAdjustments',
 ];
 
-export const DEFAULT_PERMISSIONS: Record<Permission, boolean> = Object.fromEntries(
-  ALL_PERMISSIONS.map((p) => [p, false])
-) as Record<Permission, boolean>;
-
 export function getAdminPermissions(): Record<Permission, boolean> {
   return Object.fromEntries(
     ALL_PERMISSIONS.map((p) => [p, true])
