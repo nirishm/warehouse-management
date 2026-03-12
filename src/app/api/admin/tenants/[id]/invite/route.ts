@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createTenantClient } from '@/core/db/tenant-query';
+import { getAdminPermissions } from '@/core/auth/permissions';
 
 export async function POST(
   request: NextRequest,
@@ -65,12 +66,7 @@ export async function POST(
     .insert({
       user_id: newUserId,
       display_name: fullName || email.split('@')[0],
-      permissions: {
-        canPurchase: true, canDispatch: true, canReceive: true, canSale: true,
-        canViewStock: true, canManageLocations: true, canManageCommodities: true,
-        canManageContacts: true, canViewAnalytics: true, canExportData: true,
-        canViewAuditLog: true,
-      },
+      permissions: getAdminPermissions(),
     });
 
   return NextResponse.json({ userId: newUserId, email }, { status: 201 });

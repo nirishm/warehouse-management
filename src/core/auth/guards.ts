@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createTenantClient } from '@/core/db/tenant-query';
-import { TenantContext, Permission } from './types';
+import { TenantContext } from './types';
+import { Permission, getAdminPermissions } from './permissions';
 
 export async function withTenantContext(
   request: NextRequest,
@@ -44,19 +45,8 @@ export async function withTenantContext(
     const permissions = (profile?.permissions ?? {}) as Record<Permission, boolean>;
     const userName = profile?.display_name ?? user.email ?? user.id;
 
-    const ALL_PERMISSIONS: Permission[] = [
-      'canPurchase', 'canDispatch', 'canReceive', 'canSale',
-      'canViewStock', 'canManageLocations', 'canManageCommodities',
-      'canManageContacts', 'canViewAnalytics', 'canExportData',
-      'canViewAuditLog', 'canManagePayments', 'canManageAlerts',
-      'canGenerateDocuments', 'canManageLots', 'canManageReturns',
-      'canImportData', 'canManageAdjustments',
-    ];
-
     if (verifiedRole === 'tenant_admin') {
-      for (const p of ALL_PERMISSIONS) {
-        permissions[p] = true;
-      }
+      Object.assign(permissions, getAdminPermissions());
     }
 
     let allowedLocationIds: string[] | null = null;

@@ -1,15 +1,4 @@
-export type Permission =
-  | 'canPurchase' | 'canDispatch' | 'canReceive' | 'canSale'
-  | 'canViewStock' | 'canManageLocations' | 'canManageCommodities'
-  | 'canManageContacts' | 'canViewAnalytics' | 'canExportData'
-  | 'canViewAuditLog'
-  | 'canManagePayments'
-  | 'canManageAlerts'
-  | 'canGenerateDocuments'
-  | 'canManageLots'
-  | 'canManageReturns'
-  | 'canImportData'
-  | 'canManageAdjustments';
+export type { Permission } from './permissions';
 
 export interface TenantContext {
   tenantId: string;
@@ -19,6 +8,6 @@ export interface TenantContext {
   enabledModules: string[];
   userId: string;
   userName: string;
-  permissions: Record<Permission, boolean>;
+  permissions: Record<import('./permissions').Permission, boolean>;
   allowedLocationIds: string[] | null;
 }
