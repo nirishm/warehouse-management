@@ -1,7 +1,7 @@
 import { ModuleManifest } from '@/core/modules/types';
 
 export const auditTrailManifest: ModuleManifest = {
-  id: 'audit_trail',
+  id: 'audit-trail',
   name: 'Audit Trail',
   description: 'View all system activity logs',
   icon: 'ScrollText',

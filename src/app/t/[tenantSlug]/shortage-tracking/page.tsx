@@ -16,7 +16,7 @@ interface Props {
 
 export default async function ShortageTrackingPage({ params }: Props) {
   const { tenantSlug } = await params;
-  await requirePageAccess({ tenantSlug, moduleId: 'shortage_tracking', permission: 'canViewAnalytics' });
+  await requirePageAccess({ tenantSlug, moduleId: 'shortage-tracking', permission: 'canViewAnalytics' });
 
   const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) redirect(`/t/${tenantSlug}`);

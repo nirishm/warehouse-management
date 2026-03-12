@@ -1,7 +1,7 @@
 import { ModuleManifest } from '@/core/modules/types';
 
 export const shortageTrackingManifest: ModuleManifest = {
-  id: 'shortage_tracking',
+  id: 'shortage-tracking',
   name: 'Shortage Tracking',
   description: 'Track and analyze dispatch shortages',
   icon: 'AlertTriangle',

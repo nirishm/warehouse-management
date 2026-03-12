@@ -1,9 +1,11 @@
 import { ModuleManifest, ModuleNavItem } from './types';
+import { validateModuleId } from './validate-module-id';
 
 export class ModuleRegistry {
   private modules = new Map<string, ModuleManifest>();
 
   register(mod: ModuleManifest): void {
+    validateModuleId(mod.id);
     this.modules.set(mod.id, mod);
   }
 

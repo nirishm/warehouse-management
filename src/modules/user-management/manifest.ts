@@ -1,7 +1,7 @@
 import { ModuleManifest } from '@/core/modules/types';
 
 export const userManagementManifest: ModuleManifest = {
-  id: 'user_management',
+  id: 'user-management',
   name: 'User Management',
   description: 'Manage users, roles, and permissions',
   icon: 'Users',

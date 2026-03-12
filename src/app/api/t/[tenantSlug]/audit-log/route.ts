@@ -4,7 +4,7 @@ import { listAuditEntries } from '@/modules/audit-trail/queries/audit-log';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
-    requireModule(ctx, 'audit_trail');
+    requireModule(ctx, 'audit-trail');
     requirePermission(ctx, 'canViewAuditLog');
 
     const { searchParams } = new URL(request.url);

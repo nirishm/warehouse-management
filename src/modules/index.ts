@@ -4,9 +4,7 @@ import { dispatchManifest } from './dispatch/manifest';
 import { purchaseManifest } from './purchase/manifest';
 import { saleManifest } from './sale/manifest';
 import { analyticsManifest } from './analytics/manifest';
-// NOTE: shortage_tracking, user_management, audit_trail use underscore IDs.
-// These are stored in tenants.enabled_modules and must NOT be renamed
-// without a coordinated DB migration to update all tenant rows.
+// All module IDs use kebab-case (e.g. 'shortage-tracking', 'user-management', 'audit-trail').
 import { shortageTrackingManifest } from './shortage-tracking/manifest';
 import { userManagementManifest } from './user-management/manifest';
 import { auditTrailManifest } from './audit-trail/manifest';

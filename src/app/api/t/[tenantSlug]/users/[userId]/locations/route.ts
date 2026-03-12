@@ -8,7 +8,7 @@ type RouteContext = { params: Promise<{ userId: string }> };
 export async function PUT(request: NextRequest, context: RouteContext) {
   const { userId } = await context.params;
   return withTenantContext(request, async (ctx) => {
-    requireModule(ctx, 'user_management');
+    requireModule(ctx, 'user-management');
 
     if (ctx.role !== 'tenant_admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

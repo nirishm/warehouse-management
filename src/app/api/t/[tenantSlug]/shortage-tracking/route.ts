@@ -14,7 +14,7 @@ import {
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
-    requireModule(ctx, 'shortage_tracking');
+    requireModule(ctx, 'shortage-tracking');
     requirePermission(ctx, 'canViewAnalytics');
 
     const [overview, byRoute, byTransporter, byCommodity, recent] =

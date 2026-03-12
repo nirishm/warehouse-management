@@ -6,7 +6,7 @@ import { createTenantClient } from '@/core/db/tenant-query';
 
 export async function GET(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
-    requireModule(ctx, 'user_management');
+    requireModule(ctx, 'user-management');
 
     if (ctx.role !== 'tenant_admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -19,6 +19,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   return withTenantContext(request, async (ctx) => {
+    requireModule(ctx, 'user-management');
+
     if (ctx.role !== 'tenant_admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
