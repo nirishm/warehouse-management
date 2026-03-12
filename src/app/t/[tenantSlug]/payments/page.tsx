@@ -14,7 +14,7 @@ export default async function PaymentsPage({ params }: Props) {
   const tenant = await getTenantBySlug(tenantSlug);
   if (!tenant) return null;
 
-  const payments = await listPayments(tenant.schema_name);
+  const { data: payments, total } = await listPayments(tenant.schema_name);
 
   const totalRecorded = payments.reduce((sum, p) => sum + Number(p.amount), 0);
 
@@ -33,7 +33,7 @@ export default async function PaymentsPage({ params }: Props) {
       <Card className="bg-[var(--bg-base)] border-[var(--border)]">
         <CardHeader className="pb-0">
           <CardTitle className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)]">
-            All Payments ({payments.length})
+            All Payments ({total})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

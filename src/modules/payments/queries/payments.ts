@@ -1,18 +1,31 @@
-import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
+import { createTenantClient } from '@/core/db/tenant-query';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { validateSchemaName, validateUUID } from '@/core/db/validate-schema';
 import type { CreatePaymentInput, Payment, TransactionBalance } from '../validations/payment';
+import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 
-export async function listPayments(schemaName: string): Promise<Payment[]> {
+export async function listPayments(
+  schemaName: string,
+  options?: { pagination?: PaginationParams }
+): Promise<PaginatedResponse<Payment>> {
   const client = createTenantClient(schemaName);
-  const { data, error } = await client
+  let query = client
     .from('payments')
-    .select('*')
+    .select('*', { count: 'exact' })
     .is('deleted_at', null)
     .order('payment_date', { ascending: false });
 
+  if (options?.pagination) {
+    query = applyPagination(query, options.pagination);
+  }
+
+  const { data, error, count } = await query;
   if (error) throw new Error(`Failed to list payments: ${error.message}`);
-  return (data ?? []) as Payment[];
+  return paginatedResult(
+    (data ?? []) as Payment[],
+    count ?? 0,
+    options?.pagination ?? { page: 1, pageSize: 50 }
+  );
 }
 
 export async function getPaymentsForTransaction(
@@ -38,26 +51,12 @@ export async function createPayment(
   input: CreatePaymentInput,
   userId: string
 ): Promise<Payment> {
-  const client = createTenantClient(schemaName);
-  const paymentNumber = await getNextSequenceNumber(schemaName, 'payment');
-
-  const { data, error } = await client
-    .from('payments')
-    .insert({
-      payment_number: paymentNumber,
-      transaction_type: input.transaction_type,
-      transaction_id: input.transaction_id,
-      contact_id: input.contact_id ?? null,
-      amount: input.amount,
-      payment_date: input.payment_date ?? new Date().toISOString(),
-      payment_method: input.payment_method,
-      reference_number: input.reference_number ?? null,
-      notes: input.notes ?? null,
-      recorded_by: userId,
-    })
-    .select('*')
-    .single();
-
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient.rpc('create_payment_txn', {
+    p_schema: schemaName,
+    p_input: input,
+    p_user_id: userId,
+  });
   if (error) throw new Error(`Failed to create payment: ${error.message}`);
   return data as Payment;
 }
