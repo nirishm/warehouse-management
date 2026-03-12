@@ -1,5 +1,16 @@
 import { pgTable, uuid, text, boolean, jsonb, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
 
+export const accessRequests = pgTable('access_requests', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull(),
+  email: text('email').notNull(),
+  status: text('status', { enum: ['pending', 'approved', 'rejected'] }).notNull().default('pending'),
+  tenantId: uuid('tenant_id').references(() => tenants.id),
+  reviewedBy: uuid('reviewed_by'),
+  reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const tenants = pgTable('tenants', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
