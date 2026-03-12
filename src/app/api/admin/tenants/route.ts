@@ -2,16 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { provisionTenantSchema } from '@/core/db/tenant-provisioning';
+import { withSuperAdmin } from '@/core/auth/admin-guard';
 
-export async function GET() {
-  const supabase = await createServerSupabaseClient();
-  const { data: tenants, error } = await supabase
-    .from('tenants')
-    .select('*')
-    .order('created_at', { ascending: false });
+export async function GET(request: NextRequest) {
+  return withSuperAdmin(request, async () => {
+    const admin = createAdminClient();
+    const { data: tenants, error } = await admin
+      .from('tenants')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ tenants });
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ tenants });
+  });
 }
 
 export async function POST(request: NextRequest) {
