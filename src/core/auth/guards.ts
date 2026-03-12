@@ -3,6 +3,7 @@ import type { TenantContext } from './types';
 import type { Permission } from './permissions';
 import { hasPermission } from './permissions';
 import { ApiError, errorResponse } from '../api/error-handler';
+import { checkRateLimit } from '../api/with-rate-limit';
 
 export function withTenantContext(
   handler: (req: NextRequest, ctx: TenantContext) => Promise<NextResponse>,
@@ -13,6 +14,10 @@ export function withTenantContext(
     _routeContext?: { params: Promise<Record<string, string>> },
   ) => {
     try {
+      // Check rate limits before any other logic
+      const rateLimitResponse = await checkRateLimit(req);
+      if (rateLimitResponse) return rateLimitResponse;
+
       // Read headers injected by middleware
       const tenantId = req.headers.get('x-tenant-id');
       const tenantSlug = req.headers.get('x-tenant-slug');
