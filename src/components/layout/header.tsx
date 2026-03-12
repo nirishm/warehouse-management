@@ -20,11 +20,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Sidebar } from "./sidebar";
+import { GlobalSearch } from "@/components/search/global-search";
 
 export function Header() {
   const { userEmail, role } = useTenant();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   async function handleSignOut() {
     if (signingOut) return;
@@ -77,9 +79,7 @@ export function Header() {
           background: "var(--bg-off)",
         }}
         className="hidden md:flex items-center gap-2 px-3 py-1.5 text-[13px] transition-colors hover:border-[var(--border-mid)]"
-        onClick={() => {
-          // Global search — can be wired to Command palette later
-        }}
+        onClick={() => setSearchOpen(true)}
         aria-label="Search (⌘K)"
       >
         <Search className="size-3.5 shrink-0" />
@@ -101,9 +101,13 @@ export function Header() {
         className="md:hidden"
         style={{ color: "var(--text-muted)" }}
         aria-label="Search"
+        onClick={() => setSearchOpen(true)}
       >
         <Search className="size-5" />
       </button>
+
+      {/* Global Search dialog */}
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
       {/* User dropdown */}
       <DropdownMenu>
