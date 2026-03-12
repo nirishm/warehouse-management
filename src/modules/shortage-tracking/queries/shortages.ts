@@ -65,11 +65,91 @@ function toNum(val: unknown): number {
 }
 
 // ---------------------------------------------------------------------------
+// Internal row types for joined queries
+// ---------------------------------------------------------------------------
+
+interface DispatchJoinBase {
+  id: string;
+  status: string;
+  received_at: string | null;
+  deleted_at: string | null;
+}
+
+interface DispatchJoinRoute extends DispatchJoinBase {
+  origin_location_id: string;
+  dest_location_id: string;
+}
+
+interface DispatchJoinTransporter extends DispatchJoinBase {
+  transporter_name: string | null;
+}
+
+interface DispatchJoinFull extends DispatchJoinBase {
+  dispatch_number: string;
+  origin_location_id: string;
+  dest_location_id: string;
+}
+
+interface OverviewItemRow {
+  shortage: number | null;
+  shortage_percent: number | null;
+  received_quantity: number | null;
+  dispatch: DispatchJoinBase | null;
+}
+
+interface RouteItemRow {
+  dispatch_id: string;
+  sent_quantity: number | null;
+  received_quantity: number | null;
+  shortage: number | null;
+  shortage_percent: number | null;
+  dispatch: DispatchJoinRoute | null;
+}
+
+interface TransporterItemRow {
+  dispatch_id: string;
+  shortage: number | null;
+  shortage_percent: number | null;
+  dispatch: DispatchJoinTransporter | null;
+}
+
+interface CommodityItemRow {
+  dispatch_id: string;
+  commodity_id: string;
+  sent_quantity: number | null;
+  shortage: number | null;
+  shortage_percent: number | null;
+  dispatch: DispatchJoinBase | null;
+}
+
+interface RecentItemRow {
+  id: string;
+  dispatch_id: string;
+  commodity_id: string;
+  sent_quantity: number | null;
+  received_quantity: number | null;
+  shortage: number | null;
+  shortage_percent: number | null;
+  dispatch: DispatchJoinFull | null;
+}
+
+interface LocationRow {
+  id: string;
+  name: string;
+}
+
+interface CommodityRow {
+  id: string;
+  name: string;
+}
+
+// ---------------------------------------------------------------------------
 // Queries
 // ---------------------------------------------------------------------------
 
 /**
  * Aggregate overview stats across all received dispatches.
+ * Single query: dispatch_items joined to dispatches, filtered in JS.
  */
 export async function getShortageOverview(
   schemaName: string
@@ -77,19 +157,31 @@ export async function getShortageOverview(
   const client = createTenantClient(schemaName);
   const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Get received dispatches within the last 90 days
-  const { data: dispatches, error: dErr } = await client
-    .from('dispatches')
-    .select('id')
-    .eq('status', 'received')
-    .is('deleted_at', null)
-    .gte('received_at', defaultFrom)
+  const { data, error } = await client
+    .from('dispatch_items')
+    .select(
+      'shortage, shortage_percent, received_quantity, dispatch:dispatches!dispatch_id(id, status, received_at, deleted_at)'
+    )
     .limit(500);
 
-  if (dErr) throw new Error(`Failed to fetch dispatches: ${dErr.message}`);
+  if (error) throw new Error(`Failed to fetch shortage overview: ${error.message}`);
 
-  const dispatchIds = (dispatches ?? []).map((d) => d.id);
-  if (dispatchIds.length === 0) {
+  const rows = (data ?? []) as unknown as OverviewItemRow[];
+
+  // Filter: dispatch must be received, not deleted, within 90 days
+  const allItems = rows.filter((i) => {
+    const d = i.dispatch;
+    if (!d) return false;
+    if (d.status !== 'received') return false;
+    if (d.deleted_at !== null) return false;
+    if (!d.received_at || d.received_at < defaultFrom) return false;
+    return true;
+  });
+
+  // Count distinct dispatch IDs
+  const dispatchIds = new Set(allItems.map((i) => i.dispatch!.id));
+
+  if (dispatchIds.size === 0) {
     return {
       total_received_dispatches: 0,
       items_with_shortage: 0,
@@ -99,15 +191,6 @@ export async function getShortageOverview(
     };
   }
 
-  // Get all dispatch items for received dispatches
-  const { data: items, error: iErr } = await client
-    .from('dispatch_items')
-    .select('shortage, shortage_percent, received_quantity')
-    .in('dispatch_id', dispatchIds);
-
-  if (iErr) throw new Error(`Failed to fetch dispatch items: ${iErr.message}`);
-
-  const allItems = items ?? [];
   // Only items where received_quantity is not null (actually received)
   const receivedItems = allItems.filter((i) => i.received_quantity !== null);
   const shortageItems = receivedItems.filter((i) => toNum(i.shortage) > 0);
@@ -120,11 +203,10 @@ export async function getShortageOverview(
     percents.length > 0
       ? percents.reduce((s, p) => s + p, 0) / percents.length
       : 0;
-  const maxPct =
-    percents.length > 0 ? Math.max(...percents) : 0;
+  const maxPct = percents.length > 0 ? Math.max(...percents) : 0;
 
   return {
-    total_received_dispatches: dispatchIds.length,
+    total_received_dispatches: dispatchIds.size,
     items_with_shortage: shortageItems.length,
     avg_shortage_percent: Math.round(avgPct * 100) / 100,
     max_shortage_percent: Math.round(maxPct * 100) / 100,
@@ -134,6 +216,7 @@ export async function getShortageOverview(
 
 /**
  * Shortage grouped by route (origin -> destination).
+ * Single query: dispatch_items joined to dispatches; locations fetched in parallel.
  */
 export async function getShortageByRoute(
   schemaName: string
@@ -141,52 +224,45 @@ export async function getShortageByRoute(
   const client = createTenantClient(schemaName);
   const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Get received dispatches within the last 90 days
-  const { data: dispatches, error: dErr } = await client
-    .from('dispatches')
-    .select('id, origin_location_id, dest_location_id')
-    .eq('status', 'received')
-    .is('deleted_at', null)
-    .gte('received_at', defaultFrom)
-    .limit(500);
-
-  if (dErr) throw new Error(`Failed to fetch dispatches: ${dErr.message}`);
-  if (!dispatches || dispatches.length === 0) return [];
-
-  const dispatchIds = dispatches.map((d) => d.id);
-
-  // Get dispatch items
-  const { data: items, error: iErr } = await client
+  const { data, error: iErr } = await client
     .from('dispatch_items')
     .select(
-      'dispatch_id, sent_quantity, received_quantity, shortage, shortage_percent'
+      'dispatch_id, sent_quantity, received_quantity, shortage, shortage_percent, dispatch:dispatches!dispatch_id(id, status, received_at, deleted_at, origin_location_id, dest_location_id)'
     )
-    .in('dispatch_id', dispatchIds);
+    .limit(500);
 
   if (iErr) throw new Error(`Failed to fetch dispatch items: ${iErr.message}`);
 
-  // Get all locations
-  const locationIds = new Set<string>();
-  dispatches.forEach((d) => {
-    locationIds.add(d.origin_location_id);
-    locationIds.add(d.dest_location_id);
+  const rows = (data ?? []) as unknown as RouteItemRow[];
+
+  // Filter to received, non-deleted, within 90 days
+  const filteredItems = rows.filter((i) => {
+    const d = i.dispatch;
+    if (!d) return false;
+    if (d.status !== 'received') return false;
+    if (d.deleted_at !== null) return false;
+    if (!d.received_at || d.received_at < defaultFrom) return false;
+    return true;
   });
 
-  const { data: locations, error: lErr } = await client
+  if (filteredItems.length === 0) return [];
+
+  // Collect unique location IDs, then fetch in a single parallel query
+  const locationIds = new Set<string>();
+  for (const i of filteredItems) {
+    locationIds.add(i.dispatch!.origin_location_id);
+    locationIds.add(i.dispatch!.dest_location_id);
+  }
+
+  const { data: locData, error: lErr } = await client
     .from('locations')
     .select('id, name')
     .in('id', Array.from(locationIds));
 
   if (lErr) throw new Error(`Failed to fetch locations: ${lErr.message}`);
 
-  const locMap = new Map((locations ?? []).map((l) => [l.id, l.name]));
-
-  // Build dispatch -> route mapping
-  const dispatchMap = new Map(
-    dispatches.map((d) => [
-      d.id,
-      { origin: d.origin_location_id, dest: d.dest_location_id },
-    ])
+  const locMap = new Map(
+    ((locData ?? []) as unknown as LocationRow[]).map((l) => [l.id, l.name])
   );
 
   // Aggregate by route
@@ -203,15 +279,14 @@ export async function getShortageByRoute(
     }
   >();
 
-  for (const item of items ?? []) {
-    const route = dispatchMap.get(item.dispatch_id);
-    if (!route) continue;
-    const key = `${route.origin}|${route.dest}`;
+  for (const item of filteredItems) {
+    const d = item.dispatch!;
+    const key = `${d.origin_location_id}|${d.dest_location_id}`;
 
     if (!routeAgg.has(key)) {
       routeAgg.set(key, {
-        origin_location_id: route.origin,
-        dest_location_id: route.dest,
+        origin_location_id: d.origin_location_id,
+        dest_location_id: d.dest_location_id,
         dispatchIds: new Set(),
         total_sent: 0,
         total_received: 0,
@@ -256,6 +331,7 @@ export async function getShortageByRoute(
 
 /**
  * Shortage grouped by transporter name.
+ * Single query: dispatch_items joined to dispatches for transporter_name.
  */
 export async function getShortageByTransporter(
   schemaName: string
@@ -263,30 +339,28 @@ export async function getShortageByTransporter(
   const client = createTenantClient(schemaName);
   const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Get received dispatches within the last 90 days
-  const { data: dispatches, error: dErr } = await client
-    .from('dispatches')
-    .select('id, transporter_name')
-    .eq('status', 'received')
-    .is('deleted_at', null)
-    .gte('received_at', defaultFrom)
+  const { data, error } = await client
+    .from('dispatch_items')
+    .select(
+      'dispatch_id, shortage, shortage_percent, dispatch:dispatches!dispatch_id(id, status, received_at, deleted_at, transporter_name)'
+    )
     .limit(500);
 
-  if (dErr) throw new Error(`Failed to fetch dispatches: ${dErr.message}`);
-  if (!dispatches || dispatches.length === 0) return [];
+  if (error) throw new Error(`Failed to fetch dispatch items: ${error.message}`);
 
-  const dispatchIds = dispatches.map((d) => d.id);
+  const rows = (data ?? []) as unknown as TransporterItemRow[];
 
-  const { data: items, error: iErr } = await client
-    .from('dispatch_items')
-    .select('dispatch_id, shortage, shortage_percent')
-    .in('dispatch_id', dispatchIds);
+  // Filter to received, non-deleted, within 90 days
+  const filteredItems = rows.filter((i) => {
+    const d = i.dispatch;
+    if (!d) return false;
+    if (d.status !== 'received') return false;
+    if (d.deleted_at !== null) return false;
+    if (!d.received_at || d.received_at < defaultFrom) return false;
+    return true;
+  });
 
-  if (iErr) throw new Error(`Failed to fetch dispatch items: ${iErr.message}`);
-
-  const dispatchTransporter = new Map(
-    dispatches.map((d) => [d.id, d.transporter_name ?? 'Unknown'])
-  );
+  if (filteredItems.length === 0) return [];
 
   const transporterAgg = new Map<
     string,
@@ -297,8 +371,8 @@ export async function getShortageByTransporter(
     }
   >();
 
-  for (const item of items ?? []) {
-    const name = dispatchTransporter.get(item.dispatch_id) ?? 'Unknown';
+  for (const item of filteredItems) {
+    const name = item.dispatch!.transporter_name ?? 'Unknown';
 
     if (!transporterAgg.has(name)) {
       transporterAgg.set(name, {
@@ -337,6 +411,7 @@ export async function getShortageByTransporter(
 
 /**
  * Shortage grouped by commodity.
+ * Single query: dispatch_items joined to dispatches; commodities fetched in parallel.
  */
 export async function getShortageByCommodity(
   schemaName: string
@@ -344,34 +419,33 @@ export async function getShortageByCommodity(
   const client = createTenantClient(schemaName);
   const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Get received dispatches within the last 90 days
-  const { data: dispatches, error: dErr } = await client
-    .from('dispatches')
-    .select('id')
-    .eq('status', 'received')
-    .is('deleted_at', null)
-    .gte('received_at', defaultFrom)
-    .limit(500);
-
-  if (dErr) throw new Error(`Failed to fetch dispatches: ${dErr.message}`);
-  if (!dispatches || dispatches.length === 0) return [];
-
-  const dispatchIds = dispatches.map((d) => d.id);
-
-  const { data: items, error: iErr } = await client
+  const { data, error: iErr } = await client
     .from('dispatch_items')
     .select(
-      'dispatch_id, commodity_id, sent_quantity, shortage, shortage_percent'
+      'dispatch_id, commodity_id, sent_quantity, shortage, shortage_percent, dispatch:dispatches!dispatch_id(id, status, received_at, deleted_at)'
     )
-    .in('dispatch_id', dispatchIds);
+    .limit(500);
 
   if (iErr) throw new Error(`Failed to fetch dispatch items: ${iErr.message}`);
 
-  // Get all commodities
-  const commodityIds = new Set(
-    (items ?? []).map((i) => i.commodity_id as string)
-  );
-  const { data: commodities, error: cErr } = await client
+  const rows = (data ?? []) as unknown as CommodityItemRow[];
+
+  // Filter to received, non-deleted, within 90 days
+  const filteredItems = rows.filter((i) => {
+    const d = i.dispatch;
+    if (!d) return false;
+    if (d.status !== 'received') return false;
+    if (d.deleted_at !== null) return false;
+    if (!d.received_at || d.received_at < defaultFrom) return false;
+    return true;
+  });
+
+  if (filteredItems.length === 0) return [];
+
+  // Collect unique commodity IDs and fetch names in a single extra query
+  const commodityIds = new Set(filteredItems.map((i) => i.commodity_id));
+
+  const { data: comData, error: cErr } = await client
     .from('commodities')
     .select('id, name')
     .in('id', Array.from(commodityIds));
@@ -379,7 +453,7 @@ export async function getShortageByCommodity(
   if (cErr) throw new Error(`Failed to fetch items: ${cErr.message}`);
 
   const comMap = new Map(
-    (commodities ?? []).map((c) => [c.id, c.name as string])
+    ((comData ?? []) as unknown as CommodityRow[]).map((c) => [c.id, c.name])
   );
 
   const commAgg = new Map<
@@ -392,8 +466,8 @@ export async function getShortageByCommodity(
     }
   >();
 
-  for (const item of items ?? []) {
-    const cid = item.commodity_id as string;
+  for (const item of filteredItems) {
+    const cid = item.commodity_id;
 
     if (!commAgg.has(cid)) {
       commAgg.set(cid, {
@@ -436,107 +510,95 @@ export async function getShortageByCommodity(
 
 /**
  * Recent dispatch items with shortage > 0.
+ * Single query: dispatch_items joined to dispatches; commodities + locations fetched in parallel.
  */
 export async function getRecentShortages(
   schemaName: string,
   limit: number = 20
 ): Promise<RecentShortageItem[]> {
   const client = createTenantClient(schemaName);
-
   const defaultFrom = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Get received dispatches ordered by received_at desc, bounded to 90 days
-  const { data: dispatches, error: dErr } = await client
-    .from('dispatches')
-    .select(
-      'id, dispatch_number, origin_location_id, dest_location_id, received_at'
-    )
-    .eq('status', 'received')
-    .is('deleted_at', null)
-    .gte('received_at', defaultFrom)
-    .order('received_at', { ascending: false })
-    .limit(500);
-
-  if (dErr) throw new Error(`Failed to fetch dispatches: ${dErr.message}`);
-  if (!dispatches || dispatches.length === 0) return [];
-
-  const dispatchIds = dispatches.map((d) => d.id);
-
-  // Get items with shortage > 0
-  const { data: items, error: iErr } = await client
+  const { data, error: iErr } = await client
     .from('dispatch_items')
     .select(
-      'id, dispatch_id, commodity_id, sent_quantity, received_quantity, shortage, shortage_percent'
+      'id, dispatch_id, commodity_id, sent_quantity, received_quantity, shortage, shortage_percent, dispatch:dispatches!dispatch_id(id, status, dispatch_number, origin_location_id, dest_location_id, received_at, deleted_at)'
     )
-    .in('dispatch_id', dispatchIds)
-    .gt('shortage', 0);
+    .gt('shortage', 0)
+    .limit(500);
 
   if (iErr) throw new Error(`Failed to fetch dispatch items: ${iErr.message}`);
-  if (!items || items.length === 0) return [];
 
-  // Get commodity names
-  const commodityIds = new Set(items.map((i) => i.commodity_id as string));
-  const { data: commodities, error: cErr } = await client
-    .from('commodities')
-    .select('id, name')
-    .in('id', Array.from(commodityIds));
+  const rows = (data ?? []) as unknown as RecentItemRow[];
 
-  if (cErr) throw new Error(`Failed to fetch items: ${cErr.message}`);
-
-  const comMap = new Map(
-    (commodities ?? []).map((c) => [c.id, c.name as string])
-  );
-
-  // Get location names
-  const locationIds = new Set<string>();
-  dispatches.forEach((d) => {
-    locationIds.add(d.origin_location_id);
-    locationIds.add(d.dest_location_id);
+  // Filter to received, non-deleted, within 90 days
+  const filteredItems = rows.filter((i) => {
+    const d = i.dispatch;
+    if (!d) return false;
+    if (d.status !== 'received') return false;
+    if (d.deleted_at !== null) return false;
+    if (!d.received_at || d.received_at < defaultFrom) return false;
+    return true;
   });
 
-  const { data: locations, error: lErr } = await client
-    .from('locations')
-    .select('id, name')
-    .in('id', Array.from(locationIds));
+  if (filteredItems.length === 0) return [];
 
-  if (lErr) throw new Error(`Failed to fetch locations: ${lErr.message}`);
+  // Collect IDs for parallel lookups
+  const commodityIds = new Set(filteredItems.map((i) => i.commodity_id));
+  const locationIds = new Set<string>();
+  for (const i of filteredItems) {
+    locationIds.add(i.dispatch!.origin_location_id);
+    locationIds.add(i.dispatch!.dest_location_id);
+  }
 
-  const locMap = new Map((locations ?? []).map((l) => [l.id, l.name]));
+  // Fetch commodities and locations in parallel
+  const [commoditiesResult, locationsResult] = await Promise.all([
+    client
+      .from('commodities')
+      .select('id, name')
+      .in('id', Array.from(commodityIds)),
+    client
+      .from('locations')
+      .select('id, name')
+      .in('id', Array.from(locationIds)),
+  ]);
 
-  const dispatchMap = new Map(
-    dispatches.map((d) => [
-      d.id,
-      {
-        dispatch_number: d.dispatch_number as string,
-        origin_location_id: d.origin_location_id as string,
-        dest_location_id: d.dest_location_id as string,
-        received_at: d.received_at as string,
-      },
+  if (commoditiesResult.error)
+    throw new Error(`Failed to fetch items: ${commoditiesResult.error.message}`);
+  if (locationsResult.error)
+    throw new Error(`Failed to fetch locations: ${locationsResult.error.message}`);
+
+  const comMap = new Map(
+    ((commoditiesResult.data ?? []) as unknown as CommodityRow[]).map((c) => [
+      c.id,
+      c.name,
+    ])
+  );
+  const locMap = new Map(
+    ((locationsResult.data ?? []) as unknown as LocationRow[]).map((l) => [
+      l.id,
+      l.name,
     ])
   );
 
   // Build result, sort by received_at desc, limit
-  const result: RecentShortageItem[] = items
+  const result: RecentShortageItem[] = filteredItems
     .map((item) => {
-      const dispatch = dispatchMap.get(item.dispatch_id);
-      if (!dispatch) return null;
+      const d = item.dispatch!;
       return {
         id: item.id,
         dispatch_id: item.dispatch_id,
-        dispatch_number: dispatch.dispatch_number,
-        commodity_name: comMap.get(item.commodity_id as string) ?? 'Unknown',
-        origin_name:
-          locMap.get(dispatch.origin_location_id) ?? 'Unknown',
-        dest_name:
-          locMap.get(dispatch.dest_location_id) ?? 'Unknown',
+        dispatch_number: d.dispatch_number,
+        commodity_name: comMap.get(item.commodity_id) ?? 'Unknown',
+        origin_name: locMap.get(d.origin_location_id) ?? 'Unknown',
+        dest_name: locMap.get(d.dest_location_id) ?? 'Unknown',
         sent_quantity: toNum(item.sent_quantity),
         received_quantity: toNum(item.received_quantity),
         shortage: toNum(item.shortage),
         shortage_percent: toNum(item.shortage_percent),
-        received_at: dispatch.received_at,
+        received_at: d.received_at!,
       };
     })
-    .filter((r): r is RecentShortageItem => r !== null)
     .sort(
       (a, b) =>
         new Date(b.received_at).getTime() - new Date(a.received_at).getTime()
