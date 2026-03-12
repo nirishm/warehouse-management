@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WareOS — Design System Reference</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hedvig+Letters+Serif:opsz@24&family=Rethink+Sans:wght@400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    /* ═══════════════════════════════════════════════
+       1. DESIGN TOKENS — authoritative source of truth
+       ═══════════════════════════════════════════════ */
+    :root {
+      /* Backgrounds */
+      --bg-base:      #FFFFFF;
+      --bg-off:       #F5F5F3;
+      --bg-ink:       #080808;
+
+      /* Text */
+      --text-primary: #000000;
+      --text-body:    #1C1C1C;
+      --text-muted:   #575757;
+      --text-dim:     #A3A3A3;
+
+      /* Accent */
+      --accent:       #F45F00;
+      --accent-dark:  #C94F00;
+      --accent-tint:  rgba(244,95,0,0.06);
+
+      /* Borders */
+      --border:       rgba(0,0,0,0.08);
+      --border-mid:   rgba(0,0,0,0.12);
+
+      /* Status */
+      --green:        #16A34A;
+      --green-bg:     rgba(22,163,74,0.08);
+      --blue:         #2563EB;
+      --blue-bg:      rgba(37,99,235,0.08);
+      --red:          #DC2626;
+      --red-bg:       rgba(220,38,38,0.08);
+      --orange-bg:    rgba(244,95,0,0.08);
+      --color-info:    #4B5563;   /* Info toast icon background */
+      --color-warning: #D97706;   /* Warning toast icon background */
+
+      /* Layout (marketing surface) */
+      --container:    1280px;
+      --px:           clamp(20px, 4vw, 40px);
+
+      /* App shell */
+      --sidebar-w:    240px;
+      --header-h:     60px;
+      --mobile-header-h: 56px;
+      --mobile-nav-h: 72px;
+
+      /* Component sizing */
+      --btn-h:        40px;
+      --btn-h-sm:     36px;
+      --btn-h-lg:     48px;
+      --input-h:      38px;
+      --card-padding: 20px;
+      --card-radius:  12px;
+      --table-cell-px: 16px;
+      --table-cell-py: 11px;
+      --content-px:   28px;
+
+      /* Typography */
+      --serif: 'Hedvig Letters Serif', Georgia, serif;
+      --sans:  'Rethink Sans', system-ui, sans-serif;
+      --mono:  'Space Mono', 'Courier New', monospace;
+    }
+
+    /* ═══════════════════════════════════════════════
+       2. RESET + BASE
+       ═══════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--text-body);
+      background: var(--bg-off);
+      line-height: 1.5;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    code { font-family: var(--mono); }
+
+    /* ═══════════════════════════════════════════════
+       3. PAGE SHELL
+       ═══════════════════════════════════════════════ */
+    .page-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 48px;
+      background: var(--bg-base);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 12px;
+      z-index: 100;
+    }
+    .page-header .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .page-header .brand .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .page-header .brand .wordmark {
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--bg-ink);
+      letter-spacing: -0.3px;
+    }
+    .page-header .divider {
+      width: 1px; height: 16px;
+      background: var(--border-mid);
+    }
+    .page-header .subtitle {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .page-header .spacer { flex: 1; }
+    .page-header .version {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .layout-shell {
+      display: flex;
+      padding-top: 48px;
+      min-height: 100vh;
+    }
+
+    /* ─── Sidebar Nav ─── */
+    .sidebar-nav {
+      width: 200px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 48px;
+      height: calc(100vh - 48px);
+      overflow-y: auto;
+      background: var(--bg-base);
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    .sidebar-nav .nav-group-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      padding: 12px 16px 4px;
+    }
+
+    /* S1 — Shared nav-item base */
+    .nav-item {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-left: 2px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sidebar-nav .nav-item { gap: 8px; padding: 7px 16px; font-size: 12.5px; }
+    .sidebar-mock .nav-item { gap: 10px; padding: 8px 20px; font-size: 13.5px; }
+    .nav-item:hover,
+    .sidebar-mock .nav-item.is-hover { background: var(--bg-off); color: var(--text-body); }
+    .nav-item.active {
+      color: var(--accent);
+      background: var(--accent-tint);
+      border-left-color: var(--accent);
+    }
+    .sidebar-nav .nav-item .nav-num {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      width: 14px;
+      flex-shrink: 0;
+    }
+    .sidebar-nav .nav-item.active .nav-num { color: var(--accent); }
+
+    /* ─── Main Content ─── */
+    .main-content {
+      flex: 1;
+      padding: 40px 48px;
+      max-width: 960px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       4. CONTENT STRUCTURE
+       ═══════════════════════════════════════════════ */
+    .section {
+      margin-bottom: 72px;
+    }
+    .section-heading {
+      font-family: var(--serif);
+      font-size: 26px;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+      padding-bottom: 12px;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .section-subheading {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+      margin-top: 4px;
+    }
+    .subsection-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin: 28px 0 12px;
+    }
+    .example-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 20px;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .example-row .specimen { flex: 1; }
+    .example-row .code-block { flex: 1; }
+    .code-block {
+      background: var(--bg-off);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--text-body);
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .code-block.standalone {
+      margin: 12px 0;
+    }
+
+    /* S2 — Callout base */
+    .callout { border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 13px; }
+    .callout--info { background: var(--blue-bg); border: 1px solid rgba(37,99,235,0.15); border-left: 3px solid var(--blue); font-size: 12.5px; color: var(--text-body); }
+    .callout-title { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 8px; }
+    .callout--info .callout-title { color: var(--blue); margin-bottom: 6px; }
+
+    /* ─── Two-col table ─── */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 12px 0;
+    }
+    .spec-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .spec-table tr:last-child td { border-bottom: none; }
+    .spec-table td code {
+      font-size: 11px;
+      background: var(--bg-off);
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+    }
+
+    /* ═══════════════════════════════════════════════
+       5. COMPONENT CLASSES (mirror the real app)
+       ═══════════════════════════════════════════════ */
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: var(--sans);
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s, opacity 0.15s;
+    }
+    .btn--orange {
+      height: var(--btn-h-lg);
+      padding: 0 28px;
+      background: var(--accent);
+      color: white;
+      border-radius: 9999px;
+      font-size: 14.5px;
+    }
+    .btn--orange:hover,
+    .btn--orange.is-hover  { background: var(--accent-dark); }
+    .btn--orange:active    { transform: scale(0.98); }
+    .btn--orange.is-disabled, .btn--orange:disabled {
+      opacity: 0.4; cursor: not-allowed; transform: none;
+    }
+
+    .btn--ghost {
+      height: var(--btn-h-lg);
+      padding: 0 20px;
+      background: none;
+      color: var(--text-muted);
+      border: 1.5px solid var(--border-mid);
+      border-radius: 9999px;
+      font-size: 14px;
+    }
+    .btn--ghost:hover,
+    .btn--ghost.is-hover  { border-color: var(--text-muted); color: var(--text-body); }
+    .btn--ghost.is-disabled, .btn--ghost:disabled {
+      opacity: 0.4; cursor: not-allowed;
+    }
+
+    .btn--outline-orange {
+      height: var(--btn-h);
+      padding: 0 18px;
+      background: none;
+      color: var(--accent);
+      border: 1.5px solid var(--accent);
+      border-radius: 9999px;
+      font-size: 13px;
+    }
+    .btn--outline-orange:hover,
+    .btn--outline-orange.is-hover { background: var(--accent-tint); }
+
+    .btn--ink {
+      height: var(--btn-h-lg);
+      padding: 0 28px;
+      background: var(--bg-ink);
+      color: white;
+      border-radius: 9999px;
+      font-size: 14.5px;
+    }
+    .btn--ink:hover,
+    .btn--ink.is-hover { background: #1C1C1C; }
+
+    .btn--subtle {
+      height: var(--btn-h);
+      padding: 0 16px;
+      background: var(--bg-off);
+      color: var(--text-body);
+      border-radius: 8px;
+      font-size: 13px;
+      border: 1px solid var(--border);
+    }
+    .btn--subtle:hover,
+    .btn--subtle.is-hover { background: var(--bg-off); }
+
+    .btn--destructive {
+      height: var(--btn-h);
+      padding: 0 18px;
+      background: var(--red-bg);
+      color: var(--red);
+      border-radius: 9999px;
+      font-size: 13px;
+      border: 1px solid rgba(220,38,38,0.2);
+    }
+    .btn--destructive:hover,
+    .btn--destructive.is-hover { background: rgba(220,38,38,0.14); }
+
+    .btn--icon-only {
+      width: 36px; height: 36px;
+      padding: 0;
+      background: var(--bg-off);
+      color: var(--text-muted);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .btn--icon-only:hover,
+    .btn--icon-only.is-hover { color: var(--text-body); background: var(--bg-off); }
+
+    /* Size modifiers */
+    .btn--sm { height: var(--btn-h-sm); font-size: 13px; padding: 0 16px; }
+    .btn--md { height: var(--btn-h);    font-size: 13.5px; padding: 0 18px; }
+    /* default = lg (48px) */
+
+    /* Loading */
+    .btn.is-loading { position: relative; color: transparent; }
+    .btn.is-loading::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    .btn--ghost.is-loading::after,
+    .btn--outline-orange.is-loading::after {
+      border-color: rgba(0,0,0,0.15);
+      border-top-color: var(--text-body);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Badges ─── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--mono);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 9999px;
+      padding: 3px 8px;
+    }
+    .badge::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .badge.received   { background: var(--green-bg);  color: var(--green); }
+    .badge.dispatched { background: var(--orange-bg); color: var(--accent); }
+    .badge.confirmed  { background: var(--blue-bg);   color: var(--blue); }
+    .badge.cancelled  { background: var(--red-bg);    color: var(--red); }
+    .badge.pending    { background: var(--bg-off);    color: var(--text-muted); }
+    .badge.pending::before { background: var(--text-dim); }
+
+    /* Type badge (rectangular, not pill) */
+    .type-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .type-badge.dispatch { background: var(--orange-bg); color: var(--accent); }
+    .type-badge.purchase { background: var(--blue-bg);   color: var(--blue); }
+    .type-badge.sale     { background: var(--green-bg);  color: var(--green); }
+    .type-badge.shortage { background: var(--orange-bg); color: var(--accent); font-size: 8.5px; border-radius: 3px; padding: 2px 5px; }
+
+    /* Plan tier badges */
+    .tier-badge {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .tier-badge.starter  { background: var(--bg-off); color: var(--text-muted); border: 1px solid var(--border); }
+    .tier-badge.growth   { background: var(--blue-bg);   color: var(--blue); }
+    .tier-badge.pro      { background: var(--orange-bg); color: var(--accent); }
+    .tier-badge.enterprise { background: var(--bg-ink); color: white; }
+
+    /* ─── Form Controls ─── */
+    .form-field { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      height: var(--input-h);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-base);
+      padding: 0 10px;
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--text-body);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      appearance: none;
+    }
+    .form-textarea { height: 72px; padding: 8px 10px; resize: none; }
+    .form-input:focus,
+    .form-select:focus,
+    .form-input.is-focus,
+    .form-select.is-focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(244,95,0,0.1);
+    }
+    .form-input.is-error,
+    .form-select.is-error {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+    }
+    .form-input.is-disabled,
+    .form-select.is-disabled,
+    .form-input:disabled,
+    .form-select:disabled {
+      background: var(--bg-off);
+      color: var(--text-dim);
+      cursor: not-allowed;
+    }
+    .form-footer { font-size: 11px; margin-top: 4px; color: var(--text-dim); }
+    .form-footer--error { color: var(--red); }
+
+    /* ─── Cards ─── */
+    .card {
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: var(--card-padding);
+      transition: box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+    .panel {
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 12px 0;
+    }
+    .kpi-card {
+    }
+    .kpi-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .kpi-value {
+      font-family: var(--serif);
+      font-size: 28px;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .kpi-delta {
+      font-size: 11px;
+      color: var(--green);
+      margin-top: 4px;
+    }
+
+    /* ─── Data Table ─── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table tbody tr {
+      cursor: pointer;
+      transition: background 0.1s;
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody tr:hover,
+    .data-table tbody tr.is-hover { background: var(--bg-off); }
+    .data-table tbody td {
+      padding: var(--table-cell-py) var(--table-cell-px);
+      font-size: 13px;
+      color: var(--text-body);
+    }
+    .seq-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .seq-num.accent { color: var(--accent); }
+    .timestamp {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--text-dim);
+    }
+    .qty-value { font-family: var(--mono); font-size: 12px; font-weight: 700; }
+
+    /* ─── Navigation (full sidebar mock) ─── */
+    .sidebar-mock {
+      width: 240px;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .sidebar-mock .brand-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar-mock .brand-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .sidebar-mock .brand-name {
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--bg-ink);
+      letter-spacing: -0.3px;
+    }
+    .sidebar-mock .nav-group-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      padding: 12px 20px 4px;
+    }
+    .sidebar-mock .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-mock .nav-footer {
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+    }
+
+    /* ─── Toast Cards ─── */
+    .toast-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-ink);
+      color: white;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      min-width: 280px;
+      width: fit-content;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    .toast-card .toast-icon {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .toast-card .toast-icon svg { width: 12px; height: 12px; }
+    .toast-card .toast-body { flex: 1; }
+    .toast-card .toast-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+    }
+    .toast-card .toast-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 2px;
+    }
+    .toast-card.success .toast-icon { background: var(--green); }
+    .toast-card.error   .toast-icon { background: var(--red); }
+    .toast-card.info    .toast-icon { background: var(--color-info); }
+    .toast-card.warning .toast-icon { background: var(--color-warning); }
+
+    /* ─── Color Swatches ─── */
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .swatch-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg-base);
+    }
+    .swatch-color {
+      height: 56px;
+      width: 100%;
+    }
+    .swatch-info {
+      padding: 8px 10px;
+    }
+    .swatch-token {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-body);
+      margin-bottom: 2px;
+    }
+    .swatch-hex {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      color: var(--text-dim);
+    }
+    .swatch-usage {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+
+    /* ─── Spacing bars ─── */
+    .spacing-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .spacing-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      width: 36px;
+      text-align: right;
+    }
+    .spacing-bar {
+      background: var(--accent-tint);
+      border: 1px solid var(--border-mid);
+      border-radius: 3px;
+      height: 20px;
+    }
+    .spacing-note {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ─── Empty states ─── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .empty-state .empty-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--bg-off);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 12px;
+      color: var(--text-dim);
+    }
+    .empty-state .empty-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-body);
+      margin-bottom: 4px;
+    }
+    .empty-state .empty-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      max-width: 260px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* ─── Principles list ─── */
+    .principles-list {
+      counter-reset: principle;
+      list-style: none;
+    }
+    .principles-list li {
+      counter-increment: principle;
+      display: flex;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .principles-list li:last-child { border-bottom: none; }
+    .principles-list li::before {
+      content: counter(principle, decimal-leading-zero);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 1px;
+    }
+    .principles-list li strong { color: var(--text-primary); }
+
+    /* ─── Typography specimens ─── */
+    .type-specimen-block .font-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .type-scale-row {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    .type-scale-row .size-tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      width: 40px;
+      flex-shrink: 0;
+    }
+
+    /* S6 — Shared table header rule */
+    .spec-table th, .data-table thead th {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+    }
+    .spec-table th { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--bg-off); }
+    .data-table thead th { padding: var(--table-cell-py) var(--table-cell-px); text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ SECTION: PAGE-HEADER ═══ -->
+<header class="page-header" id="page-header">
+  <div class="brand">
+    <div class="dot"></div>
+    <span class="wordmark">WAREOS</span>
+  </div>
+  <div class="divider"></div>
+  <span class="subtitle">Design System Reference</span>
+  <div class="spacer"></div>
+  <span class="version">v2.0 · 2026-03-08</span>
+</header>
+
+<div class="layout-shell">
+
+  <!-- ─── Sidebar Navigation (live demo of itself) ─── -->
+  <nav class="sidebar-nav" data-component="sidebar-nav">
+    <div class="nav-group-label">Tokens</div>
+    <a href="#colors" class="nav-item active" data-component="nav-item" data-state="active">
+      <span class="nav-num">01</span> Colors
+    </a>
+    <a href="#typography" class="nav-item">
+      <span class="nav-num">02</span> Typography
+    </a>
+    <a href="#spacing" class="nav-item">
+      <span class="nav-num">03</span> Spacing
+    </a>
+    <div class="nav-group-label">Components</div>
+    <a href="#buttons" class="nav-item">
+      <span class="nav-num">04</span> Buttons
+    </a>
+    <a href="#badges" class="nav-item">
+      <span class="nav-num">05</span> Badges
+    </a>
+    <a href="#forms" class="nav-item">
+      <span class="nav-num">06</span> Forms
+    </a>
+    <a href="#cards" class="nav-item">
+      <span class="nav-num">07</span> Cards
+    </a>
+    <a href="#tables" class="nav-item">
+      <span class="nav-num">08</span> Tables
+    </a>
+    <a href="#navigation" class="nav-item">
+      <span class="nav-num">09</span> Navigation
+    </a>
+    <a href="#toasts" class="nav-item">
+      <span class="nav-num">10</span> Toasts
+    </a>
+    <a href="#empty-states" class="nav-item">
+      <span class="nav-num">11</span> Empty States
+    </a>
+    <div class="nav-group-label">Reference</div>
+    <a href="#principles" class="nav-item">
+      <span class="nav-num">12</span> Principles
+    </a>
+  </nav>
+
+  <!-- ─── Main Content ─── -->
+  <main class="main-content">
+
+    <!-- ═══ SECTION: COLORS ═══ -->
+    <section class="section" id="colors">
+      <h2 class="section-heading">Color Tokens</h2>
+      <p class="section-subheading">Section 01 — All values from <code>:root</code> in DESIGN_SYSTEM.md</p>
+
+      <div class="callout callout--info">
+        <div class="callout-title">Canonical accent token</div>
+        <code>--accent</code> is <code>#F45F00</code> — the WareOS brand orange. Use it for all primary CTAs, active nav states, focus rings, and dispatched badge backgrounds. Use <code>--accent-tint</code> (<code>rgba(244,95,0,0.06)</code>) for the subtle 6% tint surface (active nav bg, row highlights).
+      </div>
+
+      <div class="subsection-title">Backgrounds</div>
+      <div class="swatch-grid">
+        <div class="swatch-card" data-token="--bg-base" data-hex="#FFFFFF">
+          <div class="swatch-color" style="background:#FFFFFF; border-bottom:1px solid var(--border);"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--bg-base</div>
+            <div class="swatch-hex">#FFFFFF</div>
+            <div class="swatch-usage">Cards, panels, primary surfaces</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--bg-off" data-hex="#F5F5F3">
+          <div class="swatch-color" style="background:#F5F5F3;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--bg-off</div>
+            <div class="swatch-hex">#F5F5F3</div>
+            <div class="swatch-usage">Page bg, sidebar tint, input bg, row hover</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--bg-ink" data-hex="#080808">
+          <div class="swatch-color" style="background:#080808;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--bg-ink</div>
+            <div class="swatch-hex">#080808</div>
+            <div class="swatch-usage">Footer, dark sections, toasts, inverted pills</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection-title">Text</div>
+      <div class="swatch-grid">
+        <div class="swatch-card" data-token="--text-primary" data-hex="#000000">
+          <div class="swatch-color" style="background:#000000;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--text-primary</div>
+            <div class="swatch-hex">#000000</div>
+            <div class="swatch-usage">Headlines, labels, seq numbers</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--text-body" data-hex="#1C1C1C">
+          <div class="swatch-color" style="background:#1C1C1C;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--text-body</div>
+            <div class="swatch-hex">#1C1C1C</div>
+            <div class="swatch-usage">Default body text</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--text-muted" data-hex="#575757">
+          <div class="swatch-color" style="background:#575757;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--text-muted</div>
+            <div class="swatch-hex">#575757</div>
+            <div class="swatch-usage">Supporting text, metadata</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--text-dim" data-hex="#A3A3A3">
+          <div class="swatch-color" style="background:#A3A3A3;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--text-dim</div>
+            <div class="swatch-hex">#A3A3A3</div>
+            <div class="swatch-usage">Timestamps, col headers, placeholders</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection-title">Accent</div>
+      <div class="swatch-grid">
+        <div class="swatch-card" data-token="--accent" data-hex="#F45F00">
+          <div class="swatch-color" style="background:#F45F00;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--accent</div>
+            <div class="swatch-hex">#F45F00</div>
+            <div class="swatch-usage">CTA buttons, active nav, alerts, dispatched badge</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--accent-dark" data-hex="#C94F00">
+          <div class="swatch-color" style="background:#C94F00;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--accent-dark</div>
+            <div class="swatch-hex">#C94F00</div>
+            <div class="swatch-usage">Hover state on orange elements</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--accent-tint" data-hex="rgba(244,95,0,0.06)">
+          <div class="swatch-color" style="background:rgba(244,95,0,0.06); border-bottom:1px solid var(--border);"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--accent-tint</div>
+            <div class="swatch-hex">rgba(244,95,0,0.06)</div>
+            <div class="swatch-usage">Active nav bg, row highlights</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--orange-bg" data-hex="rgba(244,95,0,0.08)">
+          <div class="swatch-color" style="background:rgba(244,95,0,0.08); border-bottom:1px solid var(--border);"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--orange-bg</div>
+            <div class="swatch-hex">rgba(244,95,0,0.08)</div>
+            <div class="swatch-usage">Dispatched badge bg (slightly stronger than tint)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection-title">Status</div>
+      <div class="swatch-grid">
+        <div class="swatch-card" data-token="--green" data-hex="#16A34A">
+          <div class="swatch-color" style="background:#16A34A;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--green</div>
+            <div class="swatch-hex">#16A34A</div>
+            <div class="swatch-usage">Received, confirmed, success</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--green-bg" data-hex="rgba(22,163,74,0.08)">
+          <div class="swatch-color" style="background:rgba(22,163,74,0.08); border-bottom:1px solid var(--border);"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--green-bg</div>
+            <div class="swatch-hex">rgba(22,163,74,0.08)</div>
+            <div class="swatch-usage">Received badge background</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--blue" data-hex="#2563EB">
+          <div class="swatch-color" style="background:#2563EB;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--blue</div>
+            <div class="swatch-hex">#2563EB</div>
+            <div class="swatch-usage">Purchase / confirmed-sale</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--blue-bg" data-hex="rgba(37,99,235,0.08)">
+          <div class="swatch-color" style="background:rgba(37,99,235,0.08); border-bottom:1px solid var(--border);"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--blue-bg</div>
+            <div class="swatch-hex">rgba(37,99,235,0.08)</div>
+            <div class="swatch-usage">Confirmed badge background</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--red" data-hex="#DC2626">
+          <div class="swatch-color" style="background:#DC2626;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--red</div>
+            <div class="swatch-hex">#DC2626</div>
+            <div class="swatch-usage">Cancelled, errors, destructive</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--red-bg" data-hex="rgba(220,38,38,0.08)">
+          <div class="swatch-color" style="background:rgba(220,38,38,0.08); border-bottom:1px solid var(--border);"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--red-bg</div>
+            <div class="swatch-hex">rgba(220,38,38,0.08)</div>
+            <div class="swatch-usage">Cancelled badge background</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--color-info" data-hex="#4B5563">
+          <div class="swatch-color" style="background:#4B5563;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--color-info</div>
+            <div class="swatch-hex">#4B5563</div>
+            <div class="swatch-usage">Info toast icon background</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--color-warning" data-hex="#D97706">
+          <div class="swatch-color" style="background:#D97706;"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--color-warning</div>
+            <div class="swatch-hex">#D97706</div>
+            <div class="swatch-usage">Warning toast icon background</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection-title">Borders</div>
+      <div class="swatch-grid">
+        <div class="swatch-card" data-token="--border" data-hex="rgba(0,0,0,0.08)">
+          <div class="swatch-color" style="background:rgba(0,0,0,0.08); border-bottom:1px solid var(--border);"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--border</div>
+            <div class="swatch-hex">rgba(0,0,0,0.08)</div>
+            <div class="swatch-usage">Default card borders, dividers</div>
+          </div>
+        </div>
+        <div class="swatch-card" data-token="--border-mid" data-hex="rgba(0,0,0,0.12)">
+          <div class="swatch-color" style="background:rgba(0,0,0,0.12); border-bottom:1px solid var(--border);"></div>
+          <div class="swatch-info">
+            <div class="swatch-token">--border-mid</div>
+            <div class="swatch-hex">rgba(0,0,0,0.12)</div>
+            <div class="swatch-usage">Ghost button borders, focused inputs (unfocused)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION: TYPOGRAPHY ═══ -->
+    <section class="section" id="typography">
+      <h2 class="section-heading">Typography</h2>
+      <p class="section-subheading">Section 02 — Three typefaces, each with a distinct role</p>
+
+      <div class="callout callout--info">
+        <div class="callout-title">Surface-specific font-size</div>
+        Marketing / landing page body: <strong>15px</strong> — App interior (dashboard, forms): <strong>14px</strong>. Intentional split; both surfaces use the same type scale and families.
+      </div>
+
+      <!-- Hedvig Letters Serif -->
+      <div class="type-specimen-block card" style="margin-bottom:10px;">
+        <div class="font-label">Hedvig Letters Serif — display, titles, KPI values</div>
+        <div class="type-scale-row">
+          <span class="size-tag">60px+</span>
+          <span style="font-family:var(--serif); font-size:48px; letter-spacing:-1px; color:var(--text-primary); line-height:1;">Warehouse OS</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="size-tag">40–48px</span>
+          <span style="font-family:var(--serif); font-size:40px; letter-spacing:-0.8px; color:var(--text-primary); line-height:1.1;">Section Heading</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="size-tag">28–32px</span>
+          <span style="font-family:var(--serif); font-size:30px; letter-spacing:-0.5px; color:var(--text-primary);">₹24,83,500</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="size-tag">22–24px</span>
+          <span style="font-family:var(--serif); font-size:22px; letter-spacing:-0.3px; color:var(--text-primary);">New Dispatch</span>
+        </div>
+        <table class="spec-table" style="margin-top:16px;">
+          <tr><th>Usage</th><th>Size</th><th>Letter-spacing</th></tr>
+          <tr><td>Hero headline</td><td><code>60px+</code></td><td><code>-1px to -1.5px</code></td></tr>
+          <tr><td>Landing section header</td><td><code>40–48px</code></td><td><code>-0.5px</code></td></tr>
+          <tr><td>KPI / stat value</td><td><code>28–32px</code></td><td><code>-0.5px</code></td></tr>
+          <tr><td>Form screen title, dashboard h1</td><td><code>22–24px</code></td><td><code>-0.3px</code></td></tr>
+        </table>
+      </div>
+
+      <!-- Rethink Sans -->
+      <div class="type-specimen-block card" style="margin-bottom:10px;">
+        <div class="font-label">Rethink Sans — all UI text, labels, buttons, nav</div>
+        <div class="type-scale-row">
+          <span class="size-tag">18–20px</span>
+          <span style="font-family:var(--sans); font-size:18px; font-weight:600; color:var(--text-primary);">Panel Title</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="size-tag">14–15px</span>
+          <span style="font-family:var(--sans); font-size:14px; color:var(--text-body);">Body text — inventory records, descriptions, nav items at 13.5px</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="size-tag">13px</span>
+          <span style="font-family:var(--sans); font-size:13px; color:var(--text-body);">Table cell content, form values, secondary labels (weight 400–500)</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="size-tag">11–12px</span>
+          <span style="font-family:var(--sans); font-size:11px; font-weight:600; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em;">Form Field Label</span>
+        </div>
+        <table class="spec-table" style="margin-top:16px;">
+          <tr><th>Usage</th><th>Size</th><th>Weight</th></tr>
+          <tr><td>Panel / card titles</td><td><code>18–20px</code></td><td><code>600</code></td></tr>
+          <tr><td>Nav items</td><td><code>13.5px</code></td><td><code>500</code></td></tr>
+          <tr><td>Body / table cells</td><td><code>13–14px</code></td><td><code>400</code></td></tr>
+          <tr><td>Button text (sm)</td><td><code>13px</code></td><td><code>600</code></td></tr>
+          <tr><td>Form field labels</td><td><code>11px</code> uppercase</td><td><code>600</code></td></tr>
+        </table>
+      </div>
+
+      <!-- Space Mono -->
+      <div class="type-specimen-block card" style="margin-bottom:10px;">
+        <div class="font-label">Space Mono — logotype, seq numbers, timestamps, table headers, data</div>
+        <div class="type-scale-row">
+          <span class="size-tag">15px</span>
+          <span style="font-family:var(--mono); font-weight:700; font-size:15px; letter-spacing:-0.3px; color:var(--bg-ink);">● WAREOS</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="size-tag">12px</span>
+          <span style="font-family:var(--mono); font-weight:700; font-size:12px; color:var(--accent);">DSP-000043</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="size-tag">10–11px</span>
+          <span style="font-family:var(--mono); font-size:10.5px; color:var(--text-dim);">2026-03-08 · 09:43</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="size-tag">10px</span>
+          <span style="font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-dim);">SEQUENCE NO</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="size-tag">9.5px</span>
+          <span style="font-family:var(--mono); font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; background:var(--green-bg); color:var(--green); padding:3px 8px; border-radius:9999px;">received</span>
+        </div>
+        <table class="spec-table" style="margin-top:16px;">
+          <tr><th>Usage</th><th>Size</th><th>Notes</th></tr>
+          <tr><td>Logotype</td><td><code>13–15px bold</code></td><td>tracking <code>-0.3px</code></td></tr>
+          <tr><td>Sequence numbers (DSP-, PUR-, SAL-)</td><td><code>11–12px bold</code></td><td>color: <code>--text-primary</code></td></tr>
+          <tr><td>Timestamps</td><td><code>10.5px</code></td><td>color: <code>--text-dim</code></td></tr>
+          <tr><td>Table column headers</td><td><code>10px uppercase</code></td><td>tracking <code>0.08em</code></td></tr>
+          <tr><td>Status / type badges</td><td><code>9.5px bold uppercase</code></td><td>tracking <code>0.08–0.1em</code></td></tr>
+          <tr><td>Shortage tags</td><td><code>8.5px bold uppercase</code></td><td>tracking <code>0.1em</code></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION: SPACING ═══ -->
+    <section class="section" id="spacing">
+      <h2 class="section-heading">Spacing &amp; Layout</h2>
+      <p class="section-subheading">Section 03 — 8px base unit; all values are multiples</p>
+
+      <div class="subsection-title">Spacing Scale</div>
+      <div class="card" style="margin-bottom:10px;">
+        <div class="spacing-row"><span class="spacing-label">4px</span><div class="spacing-bar" style="width:4px;"></div><span class="spacing-note">Gap between icon + badge dot</span></div>
+        <div class="spacing-row"><span class="spacing-label">8px</span><div class="spacing-bar" style="width:8px;"></div><span class="spacing-note">Nav icon–label gap, badge padding-x half</span></div>
+        <div class="spacing-row"><span class="spacing-label">12px</span><div class="spacing-bar" style="width:12px;"></div><span class="spacing-note">KPI grid gap, toast padding-x</span></div>
+        <div class="spacing-row"><span class="spacing-label">16px</span><div class="spacing-bar" style="width:16px;"></div><span class="spacing-note">Table cell padding-x, sidebar padding</span></div>
+        <div class="spacing-row"><span class="spacing-label">20px</span><div class="spacing-bar" style="width:20px;"></div><span class="spacing-note">Card padding (--card-padding), nav item px</span></div>
+        <div class="spacing-row"><span class="spacing-label">24px</span><div class="spacing-bar" style="width:24px;"></div><span class="spacing-note">Section gap, form column gap</span></div>
+        <div class="spacing-row"><span class="spacing-label">28px</span><div class="spacing-bar" style="width:28px;"></div><span class="spacing-note">Content area padding-x (--content-px)</span></div>
+        <div class="spacing-row"><span class="spacing-label">32px</span><div class="spacing-bar" style="width:32px;"></div><span class="spacing-note">Standard sub-section spacing</span></div>
+        <div class="spacing-row"><span class="spacing-label">40px</span><div class="spacing-bar" style="width:40px;"></div><span class="spacing-note">Standard button height (--btn-h)</span></div>
+        <div class="spacing-row"><span class="spacing-label">48px</span><div class="spacing-bar" style="width:48px;"></div><span class="spacing-note">Large button height (--btn-h-lg), CTA buttons</span></div>
+        <div class="spacing-row"><span class="spacing-label">64px</span><div class="spacing-bar" style="width:64px;"></div><span class="spacing-note">Generous inter-section gap</span></div>
+        <div class="spacing-row"><span class="spacing-label">80px</span><div class="spacing-bar" style="width:80px;"></div><span class="spacing-note">Standard content section vertical padding</span></div>
+      </div>
+
+      <div class="subsection-title">App Shell Dimensions</div>
+      <table class="spec-table">
+        <tr><th>Element</th><th>Value</th><th>Token</th><th>Notes</th></tr>
+        <tr><td>Desktop sidebar</td><td>240px</td><td><code>--sidebar-w</code></td><td>Full width; icon-only 48px on tablet</td></tr>
+        <tr><td>Desktop app header</td><td>60px</td><td><code>--header-h</code></td><td>tenant-dashboard.html</td></tr>
+        <tr><td>Mobile app header</td><td>56px</td><td><code>--mobile-header-h</code></td><td>operator-view.html — intentional 4px reduction</td></tr>
+        <tr><td>Mobile bottom nav</td><td>72px</td><td><code>--mobile-nav-h</code></td><td>Fixed above safe area</td></tr>
+        <tr><td>Mobile status bar</td><td>44px</td><td>—</td><td>Simulated on phone shell</td></tr>
+        <tr><td>Phone shell</td><td>375 × 812px</td><td>—</td><td>iPhone SE/Standard viewport</td></tr>
+        <tr><td>Input height</td><td>38px</td><td><code>--input-h</code></td><td></td></tr>
+        <tr><td>Button sm</td><td>36px</td><td><code>--btn-h-sm</code></td><td></td></tr>
+        <tr><td>Button md</td><td>40px</td><td><code>--btn-h</code></td><td></td></tr>
+        <tr><td>Button lg (CTA)</td><td>48px</td><td><code>--btn-h-lg</code></td><td>Always pill shape (border-radius 9999px)</td></tr>
+        <tr><td>Card border-radius</td><td>12px</td><td><code>--card-radius</code></td><td></td></tr>
+        <tr><td>Card padding</td><td>20px</td><td><code>--card-padding</code></td><td></td></tr>
+        <tr><td>Table cell padding</td><td>11px 16px</td><td><code>--table-cell-py / px</code></td><td></td></tr>
+      </table>
+
+      <div class="callout callout--info" style="margin-top:16px;">
+        <div class="callout-title">Marketing-surface only tokens</div>
+        <code>--container: 1280px</code> and <code>--px: clamp(20px, 4vw, 40px)</code> are defined only in <code>landing.html</code>. These control the marketing page max-width and responsive horizontal padding. They are not present in the dashboard or operator views.
+      </div>
+
+      <div class="subsection-title">Border Radius Scale</div>
+      <div class="card" style="display:flex; gap:20px; flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <div style="width:32px;height:32px;background:var(--accent-tint);border:1px solid var(--border-mid);border-radius:3px;margin:0 auto 6px;"></div>
+          <code style="font-size:10px;">3px</code><br><span style="font-size:10px;color:var(--text-dim);">shortage tag</span>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:32px;height:32px;background:var(--accent-tint);border:1px solid var(--border-mid);border-radius:4px;margin:0 auto 6px;"></div>
+          <code style="font-size:10px;">4px</code><br><span style="font-size:10px;color:var(--text-dim);">type badge</span>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:32px;height:32px;background:var(--accent-tint);border:1px solid var(--border-mid);border-radius:6px;margin:0 auto 6px;"></div>
+          <code style="font-size:10px;">6px</code><br><span style="font-size:10px;color:var(--text-dim);">code blocks</span>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:32px;height:32px;background:var(--accent-tint);border:1px solid var(--border-mid);border-radius:8px;margin:0 auto 6px;"></div>
+          <code style="font-size:10px;">8px</code><br><span style="font-size:10px;color:var(--text-dim);">inputs, subtle btn</span>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:32px;height:32px;background:var(--accent-tint);border:1px solid var(--border-mid);border-radius:12px;margin:0 auto 6px;"></div>
+          <code style="font-size:10px;">12px</code><br><span style="font-size:10px;color:var(--text-dim);">cards, panels, toasts</span>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:32px;height:32px;background:var(--accent-tint);border:1px solid var(--border-mid);border-radius:9999px;margin:0 auto 6px;"></div>
+          <code style="font-size:10px;">9999px</code><br><span style="font-size:10px;color:var(--text-dim);">pills, CTAs, badges</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION: BUTTONS ═══ -->
+    <section class="section" id="buttons">
+      <h2 class="section-heading">Buttons</h2>
+      <p class="section-subheading">Section 04 — 7 variants · 3 sizes · 4 states</p>
+
+      <div class="callout callout--info">
+        <div class="callout-title">CTA Rule</div>
+        Primary CTA buttons are <strong>always pill-shaped</strong> (<code>border-radius: 9999px</code>) with <code>active:scale(0.98)</code>. This is the single most distinctive button in the system.
+      </div>
+
+      <div class="subsection-title">Variants — All at default (lg = 48px) size</div>
+      <div class="example-row" data-component="button">
+        <div class="specimen" style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+          <button class="btn btn--orange" data-variant="orange">Get Started</button>
+          <button class="btn btn--ghost" data-variant="ghost">Cancel</button>
+          <button class="btn btn--outline-orange btn--md" data-variant="outline-orange">View Details</button>
+          <button class="btn btn--ink" data-variant="ink">Sign In</button>
+          <button class="btn btn--subtle btn--md" data-variant="subtle">Filter</button>
+          <button class="btn btn--destructive btn--md" data-variant="destructive">Delete</button>
+          <button class="btn btn--icon-only" data-variant="icon-only" title="Settings">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+        </div>
+        <div class="code-block">/* 7 Variants */
+.btn--orange      /* Primary CTA — pill, 48px */
+.btn--ghost       /* Secondary — pill, border */
+.btn--outline-orange /* Tertiary — pill, orange border */
+.btn--ink         /* Dark fill — pill */
+.btn--subtle      /* Low-key — rect 8px radius */
+.btn--destructive /* Delete / danger */
+.btn--icon-only   /* Square 36px icon button */</div>
+      </div>
+
+      <div class="subsection-title">Sizes</div>
+      <div class="example-row">
+        <div class="specimen" style="display:flex; gap:12px; align-items:center;">
+          <button class="btn btn--orange btn--sm" data-size="sm">Small 36px</button>
+          <button class="btn btn--orange btn--md" data-size="md">Medium 40px</button>
+          <button class="btn btn--orange" data-size="lg">Large 48px</button>
+        </div>
+        <div class="code-block">.btn--sm  /* height: 36px, 13px, px:16px */
+.btn--md  /* height: 40px, 13.5px, px:18px */
+default   /* height: 48px, 14.5px, px:28px */</div>
+      </div>
+
+      <div class="subsection-title">States</div>
+      <div class="example-row">
+        <div class="specimen" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn--orange btn--md" data-state="normal">Normal</button>
+          <button class="btn btn--orange btn--md is-hover" data-state="hover">Hover</button>
+          <button class="btn btn--orange btn--md is-disabled" data-state="disabled" disabled>Disabled</button>
+          <button class="btn btn--orange btn--md is-loading" data-state="loading">Loading</button>
+        </div>
+        <div class="code-block">normal     /* default */
+.is-hover  /* bg: --accent-dark */
+:disabled  /* opacity: 0.4, no-drop */
+.is-loading /* color:transparent + spinner */</div>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION: BADGES ═══ -->
+    <section class="section" id="badges">
+      <h2 class="section-heading">Badges &amp; Status</h2>
+      <p class="section-subheading">Section 05 — Operational status · type labels · tier badges</p>
+
+      <div class="subsection-title">Operational Status (pill · dot prefix)</div>
+      <div class="example-row" data-component="badge">
+        <div class="specimen" style="display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="badge received"  data-variant="received">received</span>
+          <span class="badge dispatched" data-variant="dispatched">dispatched</span>
+          <span class="badge confirmed" data-variant="confirmed">confirmed</span>
+          <span class="badge cancelled" data-variant="cancelled">cancelled</span>
+          <span class="badge pending"   data-variant="pending">pending</span>
+        </div>
+        <div class="code-block">.badge.received   /* green  #16A34A  */
+.badge.dispatched /* orange #F45F00  */
+.badge.confirmed  /* blue   #2563EB  */
+.badge.cancelled  /* red    #DC2626  */
+.badge.pending    /* --text-dim / --bg-off */
+
+/* All: font-mono 9.5px bold uppercase
+   padding: 3px 8px, border-radius: 9999px
+   ::before dot: 5px circle, currentColor */</div>
+      </div>
+
+      <div class="subsection-title">Type Labels (rectangular · no dot)</div>
+      <div class="example-row">
+        <div class="specimen" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <span class="type-badge dispatch" data-variant="dispatch">DISPATCH</span>
+          <span class="type-badge purchase" data-variant="purchase">PURCHASE</span>
+          <span class="type-badge sale"     data-variant="sale">SALE</span>
+          <span class="type-badge shortage" data-variant="shortage">SHORTAGE</span>
+        </div>
+        <div class="code-block">.type-badge  /* border-radius: 4px (not pill!) */
+.dispatch    /* --orange-bg / --accent */
+.purchase    /* --blue-bg   / --blue   */
+.sale        /* --green-bg  / --green  */
+.shortage    /* 8.5px, radius 3px      */</div>
+      </div>
+
+      <div class="subsection-title">Plan Tier Badges</div>
+      <div class="example-row">
+        <div class="specimen" style="display:flex; gap:8px; align-items:center;">
+          <span class="tier-badge starter">STARTER</span>
+          <span class="tier-badge growth">GROWTH</span>
+          <span class="tier-badge pro">PRO</span>
+          <span class="tier-badge enterprise">ENTERPRISE</span>
+        </div>
+        <div class="code-block">.tier-badge.starter    /* --bg-off, muted border */
+.tier-badge.growth     /* --blue-bg / --blue    */
+.tier-badge.pro        /* --orange-bg / --accent */
+.tier-badge.enterprise /* --bg-ink / white       */</div>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION: FORMS ═══ -->
+    <section class="section" id="forms">
+      <h2 class="section-heading">Form Controls</h2>
+      <p class="section-subheading">Section 06 — Inputs · select · textarea · label anatomy</p>
+
+      <div class="example-row" data-component="form-input">
+        <div class="specimen" style="max-width:280px; width:100%;">
+          <div class="form-field">
+            <label class="form-label">Commodity</label>
+            <input class="form-input" type="text" placeholder="e.g. Soybean" />
+            <div class="form-footer">Enter the commodity name</div>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Location</label>
+            <input class="form-input is-focus" type="text" value="Nagpur Hub" readonly />
+          </div>
+          <div class="form-field">
+            <label class="form-label">Quantity</label>
+            <input class="form-input is-error" type="text" value="abc" />
+            <div class="form-footer form-footer--error">Must be a number</div>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Category</label>
+            <select class="form-select is-disabled" disabled>
+              <option>Grains</option>
+            </select>
+          </div>
+        </div>
+        <div class="code-block">/* States via class or pseudo */
+.form-input          /* default */
+.form-input.is-focus /* border: --accent
+                        shadow: 0 0 0 3px rgba(244,95,0,0.1) */
+.form-input.is-error /* border: --red
+                        shadow: 0 0 0 3px rgba(220,38,38,0.1) */
+.form-input:disabled /* bg: --bg-off, muted text */
+
+/* Anatomy */
+label  /* 11px mono uppercase, --text-dim */
+input  /* 38px tall, 8px radius, 13px sans */
+hint   /* 11px --text-dim */
+error  /* 11px --red */</div>
+      </div>
+
+      <div class="subsection-title">Textarea</div>
+      <div class="example-row">
+        <div class="specimen" style="max-width:280px; width:100%;">
+          <label class="form-label">Remarks</label>
+          <textarea class="form-textarea" placeholder="Add notes about this dispatch…"></textarea>
+        </div>
+        <div class="code-block">/* Same as form-input but:
+   height: 72px
+   padding: 8px 10px
+   resize: none */</div>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION: CARDS ═══ -->
+    <section class="section" id="cards">
+      <h2 class="section-heading">Cards &amp; Panels</h2>
+      <p class="section-subheading">Section 07 — Data card · KPI grid · panel</p>
+
+      <div class="callout callout--info">
+        <div class="callout-title">Surface note</div>
+        Cards use <code>--bg-base</code> (white), not <code>--bg-off</code>. The page background is <code>--bg-off</code> so white cards float above it. Inner panels (table wrappers) use <code>overflow: hidden</code> to clip table borders cleanly.
+      </div>
+
+      <div class="subsection-title">KPI Grid (4-up)</div>
+      <div class="kpi-grid" data-component="kpi-grid">
+        <div class="kpi-card card">
+          <div class="kpi-label">Total Dispatches</div>
+          <div class="kpi-value">1,243</div>
+          <div class="kpi-delta">↑ 12% this month</div>
+        </div>
+        <div class="kpi-card card">
+          <div class="kpi-label">Stock Value</div>
+          <div class="kpi-value">₹24.8L</div>
+          <div class="kpi-delta" style="color:var(--red);">↓ 3% vs last week</div>
+        </div>
+        <div class="kpi-card card">
+          <div class="kpi-label">Pending Orders</div>
+          <div class="kpi-value" style="color:var(--accent);">47</div>
+          <div class="kpi-delta" style="color:var(--text-muted);">Needs review</div>
+        </div>
+        <div class="kpi-card card">
+          <div class="kpi-label">Locations</div>
+          <div class="kpi-value">12</div>
+          <div class="kpi-delta" style="color:var(--text-muted);">Across 3 hubs</div>
+        </div>
+      </div>
+      <div class="code-block standalone">/* KPI card structure */
+.kpi-label  /* mono 10px uppercase tracking-wider, --text-dim */
+.kpi-value  /* serif 28px tracking[-0.5px], --text-primary */
+.kpi-delta  /* sans 11px, --green (positive) or --red (negative) */
+
+/* Grid */
+display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;</div>
+
+      <div class="subsection-title">Standard Data Card</div>
+      <div class="example-row" data-component="card">
+        <div class="specimen">
+          <div class="card" style="max-width:300px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+              <div>
+                <div style="font-size:11px; font-weight:600; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">Recent Activity</div>
+                <div style="font-family:var(--serif); font-size:18px; color:var(--text-primary); letter-spacing:-0.3px;">3 new dispatches</div>
+              </div>
+              <span class="badge dispatched">dispatched</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted); line-height:1.5;">Nagpur Hub · 2026-03-08 · 09:43</div>
+          </div>
+        </div>
+        <div class="code-block">.card {
+  background: var(--bg-base);   /* white */
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: box-shadow 0.2s;
+}
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}</div>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION: TABLES ═══ -->
+    <section class="section" id="tables">
+      <h2 class="section-heading">Data Table</h2>
+      <p class="section-subheading">Section 08 — Dispatch table with annotated patterns</p>
+
+      <div class="panel" data-component="data-table">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Seq No</th>
+              <th>Date · Time</th>
+              <th>Commodity</th>
+              <th>Qty</th>
+              <th>Type</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="seq-num accent">DSP-000043</span></td>
+              <td><span class="timestamp">2026-03-08 · 09:43</span></td>
+              <td>Soybean</td>
+              <td><span class="qty-value">24 MT</span></td>
+              <td><span class="type-badge dispatch">DISPATCH</span></td>
+              <td><span class="badge dispatched">dispatched</span></td>
+            </tr>
+            <tr>
+              <td><span class="seq-num">PUR-000121</span></td>
+              <td><span class="timestamp">2026-03-07 · 14:20</span></td>
+              <td>Wheat</td>
+              <td><span class="qty-value">80 MT</span></td>
+              <td><span class="type-badge purchase">PURCHASE</span></td>
+              <td><span class="badge received">received</span></td>
+            </tr>
+            <tr class="is-hover">
+              <td><span class="seq-num">SAL-000089</span></td>
+              <td><span class="timestamp">2026-03-06 · 11:05</span></td>
+              <td>Maize</td>
+              <td><span class="qty-value">50 MT</span></td>
+              <td><span class="type-badge sale">SALE</span></td>
+              <td><span class="badge confirmed">confirmed</span></td>
+            </tr>
+            <tr>
+              <td><span class="seq-num">DSP-000042</span></td>
+              <td><span class="timestamp">2026-03-05 · 16:33</span></td>
+              <td>Soybean</td>
+              <td><span class="qty-value">12 MT</span></td>
+              <td><span class="type-badge dispatch">DISPATCH</span></td>
+              <td><span class="badge cancelled">cancelled</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-block standalone">/* Table annotations */
+thead th    → mono 10px uppercase tracking[0.08em] --text-dim  (column headers)
+seq-num     → mono 11px bold --text-primary (or --accent for latest)
+timestamp   → mono 10.5px --text-dim
+qty         → mono 12px bold
+.is-hover   → background: --bg-off  (simulates hover, no JS)
+
+/* Row border: 1px solid var(--border), last row no border */
+/* Wrapper: .panel (overflow:hidden clips rounded corners) */</div>
+    </section>
+
+    <!-- ═══ SECTION: NAVIGATION ═══ -->
+    <section class="section" id="navigation">
+      <h2 class="section-heading">Navigation</h2>
+      <p class="section-subheading">Section 09 — Full sidebar mockup with all states</p>
+
+      <div class="example-row" style="align-items:flex-start;" data-component="sidebar">
+        <div class="specimen">
+          <div class="sidebar-mock">
+            <div class="brand-header">
+              <div class="brand-dot"></div>
+              <span class="brand-name">WAREOS</span>
+            </div>
+            <div class="nav-group-label">Operations</div>
+            <div class="nav-item active" data-state="active">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              Dashboard
+            </div>
+            <div class="nav-item">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              Dispatch
+            </div>
+            <div class="nav-item is-hover" data-state="hover">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+              Inventory
+            </div>
+            <div class="nav-group-label">Finance</div>
+            <div class="nav-item">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              Purchase
+            </div>
+            <div class="nav-item">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Sales
+            </div>
+            <div class="nav-footer">
+              <div class="nav-item" style="color:var(--text-dim);">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Settings
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-block">.nav-item {
+  border-left: 2px solid transparent;
+  padding: 8px 20px;
+  font-size: 13.5px; font-weight: 500;
+  color: var(--text-muted);
+}
+.nav-item:hover {
+  background: var(--bg-off);
+  color: var(--text-body);
+}
+.nav-item.active {
+  color: var(--accent);
+  background: var(--accent-tint);
+  border-left-color: var(--accent); /* ← key */
+}
+
+/* Group label */
+.nav-group-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  padding: 12px 20px 4px;
+}</div>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION: TOASTS ═══ -->
+    <section class="section" id="toasts">
+      <h2 class="section-heading">Toast Notifications</h2>
+      <p class="section-subheading">Section 10 — 4 variants · static display (no JS)</p>
+
+      <div class="example-row" data-component="toast">
+        <div class="specimen">
+          <div class="toast-card success" data-variant="success">
+            <div class="toast-icon">
+              <svg fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="toast-body">
+              <div class="toast-title">Dispatch submitted</div>
+              <div class="toast-sub">DSP-000043 created successfully</div>
+            </div>
+          </div>
+          <div class="toast-card error" data-variant="error">
+            <div class="toast-icon">
+              <svg fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="toast-body">
+              <div class="toast-title">Submission failed</div>
+              <div class="toast-sub">Check your network connection</div>
+            </div>
+          </div>
+          <div class="toast-card info" data-variant="info">
+            <div class="toast-icon">
+              <svg fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="toast-body">
+              <div class="toast-title">Module disabled</div>
+              <div class="toast-sub">Analytics is off for this tenant</div>
+            </div>
+          </div>
+          <div class="toast-card warning" data-variant="warning">
+            <div class="toast-icon">
+              <svg fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+            </div>
+            <div class="toast-body">
+              <div class="toast-title">Low stock alert</div>
+              <div class="toast-sub">Soybean below minimum threshold</div>
+            </div>
+          </div>
+        </div>
+        <div class="code-block">.toast-card {
+  background: var(--bg-ink); /* #080808 */
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+/* Icon circle colors */
+.success .toast-icon { bg: var(--green) }
+.error   .toast-icon { bg: var(--red)   }
+.info    .toast-icon { bg: var(--color-info) }
+.warning .toast-icon { bg: var(--color-warning) }
+
+/* Animation (position: fixed) */
+opacity: 0; transform: translateY(20px);
+.show → opacity:1; transform:none;
+transition: 250ms ease-out</div>
+      </div>
+    </section>
+
+    <!-- ═══ SECTION: EMPTY-STATES ═══ -->
+    <section class="section" id="empty-states">
+      <h2 class="section-heading">Empty States</h2>
+      <p class="section-subheading">Section 11 — Table empty state · full-page</p>
+
+      <div class="subsection-title">Table Empty State</div>
+      <div class="panel" data-component="empty-state" data-variant="table">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Seq No</th><th>Date</th><th>Commodity</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">
+                  <div class="empty-icon">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  </div>
+                  <div class="empty-title">No dispatches yet</div>
+                  <div class="empty-desc">Dispatches you create will appear here. Start by adding your first one.</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection-title" style="margin-top:24px;">Full-Page Empty State</div>
+      <div class="card" style="padding:60px 20px;" data-component="empty-state" data-variant="full-page">
+        <div class="empty-state">
+          <div class="empty-icon" style="width:52px;height:52px;border-radius:14px;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="empty-title" style="font-size:16px; margin-bottom:6px;">No analytics data</div>
+          <div class="empty-desc" style="font-size:13px; max-width:320px;">Analytics will populate once you have dispatches, purchases, or sales recorded over the last 30 days.</div>
+          <button class="btn btn--orange btn--md" style="margin-top:20px;">Create Dispatch</button>
+        </div>
+      </div>
+      <div class="code-block standalone">/* Empty state typography rules */
+.empty-icon  /* 40px box, bg:--bg-off, radius:10px, --text-dim icon */
+.empty-title /* sans 14–16px font-weight:600, --text-body */
+.empty-desc  /* sans 12.5–13px, --text-muted, max-w:260-320px, line-h:1.5 */
+/* CTA button optional — only when there is a clear first action */</div>
+    </section>
+
+    <!-- ═══ SECTION: PRINCIPLES ═══ -->
+    <section class="section" id="principles">
+      <h2 class="section-heading">Design Principles</h2>
+      <p class="section-subheading">Section 12 — 7 rules for LLMs implementing WareOS UI</p>
+
+      <ol class="principles-list">
+        <li><strong>White cards on off-white pages.</strong> Page background is always <code>--bg-off #F5F5F3</code>. Cards and panels are always <code>--bg-base #FFFFFF</code>. Never invert this.</li>
+        <li><strong>Typography roles are absolute.</strong> Hedvig Letters Serif = page titles + KPI display values only. Space Mono = table headers (10px, uppercase, 0.08em tracking, <code>--text-dim</code>), sequence numbers (bold 11–12px, accent color on the active entry), timestamps, badges. Rethink Sans = all other UI text.</li>
+        <li><strong>Orange marks every interaction point.</strong> CTA buttons are pills: <code>height: 48px; border-radius: 9999px; active:scale(0.98)</code>. Focused inputs: <code>border-color: var(--accent); box-shadow: 0 0 0 3px rgba(244,95,0,0.1)</code>. These are non-negotiable.</li>
+        <li><strong>Orange left-border = active nav.</strong> The sidebar active state is: <code>border-left: 2px solid var(--accent)</code> + <code>background: var(--accent-tint)</code> + <code>color: var(--accent)</code>. All three together, never partially.</li>
+        <li><strong>Status badges use pill shape; type labels use rect.</strong> <code>.badge</code> (status: received/dispatched/confirmed/cancelled) = <code>border-radius: 9999px</code>. <code>.type-badge</code> (DISPATCH/PURCHASE/SALE) = <code>border-radius: 4px</code>. Do not mix.</li>
+        <li><strong>Always use <code>--accent</code> for the brand orange (<code>#F45F00</code>).</strong> Use <code>--accent-tint</code> (<code>rgba(244,95,0,0.06)</code>) for the 6% tint surface. These are the two canonical orange tokens in the design system.</li>
+        <li><strong>Never use inline color values; always use tokens.</strong> Every color reference must go through a CSS custom property. This ensures theme consistency and makes the system legible to automated tools. Exception: brand-hex values in comments for documentation.</li>
+      </ol>
+
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Sync active nav item with scroll position
+  const sections = document.querySelectorAll('section[id]');
+  const navItems = document.querySelectorAll('.sidebar-nav .nav-item[href]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navItems.forEach(n => n.classList.remove('active'));
+        const active = document.querySelector(`.sidebar-nav a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

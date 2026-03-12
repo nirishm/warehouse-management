@@ -11,7 +11,7 @@ Multi-tenant SaaS Warehouse Management System built with Next.js + Supabase.
 - **Validation**: Zod
 - **Testing**: Vitest (unit), Playwright (E2E)
 - **PDF generation**: @react-pdf/renderer (dispatch challan, GRN, delivery note)
-- **Barcode/QR**: qrcode, react-qr-code
+- **Barcode/QR**: qrcode
 - **CSV**: papaparse (bulk import/export)
 - **Email**: Resend (configured as Supabase SMTP; sends invite & password-reset emails)
 
@@ -55,6 +55,24 @@ Required in `.env.local`:
 - `pnpm test:e2e` — Run E2E tests
 - `pnpm build` — Production build
 - `pnpm lint` — Lint code
+
+## Database Migrations
+- Migrations live in `supabase/migrations/` using sequential names (`00001_...`, `00002_...`, etc.)
+- The remote DB was historically set up with timestamp-named migrations; these were reconciled via `supabase migration repair`
+- **Always push migrations before or immediately after deploying code that depends on them**
+
+```bash
+# Check which migrations are pending
+SUPABASE_ACCESS_TOKEN=<sbp_...> supabase migration list
+
+# Dry-run to confirm what will be applied
+SUPABASE_ACCESS_TOKEN=<sbp_...> supabase db push --dry-run
+
+# Apply pending migrations to production
+SUPABASE_ACCESS_TOKEN=<sbp_...> supabase db push
+```
+
+The `SUPABASE_ACCESS_TOKEN` is `SUPABASE_SERVICE_API_KEY` from `.env.local` (starts with `sbp_`).
 
 ## Conventions
 - All API routes use `withTenantContext()` wrapper for auth + tenant resolution
