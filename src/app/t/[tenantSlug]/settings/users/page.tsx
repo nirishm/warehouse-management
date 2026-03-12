@@ -1,12 +1,13 @@
 import { headers } from "next/headers";
-import { DashboardClient } from "./dashboard-client";
+import { UsersClient } from "./users-client";
 
-export default async function DashboardPage() {
+export default async function UsersPage() {
   const headersList = await headers();
   const tenantSlug = headersList.get("x-tenant-slug") ?? "";
+
   return (
     <div style={{ background: "var(--bg-off)" }} className="min-h-full">
-      <DashboardClient tenantSlug={tenantSlug} />
+      <UsersClient tenantSlug={tenantSlug} />
     </div>
   );
 }
