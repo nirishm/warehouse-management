@@ -1,6 +1,7 @@
 import { createTenantClient } from '@/core/db/tenant-query';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
+import { applyLocationFilter } from '@/core/db/query-helpers';
 import type {
   CreateAdjustmentInput,
   Adjustment,
@@ -23,10 +24,7 @@ export async function listAdjustments(
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
-  const ids = options?.allowedLocationIds;
-  if (ids !== null && ids !== undefined && ids.length > 0) {
-    query = query.in('location_id', ids);
-  }
+  query = applyLocationFilter(query, 'location_id', options?.allowedLocationIds ?? null);
 
   if (options?.pagination) {
     query = applyPagination(query, options.pagination);

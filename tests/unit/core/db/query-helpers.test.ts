@@ -10,12 +10,11 @@ describe('applyLocationFilter', () => {
     expect(result).toBe(query);
   });
 
-  it('does nothing when locationIds is empty array', () => {
-    const inMock = vi.fn();
+  it('blocks all results when locationIds is empty array', () => {
+    const inMock = vi.fn().mockReturnThis();
     const query = { in: inMock };
-    const result = applyLocationFilter(query as any, 'location_id', []);
-    expect(inMock).not.toHaveBeenCalled();
-    expect(result).toBe(query);
+    applyLocationFilter(query as any, 'location_id', []);
+    expect(inMock).toHaveBeenCalledWith('location_id', ['00000000-0000-0000-0000-000000000000']);
   });
 
   it('adds .in() when locationIds has values', () => {

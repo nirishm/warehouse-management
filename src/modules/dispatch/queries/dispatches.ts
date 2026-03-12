@@ -23,9 +23,14 @@ export async function listDispatches(
     .order('created_at', { ascending: false });
 
   const ids = options?.allowedLocationIds;
-  if (ids !== null && ids !== undefined && ids.length > 0) {
-    const list = ids.join(',');
-    query = query.or(`origin_location_id.in.(${list}),dest_location_id.in.(${list})`);
+  if (ids !== null && ids !== undefined) {
+    if (ids.length === 0) {
+      // No locations assigned — match nothing
+      query = query.in('id', ['00000000-0000-0000-0000-000000000000']);
+    } else {
+      const list = ids.join(',');
+      query = query.or(`origin_location_id.in.(${list}),dest_location_id.in.(${list})`);
+    }
   }
 
   if (options?.pagination) {
