@@ -9,7 +9,7 @@ export const adjustmentsManifest: ModuleManifest = {
   name: 'Inventory Adjustments',
   description: 'Record stock adjustments for breakage, spillage, corrections',
   icon: 'SlidersHorizontal',
-  dependencies: ['inventory'],
+  dependencies: ['inventory', 'returns'],
   permissions: ['canManageAdjustments'],
   navItems: [
     {
