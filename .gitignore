@@ -53,6 +53,11 @@ next-env.d.ts
 # screenshots from visual reviews
 /screenshots/
 .playwright-mcp/
+
+# playwright
+test-results/
+playwright-report/
+blob-report/
 supabase/.temp/
 
 # v1 archive
