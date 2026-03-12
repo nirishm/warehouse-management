@@ -64,5 +64,5 @@ export const DELETE = withTenantContext(
       return errorResponse(error);
     }
   },
-  { permission: 'items:write' },
+  { permission: 'items:delete' },
 );

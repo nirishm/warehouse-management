@@ -26,7 +26,7 @@ export const GET = withTenantContext(
       return errorResponse(error);
     }
   },
-  { permission: 'inventory:read' },
+  { permission: 'adjustments:create' },
 );
 
 export const PATCH = withTenantContext(
@@ -64,5 +64,5 @@ export const DELETE = withTenantContext(
       return errorResponse(error);
     }
   },
-  { permission: 'orders:delete' },
+  { permission: 'adjustments:create' },
 );

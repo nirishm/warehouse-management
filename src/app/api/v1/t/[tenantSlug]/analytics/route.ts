@@ -22,5 +22,5 @@ export const GET = withTenantContext(
       return errorResponse(error);
     }
   },
-  { permission: 'reports:read' },
+  { permission: 'inventory:read' },
 );

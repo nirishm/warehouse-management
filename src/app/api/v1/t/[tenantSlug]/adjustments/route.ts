@@ -32,7 +32,7 @@ export const GET = withTenantContext(
       return errorResponse(error);
     }
   },
-  { permission: 'inventory:read' },
+  { permission: 'adjustments:create' },
 );
 
 export const POST = withTenantContext(

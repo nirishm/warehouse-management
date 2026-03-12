@@ -34,5 +34,5 @@ export const PATCH = withTenantContext(
       return errorResponse(error);
     }
   },
-  { permission: 'orders:update' },
+  { permission: 'transfers:create' },
 );
