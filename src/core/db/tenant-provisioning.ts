@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin';
+import { buildStockLevelsViewSQL } from './stock-levels-view';
 
 // NOTE: This SQL is derived from supabase/migrations/00002_tenant_template.sql
 // {schema} placeholders are replaced with the actual tenant schema name at provisioning time.
@@ -267,66 +268,6 @@ CREATE TABLE {schema}.sequence_counters (
     current_value       BIGINT NOT NULL DEFAULT 0 CHECK (current_value >= 0)
 );
 
--- Stock levels view
-CREATE VIEW {schema}.stock_levels AS
-WITH inbound AS (
-    SELECT di.commodity_id, d.dest_location_id AS location_id, di.unit_id,
-           COALESCE(di.received_quantity, di.sent_quantity) AS quantity
-    FROM {schema}.dispatch_items di
-    JOIN {schema}.dispatches d ON d.id = di.dispatch_id
-    WHERE d.status = 'received' AND d.deleted_at IS NULL
-
-    UNION ALL
-
-    SELECT pi.commodity_id, p.location_id, pi.unit_id, pi.quantity
-    FROM {schema}.purchase_items pi
-    JOIN {schema}.purchases p ON p.id = pi.purchase_id
-    WHERE p.status = 'received' AND p.deleted_at IS NULL
-),
-outbound AS (
-    SELECT di.commodity_id, d.origin_location_id AS location_id, di.unit_id,
-           di.sent_quantity AS quantity
-    FROM {schema}.dispatch_items di
-    JOIN {schema}.dispatches d ON d.id = di.dispatch_id
-    WHERE d.status IN ('dispatched','in_transit','received') AND d.deleted_at IS NULL
-
-    UNION ALL
-
-    SELECT si.commodity_id, s.location_id, si.unit_id, si.quantity
-    FROM {schema}.sale_items si
-    JOIN {schema}.sales s ON s.id = si.sale_id
-    WHERE s.status IN ('confirmed','dispatched') AND s.deleted_at IS NULL
-),
-in_transit AS (
-    SELECT di.commodity_id, d.dest_location_id AS location_id, di.unit_id,
-           di.sent_quantity AS quantity
-    FROM {schema}.dispatch_items di
-    JOIN {schema}.dispatches d ON d.id = di.dispatch_id
-    WHERE d.status IN ('dispatched','in_transit') AND d.deleted_at IS NULL
-)
-SELECT
-    COALESCE(i.commodity_id, o.commodity_id) AS commodity_id,
-    COALESCE(i.location_id, o.location_id) AS location_id,
-    COALESCE(i.unit_id, o.unit_id) AS unit_id,
-    COALESCE(i.total_in, 0) AS total_in,
-    COALESCE(o.total_out, 0) AS total_out,
-    COALESCE(i.total_in, 0) - COALESCE(o.total_out, 0) AS current_stock,
-    COALESCE(t.in_transit, 0) AS in_transit
-FROM (
-    SELECT commodity_id, location_id, unit_id, SUM(quantity) AS total_in
-    FROM inbound GROUP BY commodity_id, location_id, unit_id
-) i
-FULL OUTER JOIN (
-    SELECT commodity_id, location_id, unit_id, SUM(quantity) AS total_out
-    FROM outbound GROUP BY commodity_id, location_id, unit_id
-) o ON i.commodity_id = o.commodity_id AND i.location_id = o.location_id AND i.unit_id = o.unit_id
-LEFT JOIN (
-    SELECT commodity_id, location_id, unit_id, SUM(quantity) AS in_transit
-    FROM in_transit GROUP BY commodity_id, location_id, unit_id
-) t ON COALESCE(i.commodity_id, o.commodity_id) = t.commodity_id
-   AND COALESCE(i.location_id, o.location_id) = t.location_id
-   AND COALESCE(i.unit_id, o.unit_id) = t.unit_id;
-
 -- Indexes
 CREATE INDEX idx_dispatches_status ON {schema}.dispatches(status) WHERE deleted_at IS NULL;
 CREATE INDEX idx_dispatches_origin ON {schema}.dispatches(origin_location_id) WHERE deleted_at IS NULL;
@@ -442,6 +383,11 @@ export async function provisionTenantSchema(tenantSlug: string): Promise<string>
 
   const { error: templateError } = await admin.rpc('exec_sql', { query: sql });
   if (templateError) throw new Error(`Failed to provision tenant: ${templateError.message}`);
+
+  // Create the stock_levels VIEW using the shared builder (base only: no returns, no adjustments)
+  const viewSql = buildStockLevelsViewSQL(schemaName, { includeReturns: false, includeAdjustments: false });
+  const { error: viewError } = await admin.rpc('exec_sql', { query: viewSql });
+  if (viewError) throw new Error(`Failed to create stock_levels VIEW: ${viewError.message}`);
 
   return schemaName;
 }
