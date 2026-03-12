@@ -1,6 +1,6 @@
 'use client';
 
-import { useRealtime } from '@/hooks/use-realtime';
+import { useRealtime } from '@/lib/hooks/use-realtime';
 import { useTenant } from '@/components/layout/tenant-provider';
 
 interface RealtimeListenerProps {
