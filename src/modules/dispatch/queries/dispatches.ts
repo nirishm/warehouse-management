@@ -1,4 +1,5 @@
-import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
+import { createTenantClient } from '@/core/db/tenant-query';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type {
   CreateDispatchInput,
@@ -79,47 +80,14 @@ export async function createDispatch(
   input: CreateDispatchInput,
   userId: string
 ): Promise<Dispatch> {
-  const client = createTenantClient(schemaName);
-
-  const dispatchNumber = await getNextSequenceNumber(schemaName, 'dispatch');
-
-  const { data: dispatch, error: dispatchError } = await client
-    .from('dispatches')
-    .insert({
-      dispatch_number: dispatchNumber,
-      origin_location_id: input.origin_location_id,
-      dest_location_id: input.dest_location_id,
-      status: 'dispatched',
-      dispatched_at: new Date().toISOString(),
-      dispatched_by: userId,
-      transporter_name: input.transporter_name ?? null,
-      vehicle_number: input.vehicle_number ?? null,
-      driver_name: input.driver_name ?? null,
-      driver_phone: input.driver_phone ?? null,
-      notes: input.notes ?? null,
-    })
-    .select('*')
-    .single();
-
-  if (dispatchError)
-    throw new Error(`Failed to create dispatch: ${dispatchError.message}`);
-
-  const items = input.items.map((item) => ({
-    dispatch_id: dispatch.id,
-    commodity_id: item.commodity_id,
-    unit_id: item.unit_id,
-    sent_quantity: item.sent_quantity,
-    sent_bags: item.sent_bags ?? null,
-  }));
-
-  const { error: itemsError } = await client
-    .from('dispatch_items')
-    .insert(items);
-
-  if (itemsError)
-    throw new Error(`Failed to create dispatch items: ${itemsError.message}`);
-
-  return dispatch as Dispatch;
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient.rpc('create_dispatch_txn', {
+    p_schema: schemaName,
+    p_input: input,
+    p_user_id: userId,
+  });
+  if (error) throw new Error(`Failed to create dispatch: ${error.message}`);
+  return data as Dispatch;
 }
 
 export async function cancelDispatch(

@@ -3,7 +3,6 @@ import { withTenantContext, requirePermission, requireModule } from '@/core/auth
 import { receiveDispatch } from '@/modules/dispatch/queries/receive';
 import { getDispatchById } from '@/modules/dispatch/queries/dispatches';
 import { receiveDispatchSchema } from '@/modules/dispatch/validations/receive';
-import { createAuditEntry } from '@/modules/audit-trail/queries/audit-log';
 
 type RouteContext = { params: Promise<{ tenantSlug: string; id: string }> };
 
@@ -42,15 +41,6 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
         parsed.data.items,
         ctx.userId
       );
-
-      createAuditEntry(ctx.schemaName, {
-        user_id: ctx.userId,
-        user_name: ctx.userName,
-        action: 'receive',
-        entity_type: 'dispatch',
-        entity_id: id,
-        new_data: result as unknown as Record<string, unknown>,
-      }).catch((e) => console.error('Audit log error:', e));
 
       return NextResponse.json({ data: result });
     } catch (error) {

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withTenantContext, requireModule, requirePermission, requireLocationAccess } from '@/core/auth/guards';
 import { listPurchases, createPurchase } from '@/modules/purchase/queries/purchases';
 import { createPurchaseSchema } from '@/modules/purchase/validations/purchase';
-import { createAuditEntry } from '@/modules/audit-trail/queries/audit-log';
 import { parsePagination } from '@/lib/pagination';
 
 export async function GET(request: NextRequest) {
@@ -41,15 +40,6 @@ export async function POST(request: NextRequest) {
     }
 
     const purchase = await createPurchase(ctx.schemaName, parsed.data, ctx.userId);
-
-    createAuditEntry(ctx.schemaName, {
-      user_id: ctx.userId,
-      user_name: ctx.userName,
-      action: 'create',
-      entity_type: 'purchase',
-      entity_id: purchase.id,
-      new_data: purchase as unknown as Record<string, unknown>,
-    }).catch((e) => console.error('Audit log error:', e));
 
     return NextResponse.json({ data: purchase }, { status: 201 });
   });

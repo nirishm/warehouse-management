@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withTenantContext, requireModule, requirePermission, requireLocationAccess } from '@/core/auth/guards';
 import { listAdjustments, createAdjustment } from '@/modules/adjustments/queries/adjustments';
 import { createAdjustmentSchema } from '@/modules/adjustments/validations/adjustment';
-import { createAuditEntry } from '@/modules/audit-trail/queries/audit-log';
 import { parsePagination } from '@/lib/pagination';
 
 export async function GET(request: NextRequest) {
@@ -41,15 +40,6 @@ export async function POST(request: NextRequest) {
     }
 
     const adjustment = await createAdjustment(ctx.schemaName, parsed.data, ctx.userId);
-
-    createAuditEntry(ctx.schemaName, {
-      user_id: ctx.userId,
-      user_name: ctx.userName,
-      action: 'create',
-      entity_type: 'adjustment',
-      entity_id: adjustment.id,
-      new_data: adjustment as unknown as Record<string, unknown>,
-    }).catch((e) => console.error('Audit log error:', e));
 
     return NextResponse.json({ data: adjustment }, { status: 201 });
   });

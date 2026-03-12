@@ -1,4 +1,5 @@
-import { createTenantClient, getNextSequenceNumber } from '@/core/db/tenant-query';
+import { createTenantClient } from '@/core/db/tenant-query';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { PaginationParams, applyPagination, PaginatedResponse, paginatedResult } from '@/lib/pagination';
 import type {
   CreateAdjustmentInput,
@@ -66,27 +67,31 @@ export async function createAdjustment(
   input: CreateAdjustmentInput,
   userId: string
 ): Promise<Adjustment> {
-  const client = createTenantClient(schemaName);
+  // The PG function expects p_input->'items' as an array.
+  // The current TS input is single-item, so wrap it in the expected shape.
+  const rpcInput = {
+    location_id: input.location_id,
+    notes: input.notes ?? null,
+    items: [
+      {
+        commodity_id: input.commodity_id,
+        unit_id: input.unit_id,
+        reason_id: input.reason_id,
+        quantity: input.quantity,
+      },
+    ],
+  };
 
-  const adjustmentNumber = await getNextSequenceNumber(schemaName, 'adjustment');
-
-  const { data, error } = await client
-    .from('adjustments')
-    .insert({
-      adjustment_number: adjustmentNumber,
-      location_id: input.location_id,
-      commodity_id: input.commodity_id,
-      unit_id: input.unit_id,
-      reason_id: input.reason_id,
-      quantity: input.quantity,
-      notes: input.notes ?? null,
-      created_by: userId,
-    })
-    .select('*')
-    .single();
-
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient.rpc('create_adjustment_txn', {
+    p_schema: schemaName,
+    p_input: rpcInput,
+    p_user_id: userId,
+  });
   if (error) throw new Error(`Failed to create adjustment: ${error.message}`);
-  return data as Adjustment;
+  // PG function returns a JSONB array; return the first (only) element
+  const rows = data as Adjustment[];
+  return rows[0];
 }
 
 export async function listAdjustmentReasons(
