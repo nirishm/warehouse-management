@@ -23,13 +23,11 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
+import { ItemCombobox } from "@/components/inventory/item-combobox";
+import { LocationCombobox } from "@/components/inventory/location-combobox";
+import { useTenant } from "@/components/layout/tenant-provider";
 
 interface LocationOption {
-  id: string;
-  name: string;
-}
-
-interface ItemOption {
   id: string;
   name: string;
 }
@@ -77,8 +75,8 @@ export function TransferFormDialog({
   ]);
   const [saving, setSaving] = useState(false);
 
+  const { tenantId } = useTenant();
   const [locations, setLocations] = useState<LocationOption[]>([]);
-  const [items, setItems] = useState<ItemOption[]>([]);
   const [units, setUnits] = useState<UnitOption[]>([]);
   const [loadingDropdowns, setLoadingDropdowns] = useState(false);
 
@@ -87,12 +85,10 @@ export function TransferFormDialog({
     setLoadingDropdowns(true);
     Promise.all([
       fetch(`/api/v1/t/${tenantSlug}/locations?limit=100`).then((r) => r.json()),
-      fetch(`/api/v1/t/${tenantSlug}/items?limit=200`).then((r) => r.json()),
       fetch(`/api/v1/t/${tenantSlug}/units?limit=100`).then((r) => r.json()),
     ])
-      .then(([locRes, itemRes, unitRes]) => {
+      .then(([locRes, unitRes]) => {
         setLocations(locRes.data ?? []);
-        setItems(itemRes.data ?? []);
         setUnits(unitRes.data ?? []);
       })
       .catch(() => toast.error("Failed to load dropdown data"))
@@ -199,41 +195,23 @@ export function TransferFormDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <Label>Origin Location</Label>
-              <Select
+              <LocationCombobox
+                locations={locations}
                 value={originLocationId}
                 onValueChange={setOriginLocationId}
+                placeholder="Origin location…"
                 disabled={loadingDropdowns}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select origin…" />
-                </SelectTrigger>
-                <SelectContent>
-                  {locations.map((loc) => (
-                    <SelectItem key={loc.id} value={loc.id}>
-                      {loc.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label>Destination Location</Label>
-              <Select
+              <LocationCombobox
+                locations={locations}
                 value={destLocationId}
                 onValueChange={setDestLocationId}
+                placeholder="Destination location…"
                 disabled={loadingDropdowns}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select destination…" />
-                </SelectTrigger>
-                <SelectContent>
-                  {locations.map((loc) => (
-                    <SelectItem key={loc.id} value={loc.id}>
-                      {loc.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </div>
           </div>
 
@@ -273,22 +251,13 @@ export function TransferFormDialog({
                       Item
                     </Label>
                   )}
-                  <Select
+                  <ItemCombobox
+                    tenantSlug={tenantSlug}
+                    tenantId={tenantId}
                     value={li.itemId}
-                    onValueChange={(v) => updateLineItem(index, "itemId", v)}
-                    disabled={loadingDropdowns}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select item…" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {items.map((item) => (
-                        <SelectItem key={item.id} value={item.id}>
-                          {item.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onValueChange={(id) => updateLineItem(index, "itemId", id)}
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="flex flex-col gap-1">
