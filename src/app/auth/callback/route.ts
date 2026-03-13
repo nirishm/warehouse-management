@@ -43,6 +43,10 @@ export async function GET(request: NextRequest) {
       if (data.session?.user?.id) {
         try {
           await syncUserAppMetadata(data.session.user.id);
+          // Force JWT re-mint so the redirect carries fresh app_metadata.
+          // refreshSession() triggers setAll() internally, which overwrites
+          // responseCookies with the new JWT containing updated claims.
+          await supabase.auth.refreshSession();
         } catch (e) {
           console.error('Failed to sync app_metadata on login:', e);
         }
