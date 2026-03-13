@@ -7,7 +7,7 @@ import {
   softDeleteTransfer,
 } from '@/modules/transfer/queries/transfers';
 import { updateTransferSchema } from '@/modules/transfer/validations/transfer';
-import { getUserLocationScope } from '@/core/db/location-scope';
+import { getUserLocationScope, assertTransferLocationAccess } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
@@ -46,6 +46,11 @@ export const PATCH = withTenantContext(
       const existingTransfer = await getTransfer(ctx.tenantId, id, locationScope);
       if (!existingTransfer) {
         throw new ApiError(404, 'Transfer not found', 'NOT_FOUND');
+      }
+
+      // Validate new origin location if being changed
+      if (parsed.data.originLocationId !== undefined) {
+        assertTransferLocationAccess(locationScope, parsed.data.originLocationId);
       }
 
       const transfer = await updateTransfer(ctx.tenantId, id, parsed.data, ctx.userId);

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withTenantContext } from '@/core/auth/guards';
 import { ApiError, errorResponse } from '@/core/api/error-handler';
-import { updateSaleStatus } from '@/modules/sale/queries/sales';
+import { getSale, updateSaleStatus } from '@/modules/sale/queries/sales';
 import { updateSaleStatusSchema } from '@/modules/sale/validations/sale';
+import { getUserLocationScope } from '@/core/db/location-scope';
+import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
   const segments = new URL(req.url).pathname.split('/');
@@ -18,6 +20,12 @@ export const PATCH = withTenantContext(
       const parsed = updateSaleStatusSchema.safeParse(body);
       if (!parsed.success) {
         throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR');
+      }
+
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const existing = await getSale(ctx.tenantId, id, locationScope);
+      if (!existing) {
+        throw new ApiError(404, 'Sale not found', 'NOT_FOUND');
       }
 
       const sale = await updateSaleStatus(ctx.tenantId, id, parsed.data.status, ctx.userId);

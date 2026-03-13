@@ -7,7 +7,7 @@ import {
   softDeletePurchase,
 } from '@/modules/purchase/queries/purchases';
 import { updatePurchaseSchema } from '@/modules/purchase/validations/purchase';
-import { getUserLocationScope } from '@/core/db/location-scope';
+import { getUserLocationScope, assertLocationAccess } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
@@ -46,6 +46,11 @@ export const PATCH = withTenantContext(
       const existingPurchase = await getPurchase(ctx.tenantId, id, locationScope);
       if (!existingPurchase) {
         throw new ApiError(404, 'Purchase not found', 'NOT_FOUND');
+      }
+
+      // Validate new locationId if being changed
+      if (parsed.data.locationId !== undefined) {
+        assertLocationAccess(locationScope, parsed.data.locationId);
       }
 
       const purchase = await updatePurchase(ctx.tenantId, id, parsed.data, ctx.userId);

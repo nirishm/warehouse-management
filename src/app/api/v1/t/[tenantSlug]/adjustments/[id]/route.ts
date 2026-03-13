@@ -7,7 +7,7 @@ import {
   softDeleteAdjustment,
 } from '@/modules/adjustments/queries/adjustments';
 import { updateAdjustmentSchema } from '@/modules/adjustments/validations/adjustment';
-import { getUserLocationScope } from '@/core/db/location-scope';
+import { getUserLocationScope, assertLocationAccess } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
@@ -46,6 +46,11 @@ export const PATCH = withTenantContext(
       const existingAdjustment = await getAdjustment(ctx.tenantId, id, locationScope);
       if (!existingAdjustment) {
         throw new ApiError(404, 'Adjustment not found', 'NOT_FOUND');
+      }
+
+      // Validate new locationId if being changed
+      if (parsed.data.locationId !== undefined) {
+        assertLocationAccess(locationScope, parsed.data.locationId);
       }
 
       const adjustment = await updateAdjustment(ctx.tenantId, id, parsed.data, ctx.userId);

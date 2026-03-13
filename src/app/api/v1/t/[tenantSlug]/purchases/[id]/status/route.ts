@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withTenantContext } from '@/core/auth/guards';
 import { ApiError, errorResponse } from '@/core/api/error-handler';
-import { updatePurchaseStatus } from '@/modules/purchase/queries/purchases';
+import { getPurchase, updatePurchaseStatus } from '@/modules/purchase/queries/purchases';
 import { updatePurchaseStatusSchema } from '@/modules/purchase/validations/purchase';
+import { getUserLocationScope } from '@/core/db/location-scope';
+import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
   const segments = new URL(req.url).pathname.split('/');
@@ -18,6 +20,12 @@ export const PATCH = withTenantContext(
       const parsed = updatePurchaseStatusSchema.safeParse(body);
       if (!parsed.success) {
         throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR');
+      }
+
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const existing = await getPurchase(ctx.tenantId, id, locationScope);
+      if (!existing) {
+        throw new ApiError(404, 'Purchase not found', 'NOT_FOUND');
       }
 
       const purchase = await updatePurchaseStatus(

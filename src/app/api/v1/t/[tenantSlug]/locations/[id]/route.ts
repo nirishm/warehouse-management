@@ -7,6 +7,8 @@ import {
   softDeleteLocation,
 } from '@/modules/inventory/queries/locations';
 import { updateLocationSchema } from '@/modules/inventory/validations/location';
+import { getUserLocationScope, assertLocationAccess } from '@/core/db/location-scope';
+import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
   const segments = new URL(req.url).pathname.split('/');
@@ -17,6 +19,8 @@ export const GET = withTenantContext(
   async (req: NextRequest, ctx) => {
     try {
       const id = extractId(req);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      assertLocationAccess(locationScope, id);
       const location = await getLocation(ctx.tenantId, id);
       if (!location) {
         throw new ApiError(404, 'Location not found', 'NOT_FOUND');
@@ -33,6 +37,9 @@ export const PATCH = withTenantContext(
   async (req: NextRequest, ctx) => {
     try {
       const id = extractId(req);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      assertLocationAccess(locationScope, id);
+
       const body = await req.json();
       const parsed = updateLocationSchema.safeParse(body);
       if (!parsed.success) {
@@ -55,6 +62,9 @@ export const DELETE = withTenantContext(
   async (req: NextRequest, ctx) => {
     try {
       const id = extractId(req);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      assertLocationAccess(locationScope, id);
+
       const location = await softDeleteLocation(ctx.tenantId, id, ctx.userId);
       if (!location) {
         throw new ApiError(404, 'Location not found', 'NOT_FOUND');
