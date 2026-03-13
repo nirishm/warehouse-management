@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { TenantProvider } from "@/components/layout/tenant-provider";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { MobileHeader } from "@/components/layout/mobile-header";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
 import { ShortcutsProvider } from "@/components/keyboard-shortcuts/shortcuts-provider";
@@ -42,10 +43,11 @@ export default async function TenantLayout({
 
         {/* Main content area */}
         <div className="flex-1 md:ml-[var(--sidebar-w)]">
+          <MobileHeader />
           <Header />
           <main
             style={{ paddingBottom: "calc(var(--mobile-nav-h) + 24px)" }}
-            className="px-[var(--content-px)] py-6 md:pb-6"
+            className="px-4 md:px-[var(--content-px)] py-5 md:py-6 md:pb-6"
           >
             {children}
           </main>

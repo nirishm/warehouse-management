@@ -48,7 +48,7 @@ export function Header() {
         backgroundColor: "var(--bg-base)",
         borderBottom: "1px solid var(--border)",
       }}
-      className="sticky top-0 z-40 flex items-center px-[var(--content-px)] gap-3"
+      className="hidden md:flex sticky top-0 z-40 items-center px-[var(--content-px)] gap-3"
     >
       {/* Mobile menu trigger */}
       <Sheet>
