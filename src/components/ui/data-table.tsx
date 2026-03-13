@@ -71,6 +71,7 @@ export function DataTable<TData, TValue>({
     <div className="flex flex-col gap-0">
       {/* Table */}
       <div className="rounded-[var(--card-radius)] border border-[var(--border)] bg-[var(--bg-base)] overflow-hidden">
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -134,6 +135,7 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
 
       {/* Pagination */}
