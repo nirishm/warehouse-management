@@ -40,4 +40,10 @@ describe('createTenantSchema', () => {
     expect(result.success).toBe(true);
     if (result.success) expect(result.data.ownerEmail).toBeUndefined();
   });
+
+  it('rejects slug with uppercase or spaces', () => {
+    expect(createTenantSchema.safeParse({ name: 'Acme', slug: 'Has Spaces' }).success).toBe(false);
+    expect(createTenantSchema.safeParse({ name: 'Acme', slug: 'ACME' }).success).toBe(false);
+    expect(createTenantSchema.safeParse({ name: 'Acme', slug: 'valid-slug' }).success).toBe(true);
+  });
 });
