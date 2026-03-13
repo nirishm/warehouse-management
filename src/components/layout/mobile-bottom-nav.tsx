@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Package, ShoppingCart, ShoppingBag, MoreHorizontal } from "lucide-react";
+import {
+  Home,
+  Truck,
+  Package,
+  Layers,
+  MoreHorizontal,
+  ShoppingCart,
+  ShoppingBag,
+} from "lucide-react";
 import { useTenant } from "./tenant-provider";
 
 interface MobileNavItem {
@@ -12,18 +20,30 @@ interface MobileNavItem {
 }
 
 export function MobileBottomNav() {
-  const { tenantSlug } = useTenant();
+  const { tenantSlug, role } = useTenant();
   const pathname = usePathname();
 
-  const navItems: MobileNavItem[] = [
-    { label: "Dashboard", icon: BarChart3, path: `/t/${tenantSlug}/dashboard` },
-    { label: "Inventory", icon: Package, path: `/t/${tenantSlug}/inventory` },
+  const operatorNavItems: MobileNavItem[] = [
+    { label: "Home", icon: Home, path: `/t/${tenantSlug}` },
+    { label: "Dispatch", icon: Truck, path: `/t/${tenantSlug}/transfers` },
+    { label: "Receive", icon: Package, path: `/t/${tenantSlug}/purchases` },
+    { label: "Stock", icon: Layers, path: `/t/${tenantSlug}/inventory` },
+    { label: "More", icon: MoreHorizontal, path: `/t/${tenantSlug}/more` },
+  ];
+
+  const defaultNavItems: MobileNavItem[] = [
+    { label: "Home", icon: Home, path: `/t/${tenantSlug}` },
+    { label: "Inventory", icon: Layers, path: `/t/${tenantSlug}/inventory` },
     { label: "Sales", icon: ShoppingCart, path: `/t/${tenantSlug}/sales` },
     { label: "Purchases", icon: ShoppingBag, path: `/t/${tenantSlug}/purchases` },
     { label: "More", icon: MoreHorizontal, path: `/t/${tenantSlug}/more` },
   ];
 
+  const navItems = role === "operator" ? operatorNavItems : defaultNavItems;
+
   function isActive(path: string): boolean {
+    // Exact match for root to avoid matching every sub-route
+    if (path === `/t/${tenantSlug}`) return pathname === path;
     return pathname === path || pathname.startsWith(`${path}/`);
   }
 
@@ -44,13 +64,13 @@ export function MobileBottomNav() {
             key={path}
             href={path}
             style={{
-              color: active ? "var(--accent-color)" : "var(--text-muted)",
+              color: active ? "var(--accent-color)" : "var(--text-dim)",
             }}
-            className="flex flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-400 transition-colors"
+            className="flex flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] transition-colors"
             aria-label={label}
           >
             <Icon className="size-5 shrink-0" />
-            <span>{label}</span>
+            <span style={{ fontWeight: active ? 700 : 400 }}>{label}</span>
           </Link>
         );
       })}
