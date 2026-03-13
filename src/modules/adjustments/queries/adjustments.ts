@@ -1,4 +1,5 @@
-import { eq, and, ilike, isNull, sql } from 'drizzle-orm';
+import { eq, and, ilike, isNull, sql, inArray } from 'drizzle-orm';
+import type { LocationScope } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 import { withTenantScope } from '@/core/db/tenant-scope';
 import { adjustments, adjustmentItems, auditLog } from '@/core/db/schema';
@@ -19,9 +20,15 @@ export async function listAdjustments(
     status?: string;
     locationId?: string;
     type?: string;
+    locationScope?: LocationScope;
   },
   pagination?: { limit: number; offset: number },
 ) {
+  if (filters?.locationScope !== undefined && filters.locationScope !== null
+      && filters.locationScope.length === 0) {
+    return { data: [], total: 0 };
+  }
+
   const conditions = [eq(adjustments.tenantId, tenantId), isNull(adjustments.deletedAt)];
 
   if (filters?.search) {
@@ -37,6 +44,9 @@ export async function listAdjustments(
   }
   if (filters?.type) {
     conditions.push(eq(adjustments.type, filters.type as 'qty' | 'value'));
+  }
+  if (filters?.locationScope && filters.locationScope.length > 0) {
+    conditions.push(inArray(adjustments.locationId, filters.locationScope));
   }
 
   const where = and(...conditions);
@@ -61,7 +71,12 @@ export async function listAdjustments(
 export async function getAdjustment(
   tenantId: string,
   id: string,
+  locationScope?: LocationScope,
 ): Promise<AdjustmentWithItems | null> {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return null;
+  }
+
   const result = await db
     .select()
     .from(adjustments)
@@ -70,6 +85,12 @@ export async function getAdjustment(
     );
 
   if (!result[0]) return null;
+
+  if (locationScope !== undefined && locationScope !== null) {
+    if (result[0].locationId && !locationScope.includes(result[0].locationId)) {
+      return null;
+    }
+  }
 
   const items = await db
     .select()

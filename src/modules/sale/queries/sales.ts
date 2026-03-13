@@ -1,4 +1,5 @@
-import { eq, and, ilike, isNull, sql } from 'drizzle-orm';
+import { eq, and, ilike, isNull, sql, inArray } from 'drizzle-orm';
+import type { LocationScope } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 import { withTenantScope } from '@/core/db/tenant-scope';
 import { sales, saleItems, auditLog } from '@/core/db/schema';
@@ -22,9 +23,15 @@ export async function listSales(
     search?: string;
     status?: string;
     contactId?: string;
+    locationScope?: LocationScope;
   },
   pagination?: { limit: number; offset: number },
 ) {
+  if (filters?.locationScope !== undefined && filters.locationScope !== null
+      && filters.locationScope.length === 0) {
+    return { data: [], total: 0 };
+  }
+
   const conditions = [eq(sales.tenantId, tenantId), isNull(sales.deletedAt)];
 
   if (filters?.search) {
@@ -37,6 +44,9 @@ export async function listSales(
   }
   if (filters?.contactId) {
     conditions.push(eq(sales.contactId, filters.contactId));
+  }
+  if (filters?.locationScope && filters.locationScope.length > 0) {
+    conditions.push(inArray(sales.locationId, filters.locationScope));
   }
 
   const where = and(...conditions);
@@ -58,13 +68,27 @@ export async function listSales(
   return { data, total: Number(countResult[0]?.count ?? 0) };
 }
 
-export async function getSale(tenantId: string, id: string) {
+export async function getSale(
+  tenantId: string,
+  id: string,
+  locationScope?: LocationScope,
+) {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return null;
+  }
+
   const sale = await db
     .select()
     .from(sales)
     .where(and(eq(sales.id, id), eq(sales.tenantId, tenantId), isNull(sales.deletedAt)));
 
   if (!sale[0]) return null;
+
+  if (locationScope !== undefined && locationScope !== null) {
+    if (sale[0].locationId && !locationScope.includes(sale[0].locationId)) {
+      return null;
+    }
+  }
 
   const items = await db.select().from(saleItems).where(eq(saleItems.saleId, id));
   return { ...sale[0], items };

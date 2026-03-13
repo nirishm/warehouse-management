@@ -1,4 +1,5 @@
-import { eq, and, ilike, isNull, sql } from 'drizzle-orm';
+import { eq, and, ilike, isNull, sql, inArray, or } from 'drizzle-orm';
+import type { LocationScope } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 import { withTenantScope } from '@/core/db/tenant-scope';
 import { transfers, transferItems, auditLog } from '@/core/db/schema';
@@ -27,9 +28,15 @@ export async function listTransfers(
     status?: string;
     originLocationId?: string;
     destLocationId?: string;
+    locationScope?: LocationScope;
   },
   pagination?: { limit: number; offset: number },
 ) {
+  if (filters?.locationScope !== undefined && filters.locationScope !== null
+      && filters.locationScope.length === 0) {
+    return { data: [], total: 0 };
+  }
+
   const conditions = [eq(transfers.tenantId, tenantId), isNull(transfers.deletedAt)];
 
   if (filters?.search) {
@@ -45,6 +52,14 @@ export async function listTransfers(
   }
   if (filters?.destLocationId) {
     conditions.push(eq(transfers.destLocationId, filters.destLocationId));
+  }
+  if (filters?.locationScope && filters.locationScope.length > 0) {
+    conditions.push(
+      or(
+        inArray(transfers.originLocationId, filters.locationScope),
+        inArray(transfers.destLocationId, filters.locationScope),
+      )!,
+    );
   }
 
   const where = and(...conditions);
@@ -66,7 +81,15 @@ export async function listTransfers(
   return { data, total: Number(countResult[0]?.count ?? 0) };
 }
 
-export async function getTransfer(tenantId: string, id: string): Promise<TransferWithItems | null> {
+export async function getTransfer(
+  tenantId: string,
+  id: string,
+  locationScope?: LocationScope,
+): Promise<TransferWithItems | null> {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return null;
+  }
+
   const result = await db
     .select()
     .from(transfers)
@@ -75,6 +98,12 @@ export async function getTransfer(tenantId: string, id: string): Promise<Transfe
     );
 
   if (!result[0]) return null;
+
+  if (locationScope !== undefined && locationScope !== null) {
+    const inOrigin = locationScope.includes(result[0].originLocationId);
+    const inDest = locationScope.includes(result[0].destLocationId);
+    if (!inOrigin && !inDest) return null;
+  }
 
   const items = await db
     .select()

@@ -1,4 +1,5 @@
-import { eq, and, ilike, isNull, sql } from 'drizzle-orm';
+import { eq, and, ilike, isNull, sql, inArray } from 'drizzle-orm';
+import type { LocationScope } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 import { withTenantScope } from '@/core/db/tenant-scope';
 import { locations, auditLog } from '@/core/db/schema';
@@ -12,9 +13,15 @@ export async function listLocations(
     search?: string;
     type?: string;
     isActive?: boolean;
+    locationScope?: LocationScope;
   },
   pagination?: { limit: number; offset: number },
 ) {
+  if (filters?.locationScope !== undefined && filters.locationScope !== null
+      && filters.locationScope.length === 0) {
+    return { data: [], total: 0 };
+  }
+
   const conditions = [eq(locations.tenantId, tenantId), isNull(locations.deletedAt)];
 
   if (filters?.search) {
@@ -27,6 +34,9 @@ export async function listLocations(
   }
   if (filters?.isActive !== undefined) {
     conditions.push(eq(locations.isActive, filters.isActive));
+  }
+  if (filters?.locationScope && filters.locationScope.length > 0) {
+    conditions.push(inArray(locations.id, filters.locationScope));
   }
 
   const where = and(...conditions);
