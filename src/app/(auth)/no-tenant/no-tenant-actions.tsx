@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
@@ -18,13 +19,13 @@ export function NoTenantActions() {
 
   return (
     <div className="mt-6 flex flex-col gap-3">
-      <a
+      <Link
         href="/"
         className="inline-flex h-[48px] items-center justify-center rounded-full text-[14px] font-bold text-white"
         style={{ background: 'var(--accent-color)' }}
       >
         Try Again
-      </a>
+      </Link>
       <button
         onClick={handleSignOut}
         disabled={signingOut}

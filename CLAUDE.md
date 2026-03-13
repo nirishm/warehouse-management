@@ -166,11 +166,15 @@ Required in `.env.local`:
 - `SUPABASE_SERVICE_API_KEY` — Supabase access token for CLI (starts with `sbp_`)
 - `NEXT_PUBLIC_APP_URL` — App base URL (e.g. `https://wareos.in`)
 - `RESEND_API_KEY` — Resend API key for transactional email
+- `UPSTASH_REDIS_REST_URL` — Upstash Redis URL for rate limiting
+- `UPSTASH_REDIS_REST_TOKEN` — Upstash Redis token
+- `INNGEST_EVENT_KEY` — Inngest event key for background jobs
+- `INNGEST_SIGNING_KEY` — Inngest signing key for webhook verification
 
 ## CLI Tools
 - `supabase` CLI (v2.75.0) — installed at `/opt/homebrew/bin/supabase`
 - `vercel` CLI (v50.28.0) — installed at `/opt/homebrew/bin/vercel`
-- `inngest-cli` — not yet installed (`npm i -g inngest-cli`)
+- `inngest-cli` (v1.17.5) — installed globally via `npm i -g inngest-cli`
 
 ## Design Reference
 - `.claude/context/design_reference.html` is the **strict** source of truth for all UI/frontend design decisions

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useTenant } from "@/components/layout/tenant-provider";
 import { useRealtime } from "@/hooks/use-realtime";
 import { useRealtimeContext } from "./realtime-provider";

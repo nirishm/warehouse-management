@@ -1,4 +1,4 @@
-import { eq, and, ilike, sql } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '@/core/db/drizzle';
 import { userTenants, userProfiles, userLocations, auditLog } from '@/core/db/schema';
 import { ApiError } from '@/core/api/error-handler';
@@ -66,9 +66,6 @@ export async function listUsers(
   if (memberships.length === 0) {
     return { data: [], total };
   }
-
-  // Fetch profiles for these users in this tenant
-  const userIds = memberships.map((m) => m.userId);
 
   // Fetch all profiles for the tenant, then match in memory
   const profiles = await db

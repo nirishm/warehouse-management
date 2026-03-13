@@ -74,7 +74,6 @@ export function UsersClient({ tenantSlug }: UsersClientProps) {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [editUser, setEditUser] = useState<UserData | null>(null);
   const [deleteUser, setDeleteUser] = useState<UserData | null>(null);
   const [deleting, setDeleting] = useState(false);
 

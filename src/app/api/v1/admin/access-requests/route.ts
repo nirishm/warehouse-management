@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { withAdminContext } from '@/core/auth/admin-guard';
 import { db } from '@/core/db/drizzle';
 import { accessRequests, userTenants } from '@/core/db/schema';

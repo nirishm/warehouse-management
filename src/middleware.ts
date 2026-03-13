@@ -14,6 +14,7 @@ const PUBLIC_ROUTES = [
   '/set-password',
   '/no-tenant',
   '/api/inngest',
+  '/api/auth/sync',
 ];
 
 function isPublicRoute(pathname: string): boolean {

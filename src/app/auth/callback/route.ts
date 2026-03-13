@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     // Capture cookies that Supabase sets during code exchange so we can
     // copy them onto the redirect response (NextResponse.redirect creates
     // a new Response that does NOT inherit cookieStore.set() calls).
-    let responseCookies: { name: string; value: string; options: any }[] = [];
+    let responseCookies: { name: string; value: string; options: Record<string, unknown> }[] = [];
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

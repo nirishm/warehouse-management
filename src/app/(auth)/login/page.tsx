@@ -41,7 +41,18 @@ function LoginPageInner() {
       return;
     }
 
-    router.refresh();
+    try {
+      const res = await fetch('/api/auth/sync', { method: 'POST' });
+      const body = await res.json();
+
+      if (body.tenant_slug) {
+        router.push(`/t/${body.tenant_slug}`);
+      } else {
+        router.push('/no-tenant');
+      }
+    } catch {
+      router.push('/');
+    }
   }
 
   async function handleForgot(e: React.FormEvent) {
