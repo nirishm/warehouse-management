@@ -8,6 +8,7 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'tests/**/*.test.ts'],
+    exclude: ['tests/backend/**'],
     passWithNoTests: true,
   },
   resolve: {

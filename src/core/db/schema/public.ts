@@ -17,7 +17,7 @@ export const tenants = pgTable('tenants', {
   slug: text('slug').notNull().unique(),
   status: text('status', { enum: ['active', 'suspended', 'archived'] }).notNull().default('active'),
   enabledModules: jsonb('enabled_modules').default(['inventory']),
-  plan: text('plan', { enum: ['free', 'starter', 'professional', 'enterprise'] }).notNull().default('free'),
+  plan: text('plan', { enum: ['free', 'starter', 'pro', 'enterprise'] }).notNull().default('free'),
   settings: jsonb('settings'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

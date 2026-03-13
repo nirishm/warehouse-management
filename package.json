@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest",
+    "test:backend": "vitest run --config vitest.backend.config.ts",
     "test:e2e": "playwright test"
   },
   "packageManager": "pnpm@10.30.3",
