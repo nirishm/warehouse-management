@@ -4,12 +4,14 @@ import { db } from '@/core/db/drizzle';
 import { tenants } from '@/core/db/schema';
 import { desc, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { inviteUser } from '@/modules/user-management/queries/users';
 
 const createTenantSchema = z.object({
   name: z.string().min(1),
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
-  plan: z.enum(['free', 'starter', 'professional', 'enterprise']).optional(),
+  plan: z.enum(['free', 'starter', 'pro', 'enterprise']).optional(),
   enabledModules: z.array(z.string()).optional(),
+  ownerEmail: z.string().email().optional(),
 });
 
 export const GET = withAdminContext(async (req) => {
@@ -25,16 +27,20 @@ export const GET = withAdminContext(async (req) => {
   return NextResponse.json({ data, total: Number(countResult[0]?.count ?? 0) });
 });
 
-export const POST = withAdminContext(async (req) => {
+export const POST = withAdminContext(async (req, ctx) => {
   const body = await req.json();
   const parsed = createTenantSchema.parse(body);
 
-  const result = await db.insert(tenants).values({
+  const [tenant] = await db.insert(tenants).values({
     name: parsed.name,
     slug: parsed.slug,
     plan: parsed.plan ?? 'free',
     enabledModules: parsed.enabledModules ?? ['inventory'],
   }).returning();
 
-  return NextResponse.json(result[0], { status: 201 });
+  if (parsed.ownerEmail) {
+    await inviteUser(tenant.id, parsed.ownerEmail, 'admin', undefined, ctx.userId);
+  }
+
+  return NextResponse.json(tenant, { status: 201 });
 });
