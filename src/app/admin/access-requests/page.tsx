@@ -27,6 +27,7 @@ export default function AccessRequestsPage() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>({});
+  const [selectedTenants, setSelectedTenants] = useState<Record<string, string>>({});
   const [rejectTarget, setRejectTarget] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
 
@@ -137,8 +138,8 @@ export default function AccessRequestsPage() {
                   <select
                     className="border border-[var(--border)] rounded-md px-3 py-1.5 text-[13px]"
                     style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-base)' }}
-                    defaultValue={tenants[0]?.id}
-                    id={`tenant-${r.id}`}
+                    value={selectedTenants[r.id] ?? tenants[0]?.id ?? ''}
+                    onChange={(e) => setSelectedTenants((prev) => ({ ...prev, [r.id]: e.target.value }))}
                   >
                     {tenants.map((t) => (
                       <option key={t.id} value={t.id}>
@@ -148,12 +149,7 @@ export default function AccessRequestsPage() {
                   </select>
                 )}
                 <Button
-                  onClick={() => {
-                    const select = document.getElementById(
-                      `tenant-${r.id}`,
-                    ) as HTMLSelectElement;
-                    handleAction(r.id, 'approve', select?.value);
-                  }}
+                  onClick={() => handleAction(r.id, 'approve', selectedTenants[r.id] ?? tenants[0]?.id)}
                   disabled={processing === r.id}
                   className="rounded-full h-[36px] px-4 text-[13px]"
                   style={{ backgroundColor: 'var(--green)', color: 'white' }}
