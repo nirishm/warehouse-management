@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 interface AccessRequest {
   id: string;
@@ -25,6 +26,9 @@ export default function AccessRequestsPage() {
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
+  const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>({});
+  const [rejectTarget, setRejectTarget] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
 
   const fetchData = useCallback(async () => {
     try {
@@ -52,13 +56,20 @@ export default function AccessRequestsPage() {
     requestId: string,
     action: 'approve' | 'reject',
     tenantId?: string,
+    reason?: string,
   ) => {
     setProcessing(requestId);
     try {
       const res = await fetch('/api/v1/admin/access-requests', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requestId, action, tenantId, role: 'viewer' }),
+        body: JSON.stringify({
+          requestId,
+          action,
+          tenantId,
+          role: selectedRoles[requestId] ?? 'viewer',
+          ...(reason ? { rejectionReason: reason } : {}),
+        }),
       });
       if (!res.ok) throw new Error('Failed');
       setRequests((prev) => prev.filter((r) => r.id !== requestId));
@@ -67,6 +78,8 @@ export default function AccessRequestsPage() {
       toast.error(`Failed to ${action}`);
     } finally {
       setProcessing(null);
+      setRejectTarget(null);
+      setRejectionReason('');
     }
   };
 
@@ -109,6 +122,17 @@ export default function AccessRequestsPage() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
+                <select
+                  value={selectedRoles[r.id] ?? 'viewer'}
+                  onChange={(e) => setSelectedRoles((prev) => ({ ...prev, [r.id]: e.target.value }))}
+                  className="border border-[var(--border)] rounded-md px-2 py-1.5 text-[13px]"
+                  style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-base)' }}
+                >
+                  <option value="admin">admin</option>
+                  <option value="manager">manager</option>
+                  <option value="operator">operator</option>
+                  <option value="viewer">viewer</option>
+                </select>
                 {tenants.length > 0 && (
                   <select
                     className="border border-[var(--border)] rounded-md px-3 py-1.5 text-[13px]"
@@ -137,7 +161,7 @@ export default function AccessRequestsPage() {
                   Approve
                 </Button>
                 <Button
-                  onClick={() => handleAction(r.id, 'reject')}
+                  onClick={() => setRejectTarget(r.id)}
                   disabled={processing === r.id}
                   variant="outline"
                   className="rounded-full h-[36px] px-4 text-[13px]"
@@ -149,6 +173,58 @@ export default function AccessRequestsPage() {
           ))}
         </div>
       )}
+
+      {/* Rejection Notes Dialog */}
+      <Dialog
+        open={!!rejectTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setRejectTarget(null);
+            setRejectionReason('');
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Access Request</DialogTitle>
+          </DialogHeader>
+          <div className="py-2">
+            <p style={{ color: 'var(--text-muted)' }} className="text-[13px] mb-3">
+              Optionally provide a reason for rejection.
+            </p>
+            <textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Reason for rejection (optional)"
+              rows={3}
+              className="w-full border border-[var(--border)] rounded-lg px-3 py-2 text-[13px] resize-none"
+              style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-base)' }}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRejectTarget(null);
+                setRejectionReason('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() =>
+                rejectTarget && handleAction(rejectTarget, 'reject', undefined, rejectionReason)
+              }
+              disabled={processing === rejectTarget}
+              variant="outline"
+              className="rounded-full h-[48px] px-6"
+              style={{ color: 'var(--red)', borderColor: 'var(--red)' }}
+            >
+              Confirm Reject
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
