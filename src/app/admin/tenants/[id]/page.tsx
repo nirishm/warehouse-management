@@ -182,7 +182,7 @@ export default function TenantDetailPage() {
       setInviteEmail('');
       setInviteRole('viewer');
       setInviteDisplayName('');
-      fetchUsers();
+      await fetchUsers();
       toast.success('Invite sent');
     } catch {
       toast.error('Failed to send invite');
@@ -337,11 +337,16 @@ export default function TenantDetailPage() {
                     className="border border-[var(--border)] rounded-md px-2 py-1 text-[12px]"
                     style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-base)' }}
                   >
-                    {u.role === 'owner' && <option value="owner">owner</option>}
-                    <option value="admin">admin</option>
-                    <option value="manager">manager</option>
-                    <option value="operator">operator</option>
-                    <option value="viewer">viewer</option>
+                    {u.role === 'owner' ? (
+                      <option value="owner">owner</option>
+                    ) : (
+                      <>
+                        <option value="admin">admin</option>
+                        <option value="manager">manager</option>
+                        <option value="operator">operator</option>
+                        <option value="viewer">viewer</option>
+                      </>
+                    )}
                   </select>
                   {u.role !== 'owner' && (
                     <Button
@@ -361,7 +366,7 @@ export default function TenantDetailPage() {
       </div>
 
       {/* Invite User Dialog */}
-      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+      <Dialog open={inviteOpen} onOpenChange={(open) => { if (!open) { setInviteOpen(false); setInviteEmail(''); setInviteRole('viewer'); setInviteDisplayName(''); } }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Invite User to {tenant.name}</DialogTitle>
@@ -403,7 +408,7 @@ export default function TenantDetailPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setInviteOpen(false)}>
+            <Button variant="outline" onClick={() => { setInviteOpen(false); setInviteEmail(''); setInviteRole('viewer'); setInviteDisplayName(''); }}>
               Cancel
             </Button>
             <Button
