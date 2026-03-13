@@ -48,7 +48,14 @@ export async function GET(request: NextRequest) {
           // responseCookies with the new JWT containing updated claims.
           await supabase.auth.refreshSession();
         } catch (e) {
-          console.error('Failed to sync app_metadata on login:', e);
+          // Log with enough context to diagnose production failures.
+          // This is the #1 suspect when users land on /no-tenant unexpectedly.
+          console.error('[auth/callback] syncUserAppMetadata failed:', {
+            userId: data.session.user.id,
+            error: e instanceof Error ? e.message : String(e),
+            hasDbUrl: !!process.env.DATABASE_URL,
+            hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+          });
         }
       }
 
