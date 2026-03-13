@@ -8,6 +8,7 @@ export const accessRequests = pgTable('access_requests', {
   tenantId: uuid('tenant_id').references(() => tenants.id),
   reviewedBy: uuid('reviewed_by'),
   reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+  rejectionReason: text('rejection_reason'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
