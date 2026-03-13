@@ -1,19 +1,26 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
 type View = 'login' | 'forgot' | 'forgot-sent';
 
-export default function LoginPage() {
+function LoginPageInner() {
   const router = useRouter();
   const [view, setView] = useState<View>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const searchParams = useSearchParams();
+  const [error, setError] = useState(() => {
+    const urlError = searchParams.get('error');
+    if (urlError === 'auth_callback_failed') {
+      return 'Password reset link has expired or is invalid. Please request a new one.';
+    }
+    return '';
+  });
   const [googleLoading, setGoogleLoading] = useState(false);
 
   const supabase = createClient();
@@ -222,5 +229,13 @@ export default function LoginPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageInner />
+    </Suspense>
   );
 }
