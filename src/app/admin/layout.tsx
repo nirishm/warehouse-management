@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db } from '@/core/db/drizzle';
@@ -29,20 +30,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             WareOS Admin
           </h1>
           <nav className="flex items-center gap-4">
-            <a
+            <Link
               href="/admin/tenants"
               style={{ color: 'var(--text-muted)' }}
               className="text-[14px] hover:underline"
             >
               Tenants
-            </a>
-            <a
+            </Link>
+            <Link
               href="/admin/access-requests"
               style={{ color: 'var(--text-muted)' }}
               className="text-[14px] hover:underline"
             >
               Access Requests
-            </a>
+            </Link>
           </nav>
         </div>
       </header>

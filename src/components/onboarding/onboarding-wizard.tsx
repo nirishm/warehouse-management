@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useTenant } from "@/components/layout/tenant-provider";
 import { Button } from "@/components/ui/button";
@@ -566,31 +566,34 @@ export function OnboardingWizard() {
 
   const dismissalKey = DISMISSAL_KEY(tenantId);
 
-  const checkAndShow = useCallback(async () => {
+  useEffect(() => {
     if (typeof window !== "undefined") {
       const dismissed = localStorage.getItem(dismissalKey);
       if (dismissed === "true") return;
     }
 
-    try {
-      const res = await fetch(`/api/v1/t/${tenantSlug}/onboarding/status`);
-      if (!res.ok) return;
-      const status: OnboardingStatus = await res.json();
-      if (status.needed) {
-        // Start from the first incomplete step
-        if (!status.hasLocations) setStep(1);
-        else if (!status.hasUnits) setStep(2);
-        else setStep(3);
-        setVisible(true);
-      }
-    } catch {
-      // Silently fail — don't block app loading
-    }
-  }, [tenantSlug, dismissalKey]);
+    let cancelled = false;
 
-  useEffect(() => {
-    checkAndShow();
-  }, [checkAndShow]);
+    (async () => {
+      try {
+        const res = await fetch(`/api/v1/t/${tenantSlug}/onboarding/status`);
+        if (!res.ok || cancelled) return;
+        const status: OnboardingStatus = await res.json();
+        if (cancelled) return;
+        if (status.needed) {
+          // Start from the first incomplete step
+          if (!status.hasLocations) setStep(1);
+          else if (!status.hasUnits) setStep(2);
+          else setStep(3);
+          setVisible(true);
+        }
+      } catch {
+        // Silently fail — don't block app loading
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [tenantSlug, dismissalKey]);
 
   function handleDismiss() {
     if (typeof window !== "undefined") {
