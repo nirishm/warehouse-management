@@ -11,6 +11,7 @@ const reviewSchema = z.object({
   action: z.enum(['approve', 'reject']),
   tenantId: z.string().uuid().optional(),
   role: z.enum(['owner', 'admin', 'manager', 'operator', 'viewer']).optional(),
+  rejectionReason: z.string().max(500).optional(),
 });
 
 export const GET = withAdminContext(async (req) => {
@@ -63,7 +64,12 @@ export const PATCH = withAdminContext(async (req, ctx) => {
   } else {
     await db
       .update(accessRequests)
-      .set({ status: 'rejected', reviewedBy: ctx.userId, reviewedAt: new Date() })
+      .set({
+        status: 'rejected',
+        reviewedBy: ctx.userId,
+        reviewedAt: new Date(),
+        rejectionReason: parsed.rejectionReason ?? null,
+      })
       .where(eq(accessRequests.id, parsed.requestId));
   }
 
