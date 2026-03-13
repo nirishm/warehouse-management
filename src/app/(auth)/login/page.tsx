@@ -19,6 +19,9 @@ function LoginPageInner() {
     if (urlError === 'auth_callback_failed') {
       return 'Password reset link has expired or is invalid. Please request a new one.';
     }
+    if (urlError === 'oauth_failed') {
+      return 'Google sign-in failed. If you registered with email and password, please use that to sign in instead.';
+    }
     return '';
   });
   const [googleLoading, setGoogleLoading] = useState(false);

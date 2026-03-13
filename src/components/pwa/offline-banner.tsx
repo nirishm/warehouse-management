@@ -2,11 +2,12 @@
 import { useState, useEffect } from "react";
 
 export function OfflineBanner() {
-  const [offline, setOffline] = useState(
-    () => typeof navigator !== "undefined" && !navigator.onLine
-  );
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
+    // Sync real offline state after mount (runs client-side only)
+    setOffline(!navigator.onLine);
+
     const handleOffline = () => setOffline(true);
     const handleOnline = () => setOffline(false);
 
