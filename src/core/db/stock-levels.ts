@@ -25,6 +25,7 @@ export async function queryStockLevels(
   filters?: {
     itemId?: string;
     locationId?: string;
+    locationIds?: string[];
   },
 ): Promise<StockLevel[]> {
   const conditions = [sql`tenant_id = ${tenantId}`];
@@ -34,6 +35,10 @@ export async function queryStockLevels(
   }
   if (filters?.locationId) {
     conditions.push(sql`location_id = ${filters.locationId}`);
+  }
+  if (filters?.locationIds && filters.locationIds.length > 0) {
+    const placeholders = filters.locationIds.map(id => sql`${id}`);
+    conditions.push(sql`location_id IN (${sql.join(placeholders, sql`, `)})`);
   }
 
   const whereClause = sql.join(conditions, sql` AND `);
