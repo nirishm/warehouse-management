@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { OfflineBanner } from '@/components/pwa/offline-banner';
 import { PwaRegister } from '@/components/pwa/pwa-register';
@@ -7,12 +7,15 @@ export const metadata: Metadata = {
   title: 'WareOS',
   description: 'Inventory & Warehouse Management',
   manifest: '/manifest.json',
-  themeColor: '#F27B35',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'WareOS',
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#F27B35',
 };
 
 export default function RootLayout({
