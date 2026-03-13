@@ -100,8 +100,8 @@ export async function getTransfer(
   if (!result[0]) return null;
 
   if (locationScope !== undefined && locationScope !== null) {
-    const inOrigin = locationScope.includes(result[0].originLocationId);
-    const inDest = locationScope.includes(result[0].destLocationId);
+    const inOrigin = result[0].originLocationId ? locationScope.includes(result[0].originLocationId) : false;
+    const inDest = result[0].destLocationId ? locationScope.includes(result[0].destLocationId) : false;
     if (!inOrigin && !inDest) return null;
   }
 
