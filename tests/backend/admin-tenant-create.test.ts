@@ -5,7 +5,7 @@ import { z } from 'zod';
 const createTenantSchema = z.object({
   name: z.string().min(1),
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
-  plan: z.enum(['free', 'starter', 'professional', 'enterprise']).optional(),
+  plan: z.enum(['free', 'starter', 'pro', 'enterprise']).optional(),
   enabledModules: z.array(z.string()).optional(),
   ownerEmail: z.string().email().optional(),
 });
