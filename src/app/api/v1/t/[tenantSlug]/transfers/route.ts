@@ -4,6 +4,8 @@ import { ApiError, errorResponse } from '@/core/api/error-handler';
 import { parsePagination } from '@/lib/pagination';
 import { listTransfers, createTransfer } from '@/modules/transfer/queries/transfers';
 import { createTransferSchema } from '@/modules/transfer/validations/transfer';
+import { getUserLocationScope } from '@/core/db/location-scope';
+import { db } from '@/core/db/drizzle';
 
 export const GET = withTenantContext(
   async (req: NextRequest, ctx) => {
@@ -17,7 +19,8 @@ export const GET = withTenantContext(
         destLocationId: searchParams.get('destLocationId') ?? undefined,
       };
 
-      const { data, total } = await listTransfers(ctx.tenantId, filters, pagination);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const { data, total } = await listTransfers(ctx.tenantId, { ...filters, locationScope }, pagination);
 
       return NextResponse.json({
         data,

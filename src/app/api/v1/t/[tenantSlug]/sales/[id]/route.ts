@@ -3,6 +3,8 @@ import { withTenantContext } from '@/core/auth/guards';
 import { ApiError, errorResponse } from '@/core/api/error-handler';
 import { getSale, updateSale, softDeleteSale } from '@/modules/sale/queries/sales';
 import { updateSaleSchema } from '@/modules/sale/validations/sale';
+import { getUserLocationScope } from '@/core/db/location-scope';
+import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
   const segments = new URL(req.url).pathname.split('/');
@@ -13,7 +15,8 @@ export const GET = withTenantContext(
   async (req: NextRequest, ctx) => {
     try {
       const id = extractId(req);
-      const sale = await getSale(ctx.tenantId, id);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const sale = await getSale(ctx.tenantId, id, locationScope);
       if (!sale) {
         throw new ApiError(404, 'Sale not found', 'NOT_FOUND');
       }

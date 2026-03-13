@@ -7,6 +7,8 @@ import {
   softDeleteTransfer,
 } from '@/modules/transfer/queries/transfers';
 import { updateTransferSchema } from '@/modules/transfer/validations/transfer';
+import { getUserLocationScope } from '@/core/db/location-scope';
+import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
   const segments = new URL(req.url).pathname.split('/');
@@ -17,7 +19,8 @@ export const GET = withTenantContext(
   async (req: NextRequest, ctx) => {
     try {
       const id = extractId(req);
-      const transfer = await getTransfer(ctx.tenantId, id);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const transfer = await getTransfer(ctx.tenantId, id, locationScope);
       if (!transfer) {
         throw new ApiError(404, 'Transfer not found', 'NOT_FOUND');
       }

@@ -4,6 +4,8 @@ import { ApiError, errorResponse } from '@/core/api/error-handler';
 import { parsePagination } from '@/lib/pagination';
 import { listAdjustments, createAdjustment } from '@/modules/adjustments/queries/adjustments';
 import { createAdjustmentSchema } from '@/modules/adjustments/validations/adjustment';
+import { getUserLocationScope } from '@/core/db/location-scope';
+import { db } from '@/core/db/drizzle';
 
 export const GET = withTenantContext(
   async (req: NextRequest, ctx) => {
@@ -17,7 +19,8 @@ export const GET = withTenantContext(
         type: searchParams.get('type') ?? undefined,
       };
 
-      const { data, total } = await listAdjustments(ctx.tenantId, filters, pagination);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const { data, total } = await listAdjustments(ctx.tenantId, { ...filters, locationScope }, pagination);
 
       return NextResponse.json({
         data,

@@ -7,6 +7,8 @@ import {
   softDeleteAdjustment,
 } from '@/modules/adjustments/queries/adjustments';
 import { updateAdjustmentSchema } from '@/modules/adjustments/validations/adjustment';
+import { getUserLocationScope } from '@/core/db/location-scope';
+import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
   const segments = new URL(req.url).pathname.split('/');
@@ -17,7 +19,8 @@ export const GET = withTenantContext(
   async (req: NextRequest, ctx) => {
     try {
       const id = extractId(req);
-      const adjustment = await getAdjustment(ctx.tenantId, id);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const adjustment = await getAdjustment(ctx.tenantId, id, locationScope);
       if (!adjustment) {
         throw new ApiError(404, 'Adjustment not found', 'NOT_FOUND');
       }

@@ -7,6 +7,8 @@ import {
   softDeletePurchase,
 } from '@/modules/purchase/queries/purchases';
 import { updatePurchaseSchema } from '@/modules/purchase/validations/purchase';
+import { getUserLocationScope } from '@/core/db/location-scope';
+import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
   const segments = new URL(req.url).pathname.split('/');
@@ -17,7 +19,8 @@ export const GET = withTenantContext(
   async (req: NextRequest, ctx) => {
     try {
       const id = extractId(req);
-      const purchase = await getPurchase(ctx.tenantId, id);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const purchase = await getPurchase(ctx.tenantId, id, locationScope);
       if (!purchase) {
         throw new ApiError(404, 'Purchase not found', 'NOT_FOUND');
       }

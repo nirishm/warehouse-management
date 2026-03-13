@@ -3,6 +3,8 @@ import { withTenantContext } from '@/core/auth/guards';
 import { errorResponse } from '@/core/api/error-handler';
 import { getDashboardAnalytics } from '@/modules/analytics/queries/analytics';
 import type { Period } from '@/modules/analytics/queries/analytics';
+import { getUserLocationScope } from '@/core/db/location-scope';
+import { db } from '@/core/db/drizzle';
 
 export const GET = withTenantContext(
   async (req: NextRequest, ctx) => {
@@ -15,7 +17,8 @@ export const GET = withTenantContext(
       const period: Period | undefined =
         from !== undefined || to !== undefined ? { from, to } : undefined;
 
-      const data = await getDashboardAnalytics(ctx.tenantId, period);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const data = await getDashboardAnalytics(ctx.tenantId, period, locationScope);
 
       return NextResponse.json({ data });
     } catch (error) {

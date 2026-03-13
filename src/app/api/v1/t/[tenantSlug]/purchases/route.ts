@@ -4,6 +4,8 @@ import { ApiError, errorResponse } from '@/core/api/error-handler';
 import { parsePagination } from '@/lib/pagination';
 import { listPurchases, createPurchase } from '@/modules/purchase/queries/purchases';
 import { createPurchaseSchema } from '@/modules/purchase/validations/purchase';
+import { getUserLocationScope } from '@/core/db/location-scope';
+import { db } from '@/core/db/drizzle';
 
 export const GET = withTenantContext(
   async (req: NextRequest, ctx) => {
@@ -16,7 +18,8 @@ export const GET = withTenantContext(
         contactId: searchParams.get('contactId') ?? undefined,
       };
 
-      const { data, total } = await listPurchases(ctx.tenantId, filters, pagination);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const { data, total } = await listPurchases(ctx.tenantId, { ...filters, locationScope }, pagination);
 
       return NextResponse.json({
         data,
