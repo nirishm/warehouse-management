@@ -7,7 +7,7 @@ import {
   softDeleteAdjustment,
 } from '@/modules/adjustments/queries/adjustments';
 import { updateAdjustmentSchema } from '@/modules/adjustments/validations/adjustment';
-import { getUserLocationScope, assertLocationAccess } from '@/core/db/location-scope';
+import { getUserLocationScope } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {

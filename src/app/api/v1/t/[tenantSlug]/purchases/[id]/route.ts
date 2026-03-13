@@ -7,7 +7,7 @@ import {
   softDeletePurchase,
 } from '@/modules/purchase/queries/purchases';
 import { updatePurchaseSchema } from '@/modules/purchase/validations/purchase';
-import { getUserLocationScope, assertLocationAccess } from '@/core/db/location-scope';
+import { getUserLocationScope } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {

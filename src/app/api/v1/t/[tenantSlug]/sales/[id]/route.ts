@@ -3,7 +3,7 @@ import { withTenantContext } from '@/core/auth/guards';
 import { ApiError, errorResponse } from '@/core/api/error-handler';
 import { getSale, updateSale, softDeleteSale } from '@/modules/sale/queries/sales';
 import { updateSaleSchema } from '@/modules/sale/validations/sale';
-import { getUserLocationScope, assertLocationAccess } from '@/core/db/location-scope';
+import { getUserLocationScope } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {

@@ -7,7 +7,7 @@ import {
   softDeleteTransfer,
 } from '@/modules/transfer/queries/transfers';
 import { updateTransferSchema } from '@/modules/transfer/validations/transfer';
-import { getUserLocationScope, assertTransferLocationAccess } from '@/core/db/location-scope';
+import { getUserLocationScope } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
