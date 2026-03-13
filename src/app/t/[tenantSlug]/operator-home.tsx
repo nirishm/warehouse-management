@@ -136,10 +136,10 @@ export function OperatorHome({ tenantSlug }: { tenantSlug: string }) {
           >
             <Icon
               className="size-5 shrink-0"
-              style={{ color: primary ? "#FFFFFF" : "var(--accent-color)" }}
+              style={{ color: primary ? "var(--bg-base)" : "var(--accent-color)" }}
             />
             <span
-              style={{ color: primary ? "#FFFFFF" : "var(--text-primary)" }}
+              style={{ color: primary ? "var(--bg-base)" : "var(--text-primary)" }}
               className="text-[14px] font-bold"
             >
               {label}
