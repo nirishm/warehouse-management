@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { withAdminContext } from '@/core/auth/admin-guard';
 import { db } from '@/core/db/drizzle';
-import { tenants } from '@/core/db/schema';
+import { tenants, auditLog } from '@/core/db/schema';
 import { desc, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { inviteUser } from '@/modules/user-management/queries/users';
@@ -31,12 +31,25 @@ export const POST = withAdminContext(async (req, ctx) => {
   const body = await req.json();
   const parsed = createTenantSchema.parse(body);
 
-  const [tenant] = await db.insert(tenants).values({
-    name: parsed.name,
-    slug: parsed.slug,
-    plan: parsed.plan ?? 'free',
-    enabledModules: parsed.enabledModules ?? ['inventory'],
-  }).returning();
+  const tenant = await db.transaction(async (tx) => {
+    const [created] = await tx.insert(tenants).values({
+      name: parsed.name,
+      slug: parsed.slug,
+      plan: parsed.plan ?? 'free',
+      enabledModules: parsed.enabledModules ?? ['inventory'],
+    }).returning();
+
+    await tx.insert(auditLog).values({
+      tenantId: created.id,
+      userId: ctx.userId,
+      action: 'create',
+      entityType: 'tenant',
+      entityId: created.id,
+      newData: { name: created.name, slug: created.slug, plan: created.plan },
+    });
+
+    return created;
+  });
 
   if (parsed.ownerEmail) {
     await inviteUser(tenant.id, parsed.ownerEmail, 'admin', undefined, ctx.userId);
