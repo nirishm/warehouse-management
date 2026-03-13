@@ -45,7 +45,8 @@ export default function TenantDetailPage() {
       const res = await fetch(`/api/v1/admin/tenants/${id}`);
       if (!res.ok) throw new Error('Failed to fetch tenant');
       setTenant(await res.json());
-    } catch {
+    } catch (err) {
+      console.error('[admin/tenant] fetch failed:', err);
       toast.error('Failed to load tenant');
     } finally {
       setLoading(false);
@@ -73,7 +74,8 @@ export default function TenantDetailPage() {
       if (!res.ok) throw new Error('Failed to update');
       setTenant({ ...tenant, enabledModules: updated });
       toast.success('Modules updated');
-    } catch {
+    } catch (err) {
+      console.error('[admin/tenant] module toggle failed:', err);
       toast.error('Failed to update modules');
     } finally {
       setSaving(false);
@@ -92,7 +94,8 @@ export default function TenantDetailPage() {
       if (!res.ok) throw new Error('Failed to update');
       setTenant({ ...tenant, status: newStatus });
       toast.success(`Tenant ${newStatus}`);
-    } catch {
+    } catch (err) {
+      console.error('[admin/tenant] status toggle failed:', err);
       toast.error('Failed to update status');
     } finally {
       setSaving(false);

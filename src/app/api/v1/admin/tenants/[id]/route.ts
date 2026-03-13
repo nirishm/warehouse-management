@@ -36,11 +36,17 @@ export const PATCH = withAdminContext(async (req) => {
   const body = await req.json();
   const parsed = updateTenantSchema.parse(body);
 
-  // Build the set data, handling jsonb serialization for enabledModules.
-  // postgres.js binds JS arrays as Postgres native arrays, not JSON.
-  // Explicit JSON.stringify + ::jsonb cast fixes "malformed array literal".
-  const setData: Record<string, unknown> = { ...parsed, updatedAt: new Date() };
-  if (parsed.enabledModules) {
+  // Build setData explicitly — don't spread parsed.
+  // jsonb columns (enabledModules, settings) need sql cast to avoid
+  // postgres.js binding them as native Postgres arrays/objects.
+  const setData: Record<string, unknown> = { updatedAt: new Date() };
+  if (parsed.name !== undefined) setData.name = parsed.name;
+  if (parsed.status !== undefined) setData.status = parsed.status;
+  if (parsed.plan !== undefined) setData.plan = parsed.plan;
+  if (parsed.settings !== undefined) {
+    setData.settings = sql`${JSON.stringify(parsed.settings)}::jsonb`;
+  }
+  if (parsed.enabledModules !== undefined) {
     setData.enabledModules = sql`${JSON.stringify(parsed.enabledModules)}::jsonb`;
   }
 
