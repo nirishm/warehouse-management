@@ -47,6 +47,8 @@ function LoginPageInner() {
 
       if (body.tenant_slug) {
         router.push(`/t/${body.tenant_slug}`);
+      } else if (body.is_super_admin) {
+        router.push('/admin');
       } else {
         router.push('/no-tenant');
       }

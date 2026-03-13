@@ -60,6 +60,21 @@ export async function middleware(request: NextRequest) {
 
   const { app_metadata } = jwt;
 
+  const isSuperAdmin = app_metadata.is_super_admin === true;
+
+  // Super-admins accessing /admin routes: allow without tenant context
+  if (isSuperAdmin && (pathname.startsWith('/admin') || pathname.startsWith('/api/v1/admin'))) {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-user-id', jwt.sub);
+    requestHeaders.set('x-user-email', jwt.email);
+
+    const finalResponse = NextResponse.next({ request: { headers: requestHeaders } });
+    response.cookies.getAll().forEach((cookie) => {
+      finalResponse.cookies.set(cookie);
+    });
+    return finalResponse;
+  }
+
   // Determine which tenant context to use for this request.
   // Default to the primary tenant from app_metadata.
   let tenantId = app_metadata.tenant_id;
@@ -86,8 +101,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // No tenant at all → send to provisioning / error page.
+  // No tenant at all → super-admins go to /admin, others to /no-tenant.
   if (!tenantId) {
+    if (isSuperAdmin) {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
     return NextResponse.redirect(new URL('/no-tenant', request.url));
   }
 

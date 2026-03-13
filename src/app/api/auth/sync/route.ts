@@ -35,10 +35,11 @@ export async function POST() {
   try {
     await syncUserAppMetadata(session.user.id);
     const { data: refreshData } = await supabase.auth.refreshSession();
-    const tenantSlug =
-      refreshData.session?.user?.app_metadata?.tenant_slug ?? null;
+    const appMeta = refreshData.session?.user?.app_metadata ?? {};
+    const tenantSlug = appMeta.tenant_slug ?? null;
+    const isSuperAdmin = appMeta.is_super_admin === true;
 
-    return NextResponse.json({ tenant_slug: tenantSlug });
+    return NextResponse.json({ tenant_slug: tenantSlug, is_super_admin: isSuperAdmin });
   } catch (e) {
     console.error('Failed to sync metadata on password login:', e);
     return NextResponse.json({ error: 'Sync failed' }, { status: 500 });
