@@ -1,5 +1,5 @@
 import { db } from '@/core/db/drizzle';
-import { userTenants, tenants } from '@/core/db/schema';
+import { userTenants, tenants, superAdmins } from '@/core/db/schema';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { eq, inArray } from 'drizzle-orm';
 import type { Role } from './types';
@@ -24,8 +24,21 @@ interface TenantRow {
 export function buildAppMetadata(
   memberships: MembershipRow[],
   tenantRows: TenantRow[],
+  isSuperAdmin: boolean = false,
 ) {
-  if (memberships.length === 0) return null;
+  if (memberships.length === 0) {
+    if (isSuperAdmin) {
+      return {
+        tenant_id: '',
+        tenant_slug: '',
+        role: 'viewer' as Role,
+        enabled_modules: [] as string[],
+        is_super_admin: true,
+        memberships: [],
+      };
+    }
+    return null;
+  }
 
   const tenantMap = new Map(tenantRows.map((t) => [t.id, t]));
 
@@ -45,6 +58,7 @@ export function buildAppMetadata(
     tenant_slug: primaryTenant.slug,
     role: primary.role,
     enabled_modules: enabledModules,
+    is_super_admin: isSuperAdmin,
     memberships: memberships.map((m) => ({
       tenantId: m.tenantId,
       slug: tenantMap.get(m.tenantId)?.slug ?? '',
@@ -62,6 +76,13 @@ export function buildAppMetadata(
  * 2. On every login (auth callback) to catch stale metadata
  */
 export async function syncUserAppMetadata(userId: string): Promise<void> {
+  // Check if user is a super-admin
+  const superAdminRows = await db
+    .select({ userId: superAdmins.userId })
+    .from(superAdmins)
+    .where(eq(superAdmins.userId, userId));
+  const isSuperAdmin = superAdminRows.length > 0;
+
   // Fetch all tenant memberships for this user
   const memberships = await db
     .select({
@@ -73,20 +94,23 @@ export async function syncUserAppMetadata(userId: string): Promise<void> {
     .from(userTenants)
     .where(eq(userTenants.userId, userId));
 
-  if (memberships.length === 0) return;
+  if (memberships.length === 0 && !isSuperAdmin) return;
 
-  // Fetch tenant details for all memberships
-  const tenantIds = memberships.map((m) => m.tenantId);
-  const tenantRows = await db
-    .select({
-      id: tenants.id,
-      slug: tenants.slug,
-      enabledModules: tenants.enabledModules,
-    })
-    .from(tenants)
-    .where(inArray(tenants.id, tenantIds));
+  // Fetch tenant details for all memberships (skip if no memberships)
+  let tenantRows: TenantRow[] = [];
+  if (memberships.length > 0) {
+    const tenantIds = memberships.map((m) => m.tenantId);
+    tenantRows = await db
+      .select({
+        id: tenants.id,
+        slug: tenants.slug,
+        enabledModules: tenants.enabledModules,
+      })
+      .from(tenants)
+      .where(inArray(tenants.id, tenantIds));
+  }
 
-  const appMetadata = buildAppMetadata(memberships, tenantRows);
+  const appMetadata = buildAppMetadata(memberships, tenantRows, isSuperAdmin);
   if (!appMetadata) return;
 
   // Update Supabase Auth user's app_metadata

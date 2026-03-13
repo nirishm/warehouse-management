@@ -31,6 +31,7 @@ describe('buildAppMetadata', () => {
       tenant_slug: 'acme',
       role: 'admin',
       enabled_modules: ['inventory', 'purchases'],
+      is_super_admin: false,
       memberships: [
         { tenantId: 'tenant-1', slug: 'acme', role: 'admin' },
       ],
@@ -67,5 +68,64 @@ describe('buildAppMetadata', () => {
 
     expect(result?.tenant_id).toBe('t-1');
     expect(result?.enabled_modules).toEqual([]);
+  });
+
+  it('returns minimal metadata with is_super_admin: true for super-admin with no memberships', () => {
+    const result = buildAppMetadata([], [], true);
+    expect(result).toEqual({
+      tenant_id: '',
+      tenant_slug: '',
+      role: 'viewer',
+      enabled_modules: [],
+      is_super_admin: true,
+      memberships: [],
+    });
+  });
+
+  it('includes is_super_admin: true alongside tenant context for super-admin with memberships', () => {
+    const memberships = [
+      {
+        userId: 'sa-1',
+        tenantId: 'tenant-1',
+        role: 'owner' as const,
+        isDefault: true,
+      },
+    ];
+    const tenantRows = [
+      {
+        id: 'tenant-1',
+        slug: 'acme',
+        enabledModules: ['inventory'],
+      },
+    ];
+
+    const result = buildAppMetadata(memberships, tenantRows, true);
+
+    expect(result?.is_super_admin).toBe(true);
+    expect(result?.tenant_id).toBe('tenant-1');
+    expect(result?.tenant_slug).toBe('acme');
+    expect(result?.role).toBe('owner');
+  });
+
+  it('sets is_super_admin: false for regular user with memberships', () => {
+    const memberships = [
+      {
+        userId: 'user-1',
+        tenantId: 'tenant-1',
+        role: 'viewer' as const,
+        isDefault: true,
+      },
+    ];
+    const tenantRows = [
+      {
+        id: 'tenant-1',
+        slug: 'acme',
+        enabledModules: ['inventory'],
+      },
+    ];
+
+    const result = buildAppMetadata(memberships, tenantRows, false);
+
+    expect(result?.is_super_admin).toBe(false);
   });
 });

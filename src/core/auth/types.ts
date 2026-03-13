@@ -8,6 +8,7 @@ export interface AppJwtPayload {
     tenant_slug: string;
     role: Role;
     enabled_modules: string[];
+    is_super_admin?: boolean;
     memberships: Array<{
       tenantId: string;
       slug: string;
