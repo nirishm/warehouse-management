@@ -1,7 +1,8 @@
-import { eq, and, isNull, inArray, sql } from 'drizzle-orm';
+import { eq, and, isNull, inArray, sql, or } from 'drizzle-orm';
 import { db } from '@/core/db/drizzle';
 import { queryStockLevels } from '@/core/db/stock-levels';
 import { items, sales, saleItems, purchases, purchaseItems, transfers } from '@/core/db/schema';
+import type { LocationScope } from '@/core/db/location-scope';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -68,9 +69,14 @@ export interface DashboardAnalytics {
  * stock_levels returns one row per (item, location, unit) — we collapse per item
  * by summing currentStock first, then multiply by the item's sellingPrice.
  */
-export async function getStockValue(tenantId: string): Promise<StockValueResult> {
-  // Aggregate stock per item across all locations
-  const stockLevels = await queryStockLevels(db, tenantId);
+export async function getStockValue(tenantId: string, locationScope?: LocationScope): Promise<StockValueResult> {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return { total: 0 };
+  }
+  // Aggregate stock per item across scoped locations
+  const stockLevels = await queryStockLevels(db, tenantId,
+    locationScope ? { locationIds: locationScope } : undefined,
+  );
 
   if (stockLevels.length === 0) {
     return { total: 0 };
@@ -109,8 +115,13 @@ export async function getStockValue(tenantId: string): Promise<StockValueResult>
 /**
  * Count of items where currentStock (summed across locations) < item.reorderLevel.
  */
-export async function getItemsBelowReorder(tenantId: string): Promise<ItemsBelowReorderResult> {
-  const stockLevels = await queryStockLevels(db, tenantId);
+export async function getItemsBelowReorder(tenantId: string, locationScope?: LocationScope): Promise<ItemsBelowReorderResult> {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return { count: 0 };
+  }
+  const stockLevels = await queryStockLevels(db, tenantId,
+    locationScope ? { locationIds: locationScope } : undefined,
+  );
 
   // Sum stock per item across all locations
   const stockByItem = new Map<string, number>();
@@ -148,28 +159,38 @@ export async function getItemsBelowReorder(tenantId: string): Promise<ItemsBelow
 /**
  * Count open purchase orders (draft|ordered) and open sales (draft|confirmed).
  */
-export async function getOpenOrdersCount(tenantId: string): Promise<OpenOrdersCountResult> {
+export async function getOpenOrdersCount(tenantId: string, locationScope?: LocationScope): Promise<OpenOrdersCountResult> {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return { purchases: 0, sales: 0, total: 0 };
+  }
+
+  const purchaseConditions = [
+    eq(purchases.tenantId, tenantId),
+    isNull(purchases.deletedAt),
+    inArray(purchases.status, ['draft', 'ordered']),
+  ];
+  if (locationScope && locationScope.length > 0) {
+    purchaseConditions.push(inArray(purchases.locationId, locationScope));
+  }
+
+  const saleConditions = [
+    eq(sales.tenantId, tenantId),
+    isNull(sales.deletedAt),
+    inArray(sales.status, ['draft', 'confirmed']),
+  ];
+  if (locationScope && locationScope.length > 0) {
+    saleConditions.push(inArray(sales.locationId, locationScope));
+  }
+
   const [purchaseResult, salesResult] = await Promise.all([
     db
       .select({ count: sql<number>`cast(count(*) as integer)` })
       .from(purchases)
-      .where(
-        and(
-          eq(purchases.tenantId, tenantId),
-          isNull(purchases.deletedAt),
-          inArray(purchases.status, ['draft', 'ordered']),
-        ),
-      ),
+      .where(and(...purchaseConditions)),
     db
       .select({ count: sql<number>`cast(count(*) as integer)` })
       .from(sales)
-      .where(
-        and(
-          eq(sales.tenantId, tenantId),
-          isNull(sales.deletedAt),
-          inArray(sales.status, ['draft', 'confirmed']),
-        ),
-      ),
+      .where(and(...saleConditions)),
   ]);
 
   const purchasesCount = Number(purchaseResult[0]?.count ?? 0);
@@ -185,17 +206,29 @@ export async function getOpenOrdersCount(tenantId: string): Promise<OpenOrdersCo
 /**
  * Count transfers with status 'dispatched' or 'in_transit'.
  */
-export async function getInTransitCount(tenantId: string): Promise<InTransitCountResult> {
+export async function getInTransitCount(tenantId: string, locationScope?: LocationScope): Promise<InTransitCountResult> {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return { count: 0 };
+  }
+
+  const conditions = [
+    eq(transfers.tenantId, tenantId),
+    isNull(transfers.deletedAt),
+    inArray(transfers.status, ['dispatched', 'in_transit']),
+  ];
+  if (locationScope && locationScope.length > 0) {
+    conditions.push(
+      or(
+        inArray(transfers.originLocationId, locationScope),
+        inArray(transfers.destLocationId, locationScope),
+      )!,
+    );
+  }
+
   const result = await db
     .select({ count: sql<number>`cast(count(*) as integer)` })
     .from(transfers)
-    .where(
-      and(
-        eq(transfers.tenantId, tenantId),
-        isNull(transfers.deletedAt),
-        inArray(transfers.status, ['dispatched', 'in_transit']),
-      ),
-    );
+    .where(and(...conditions));
 
   return { count: Number(result[0]?.count ?? 0) };
 }
@@ -203,13 +236,19 @@ export async function getInTransitCount(tenantId: string): Promise<InTransitCoun
 /**
  * Sum of (quantity * unitPrice) for confirmed/dispatched sales, with optional date range.
  */
-export async function getRevenue(tenantId: string, period?: Period): Promise<RevenueResult> {
+export async function getRevenue(tenantId: string, period?: Period, locationScope?: LocationScope): Promise<RevenueResult> {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return { total: 0 };
+  }
   // Build date conditions on sales.createdAt
   const saleDateConditions = [
     eq(sales.tenantId, tenantId),
     isNull(sales.deletedAt),
     inArray(sales.status, ['confirmed', 'dispatched']),
   ];
+  if (locationScope && locationScope.length > 0) {
+    saleDateConditions.push(inArray(sales.locationId, locationScope));
+  }
 
   if (period?.from) {
     saleDateConditions.push(
@@ -241,12 +280,19 @@ export async function getTopSellingItems(
   tenantId: string,
   period?: Period,
   limit = 10,
+  locationScope?: LocationScope,
 ): Promise<TopSellingItem[]> {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return [];
+  }
   const saleDateConditions = [
     eq(sales.tenantId, tenantId),
     isNull(sales.deletedAt),
     inArray(sales.status, ['confirmed', 'dispatched']),
   ];
+  if (locationScope && locationScope.length > 0) {
+    saleDateConditions.push(inArray(sales.locationId, locationScope));
+  }
 
   if (period?.from) {
     saleDateConditions.push(
@@ -291,7 +337,11 @@ export async function getTopSellingItems(
 export async function getStockMovement(
   tenantId: string,
   period?: Period,
+  locationScope?: LocationScope,
 ): Promise<StockMovementDay[]> {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return [];
+  }
   // Default: last 7 days (today - 6 days .. today)
   const toDate = period?.to ? new Date(period.to) : new Date();
   const fromDate = period?.from
@@ -306,6 +356,18 @@ export async function getStockMovement(
   const toIso = toDate.toISOString();
 
   // Inbound: purchases with status 'received'
+  const inboundJoinConditions = [
+    eq(purchaseItems.purchaseId, purchases.id),
+    eq(purchases.tenantId, tenantId),
+    isNull(purchases.deletedAt),
+    eq(purchases.status, 'received'),
+    sql`${purchases.createdAt} >= ${fromIso}::timestamptz`,
+    sql`${purchases.createdAt} <= ${toIso}::timestamptz`,
+  ];
+  if (locationScope && locationScope.length > 0) {
+    inboundJoinConditions.push(inArray(purchases.locationId, locationScope));
+  }
+
   const inboundRows = await db
     .select({
       date: sql<string>`to_char(date_trunc('day', ${purchases.createdAt}), 'YYYY-MM-DD')`,
@@ -314,19 +376,24 @@ export async function getStockMovement(
     .from(purchaseItems)
     .innerJoin(
       purchases,
-      and(
-        eq(purchaseItems.purchaseId, purchases.id),
-        eq(purchases.tenantId, tenantId),
-        isNull(purchases.deletedAt),
-        eq(purchases.status, 'received'),
-        sql`${purchases.createdAt} >= ${fromIso}::timestamptz`,
-        sql`${purchases.createdAt} <= ${toIso}::timestamptz`,
-      ),
+      and(...inboundJoinConditions),
     )
     .groupBy(sql`date_trunc('day', ${purchases.createdAt})`)
     .orderBy(sql`date_trunc('day', ${purchases.createdAt})`);
 
   // Outbound: sales with status 'confirmed' or 'dispatched'
+  const outboundJoinConditions = [
+    eq(saleItems.saleId, sales.id),
+    eq(sales.tenantId, tenantId),
+    isNull(sales.deletedAt),
+    inArray(sales.status, ['confirmed', 'dispatched']),
+    sql`${sales.createdAt} >= ${fromIso}::timestamptz`,
+    sql`${sales.createdAt} <= ${toIso}::timestamptz`,
+  ];
+  if (locationScope && locationScope.length > 0) {
+    outboundJoinConditions.push(inArray(sales.locationId, locationScope));
+  }
+
   const outboundRows = await db
     .select({
       date: sql<string>`to_char(date_trunc('day', ${sales.createdAt}), 'YYYY-MM-DD')`,
@@ -335,14 +402,7 @@ export async function getStockMovement(
     .from(saleItems)
     .innerJoin(
       sales,
-      and(
-        eq(saleItems.saleId, sales.id),
-        eq(sales.tenantId, tenantId),
-        isNull(sales.deletedAt),
-        inArray(sales.status, ['confirmed', 'dispatched']),
-        sql`${sales.createdAt} >= ${fromIso}::timestamptz`,
-        sql`${sales.createdAt} <= ${toIso}::timestamptz`,
-      ),
+      and(...outboundJoinConditions),
     )
     .groupBy(sql`date_trunc('day', ${sales.createdAt})`)
     .orderBy(sql`date_trunc('day', ${sales.createdAt})`);
@@ -374,6 +434,7 @@ export async function getStockMovement(
 export async function getDashboardAnalytics(
   tenantId: string,
   period?: Period,
+  locationScope?: LocationScope,
 ): Promise<DashboardAnalytics> {
   const [
     stockValue,
@@ -384,13 +445,13 @@ export async function getDashboardAnalytics(
     topSellingItems,
     stockMovement,
   ] = await Promise.all([
-    getStockValue(tenantId),
-    getItemsBelowReorder(tenantId),
-    getOpenOrdersCount(tenantId),
-    getInTransitCount(tenantId),
-    getRevenue(tenantId, period),
-    getTopSellingItems(tenantId, period),
-    getStockMovement(tenantId, period),
+    getStockValue(tenantId, locationScope),
+    getItemsBelowReorder(tenantId, locationScope),
+    getOpenOrdersCount(tenantId, locationScope),
+    getInTransitCount(tenantId, locationScope),
+    getRevenue(tenantId, period, locationScope),
+    getTopSellingItems(tenantId, period, 10, locationScope),
+    getStockMovement(tenantId, period, locationScope),
   ]);
 
   return {

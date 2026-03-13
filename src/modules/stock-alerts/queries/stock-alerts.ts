@@ -1,7 +1,8 @@
-import { eq } from 'drizzle-orm';
+import { eq, and, or, inArray, isNull } from 'drizzle-orm';
 import { db } from '@/core/db/drizzle';
 import { alertThresholds } from '@/core/db/schema';
 import { queryStockLevels } from '@/core/db/stock-levels';
+import type { LocationScope } from '@/core/db/location-scope';
 
 export interface StockAlert {
   itemId: string;
@@ -12,15 +13,34 @@ export interface StockAlert {
   deficit: number;
 }
 
-export async function getStockAlerts(tenantId: string): Promise<StockAlert[]> {
+export async function getStockAlerts(
+  tenantId: string,
+  locationScope?: LocationScope,
+): Promise<StockAlert[]> {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return [];
+  }
+
+  const thresholdConditions = [eq(alertThresholds.tenantId, tenantId)];
+  if (locationScope && locationScope.length > 0) {
+    thresholdConditions.push(
+      or(
+        inArray(alertThresholds.locationId, locationScope),
+        isNull(alertThresholds.locationId),
+      )!,
+    );
+  }
+
   const thresholds = await db
     .select()
     .from(alertThresholds)
-    .where(eq(alertThresholds.tenantId, tenantId));
+    .where(and(...thresholdConditions));
 
   if (thresholds.length === 0) return [];
 
-  const stockLevels = await queryStockLevels(db, tenantId);
+  const stockLevels = await queryStockLevels(db, tenantId,
+    locationScope ? { locationIds: locationScope } : undefined,
+  );
 
   const alerts: StockAlert[] = [];
 

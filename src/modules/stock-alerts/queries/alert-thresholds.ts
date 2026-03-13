@@ -1,4 +1,5 @@
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and, sql, inArray, or, isNull } from 'drizzle-orm';
+import type { LocationScope } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 import { withTenantScope } from '@/core/db/tenant-scope';
 import { alertThresholds, auditLog } from '@/core/db/schema';
@@ -13,6 +14,7 @@ type AlertThresholdRow = typeof alertThresholds.$inferSelect;
 export interface AlertThresholdFilters {
   itemId?: string;
   locationId?: string;
+  locationScope?: LocationScope;
 }
 
 export async function listAlertThresholds(
@@ -20,6 +22,11 @@ export async function listAlertThresholds(
   filters?: AlertThresholdFilters,
   pagination?: Pick<PaginationParams, 'limit' | 'offset'>,
 ) {
+  if (filters?.locationScope !== undefined && filters.locationScope !== null
+      && filters.locationScope.length === 0) {
+    return { data: [], total: 0 };
+  }
+
   const conditions = [eq(alertThresholds.tenantId, tenantId)];
 
   if (filters?.itemId) {
@@ -27,6 +34,14 @@ export async function listAlertThresholds(
   }
   if (filters?.locationId) {
     conditions.push(eq(alertThresholds.locationId, filters.locationId));
+  }
+  if (filters?.locationScope && filters.locationScope.length > 0) {
+    conditions.push(
+      or(
+        inArray(alertThresholds.locationId, filters.locationScope),
+        isNull(alertThresholds.locationId),
+      )!,
+    );
   }
 
   const where = and(...conditions);

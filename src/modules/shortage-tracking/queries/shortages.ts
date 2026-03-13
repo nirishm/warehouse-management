@@ -1,6 +1,7 @@
-import { eq, and, gt, isNull, gte, lte, sql } from 'drizzle-orm';
+import { eq, and, gt, isNull, gte, lte, sql, inArray, or } from 'drizzle-orm';
 import { db } from '@/core/db/drizzle';
 import { transfers, transferItems } from '@/core/db/schema';
+import type { LocationScope } from '@/core/db/location-scope';
 
 export async function listShortages(
   tenantId: string,
@@ -8,9 +9,15 @@ export async function listShortages(
     locationId?: string;
     dateFrom?: string;
     dateTo?: string;
+    locationScope?: LocationScope;
   },
   pagination?: { limit: number; offset: number },
 ) {
+  if (filters?.locationScope !== undefined && filters.locationScope !== null
+      && filters.locationScope.length === 0) {
+    return { data: [], total: 0 };
+  }
+
   const conditions = [
     eq(transfers.tenantId, tenantId),
     eq(transfers.status, 'received'),
@@ -22,6 +29,14 @@ export async function listShortages(
     // Filter by either origin or destination location
     conditions.push(
       sql`(${transfers.originLocationId} = ${filters.locationId} OR ${transfers.destLocationId} = ${filters.locationId})`,
+    );
+  }
+  if (filters?.locationScope && filters.locationScope.length > 0) {
+    conditions.push(
+      or(
+        inArray(transfers.originLocationId, filters.locationScope),
+        inArray(transfers.destLocationId, filters.locationScope),
+      )!,
     );
   }
   if (filters?.dateFrom) {
