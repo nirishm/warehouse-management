@@ -28,10 +28,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, MoreHorizontal, Trash2, Shield } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Trash2, Shield, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InviteUserDialog } from "./invite-user-dialog";
+import { LocationAssignDialog } from "./location-assign-dialog";
 
 interface UserData {
   userId: string;
@@ -82,6 +83,10 @@ export function UsersClient({ tenantSlug }: UsersClientProps) {
   const [roleDialogUser, setRoleDialogUser] = useState<UserData | null>(null);
   const [newRole, setNewRole] = useState("operator");
   const [savingRole, setSavingRole] = useState(false);
+
+  // Location assignment dialog state
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
+  const [locationDialogUser, setLocationDialogUser] = useState<UserData | null>(null);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -212,6 +217,18 @@ export function UsersClient({ tenantSlug }: UsersClientProps) {
                 <Shield className="size-4" />
                 Change Role
               </DropdownMenuItem>
+              {!["owner", "admin"].includes(user.role) && (
+                <DropdownMenuItem
+                  className="gap-2 cursor-pointer"
+                  onClick={() => {
+                    setLocationDialogUser(user);
+                    setLocationDialogOpen(true);
+                  }}
+                >
+                  <MapPin className="size-4" />
+                  Manage Locations
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 destructive
                 className="gap-2 cursor-pointer"
@@ -336,6 +353,21 @@ export function UsersClient({ tenantSlug }: UsersClientProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Location Assignment Dialog */}
+      {locationDialogUser && (
+        <LocationAssignDialog
+          open={locationDialogOpen}
+          onOpenChange={(open) => {
+            setLocationDialogOpen(open);
+            if (!open) setLocationDialogUser(null);
+          }}
+          tenantSlug={tenantSlug}
+          userId={locationDialogUser.userId}
+          userName={locationDialogUser.displayName ?? "this user"}
+          onSuccess={fetchUsers}
+        />
+      )}
 
       {/* Remove User Confirmation */}
       <Dialog
