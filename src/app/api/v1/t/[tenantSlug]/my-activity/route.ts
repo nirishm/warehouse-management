@@ -4,12 +4,8 @@ import { errorResponse } from '@/core/api/error-handler';
 import { listAuditEntries } from '@/modules/audit-trail/queries/audit';
 
 export const GET = withTenantContext(
-  async (req: NextRequest, ctx) => {
+  async (_req: NextRequest, ctx) => {
     try {
-      if (!ctx.userId) {
-        return NextResponse.json({ entries: [] });
-      }
-
       const { data } = await listAuditEntries(
         ctx.tenantId,
         { userId: ctx.userId },
