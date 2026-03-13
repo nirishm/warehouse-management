@@ -10,9 +10,8 @@ function storageKey(tenantId: string) {
 }
 
 export function getRecentItems(tenantId: string): RecentItem[] {
-  if (typeof globalThis === 'undefined' || !globalThis.localStorage) return [];
   try {
-    const raw = globalThis.localStorage.getItem(storageKey(tenantId));
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(storageKey(tenantId)) : null;
     return raw ? (JSON.parse(raw) as RecentItem[]) : [];
   } catch {
     return [];
@@ -20,13 +19,21 @@ export function getRecentItems(tenantId: string): RecentItem[] {
 }
 
 export function addRecentItem(tenantId: string, item: RecentItem): void {
-  if (typeof globalThis === 'undefined' || !globalThis.localStorage) return;
-  const existing = getRecentItems(tenantId).filter((r) => r.id !== item.id);
-  const updated = [item, ...existing].slice(0, MAX_RECENTS);
-  globalThis.localStorage.setItem(storageKey(tenantId), JSON.stringify(updated));
+  try {
+    if (typeof localStorage === 'undefined') return;
+    const existing = getRecentItems(tenantId).filter((r) => r.id !== item.id);
+    const updated = [item, ...existing].slice(0, MAX_RECENTS);
+    localStorage.setItem(storageKey(tenantId), JSON.stringify(updated));
+  } catch {
+    // Silently fail if localStorage is unavailable
+  }
 }
 
 export function clearRecentItems(tenantId: string): void {
-  if (typeof globalThis === 'undefined' || !globalThis.localStorage) return;
-  globalThis.localStorage.removeItem(storageKey(tenantId));
+  try {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.removeItem(storageKey(tenantId));
+  } catch {
+    // Silently fail if localStorage is unavailable
+  }
 }

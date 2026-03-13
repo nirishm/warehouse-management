@@ -23,6 +23,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { ItemCombobox } from "@/components/inventory/item-combobox";
+import { LocationCombobox } from "@/components/inventory/location-combobox";
+import { ContactCombobox } from "@/components/inventory/contact-combobox";
+import { useTenant } from "@/components/layout/tenant-provider";
 
 interface PurchaseData {
   id: string;
@@ -45,12 +49,6 @@ interface LocationOption {
   id: string;
   name: string;
   locationType?: string | null;
-}
-
-interface ItemOption {
-  id: string;
-  name: string;
-  code?: string | null;
 }
 
 interface UnitOption {
@@ -90,10 +88,10 @@ export function PurchaseFormDialog({
 }: PurchaseFormDialogProps) {
   const isEdit = Boolean(purchase);
   const [saving, setSaving] = useState(false);
+  const { tenantId } = useTenant();
 
   const [contacts, setContacts] = useState<ContactOption[]>([]);
   const [locations, setLocations] = useState<LocationOption[]>([]);
-  const [items, setItems] = useState<ItemOption[]>([]);
   const [units, setUnits] = useState<UnitOption[]>([]);
 
   const [form, setForm] = useState({
@@ -132,12 +130,10 @@ export function PurchaseFormDialog({
     Promise.all([
       fetch(`/api/v1/t/${tenantSlug}/contacts?limit=200`).then((r) => r.json()).catch(() => ({ data: [] })),
       fetch(`/api/v1/t/${tenantSlug}/locations?limit=100`).then((r) => r.json()).catch(() => ({ data: [] })),
-      fetch(`/api/v1/t/${tenantSlug}/items?limit=200`).then((r) => r.json()).catch(() => ({ data: [] })),
       fetch(`/api/v1/t/${tenantSlug}/units?limit=100`).then((r) => r.json()).catch(() => ({ data: [] })),
-    ]).then(([c, l, it, u]) => {
+    ]).then(([c, l, u]) => {
       setContacts(c.data ?? []);
       setLocations(l.data ?? []);
-      setItems(it.data ?? []);
       setUnits(u.data ?? []);
     });
 
@@ -251,39 +247,20 @@ export function PurchaseFormDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="purchase-contact">Contact (Supplier)</Label>
-              <Select
+              <ContactCombobox
+                contacts={contacts}
                 value={form.contactId}
                 onValueChange={(v) => setField("contactId", v)}
-              >
-                <SelectTrigger id="purchase-contact">
-                  <SelectValue placeholder="Select contact" />
-                </SelectTrigger>
-                <SelectContent>
-                  {contacts.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="Select supplier…"
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="purchase-location">Destination Location</Label>
-              <Select
+              <LocationCombobox
+                locations={locations}
                 value={form.locationId}
                 onValueChange={(v) => setField("locationId", v)}
-              >
-                <SelectTrigger id="purchase-location">
-                  <SelectValue placeholder="Select location" />
-                </SelectTrigger>
-                <SelectContent>
-                  {locations.map((l) => (
-                    <SelectItem key={l.id} value={l.id}>
-                      {l.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </div>
           </div>
 
@@ -351,21 +328,13 @@ export function PurchaseFormDialog({
                 className="grid grid-cols-[1fr_140px_100px_120px_40px] gap-2 items-center"
               >
                 {/* Item selector */}
-                <Select
+                <ItemCombobox
+                  tenantSlug={tenantSlug}
+                  tenantId={tenantId}
                   value={li.itemId}
-                  onValueChange={(v) => updateLineItem(index, "itemId", v)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select item" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {items.map((it) => (
-                      <SelectItem key={it.id} value={it.id}>
-                        {it.code ? `[${it.code}] ` : ""}{it.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onValueChange={(id) => updateLineItem(index, "itemId", id)}
+                  className="w-full"
+                />
 
                 {/* Unit selector */}
                 <Select
