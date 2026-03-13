@@ -29,6 +29,7 @@ const ENTITY_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
   transfer: { bg: "var(--orange-bg)", text: "var(--accent-color)" },
   purchase: { bg: "var(--blue-bg)", text: "var(--blue)" },
   sale: { bg: "var(--green-bg)", text: "var(--green)" },
+  adjustment: { bg: "rgba(217, 119, 6, 0.08)", text: "var(--color-warning)" },
 };
 
 function getBadgeStyle(entityType: string) {
