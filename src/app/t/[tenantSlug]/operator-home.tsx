@@ -15,6 +15,7 @@ interface ActivityEntry {
   entityType: string;
   entityId: string;
   description: string;
+  summary: string | null;
   createdAt: string;
 }
 
@@ -133,7 +134,7 @@ export function OperatorHome({ tenantSlug }: { tenantSlug: string }) {
               backgroundColor: primary ? "var(--accent-color)" : "var(--bg-off)",
               borderRadius: "12px",
             }}
-            className="flex flex-col gap-2.5 p-5 active:opacity-80 transition-opacity"
+            className="flex flex-col gap-2.5 px-4 py-5 active:opacity-80 transition-opacity"
           >
             <Icon
               className="size-5 shrink-0"
@@ -220,9 +221,11 @@ export function OperatorHome({ tenantSlug }: { tenantSlug: string }) {
                       {label}
                     </span>
                   </div>
-                  <p style={{ color: "var(--text-primary)" }} className="text-[13px] truncate">
-                    {entry.entityType.charAt(0).toUpperCase() + entry.entityType.slice(1)} #{entry.entityId.slice(0, 8)}
-                  </p>
+                  {entry.summary && (
+                    <p style={{ color: "var(--text-muted)" }} className="text-[13px] truncate">
+                      {entry.summary}
+                    </p>
+                  )}
                 </div>
                 <span
                   style={{ color: "var(--text-dim)", whiteSpace: "nowrap", marginLeft: "12px" }}
