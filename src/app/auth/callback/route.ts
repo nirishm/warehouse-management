@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { syncUserAppMetadata } from '@/core/auth/sync-metadata';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -33,9 +34,20 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      // Sync app_metadata from DB on every login — catches stale JWTs,
+      // role changes, and manually-added user_tenants records.
+      // Wrapped in try/catch so sync failure doesn't block login.
+      if (data.session?.user?.id) {
+        try {
+          await syncUserAppMetadata(data.session.user.id);
+        } catch (e) {
+          console.error('Failed to sync app_metadata on login:', e);
+        }
+      }
+
       const response = NextResponse.redirect(new URL(next, request.url));
       // Explicitly set session cookies on the redirect response
       responseCookies.forEach(({ name, value, options }) => {

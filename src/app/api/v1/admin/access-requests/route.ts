@@ -4,6 +4,7 @@ import { db } from '@/core/db/drizzle';
 import { accessRequests, userTenants } from '@/core/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { z } from 'zod';
+import { syncUserAppMetadata } from '@/core/auth/sync-metadata';
 
 const reviewSchema = z.object({
   requestId: z.string().uuid(),
@@ -50,6 +51,9 @@ export const PATCH = withAdminContext(async (req, ctx) => {
       role: parsed.role ?? 'viewer',
       isDefault: true,
     });
+
+    // Sync app_metadata so the user's JWT reflects their new tenant access
+    await syncUserAppMetadata(ar.userId);
 
     // Update request status
     await db
