@@ -63,7 +63,7 @@ describe('Soft Deletes', () => {
     it('soft-deleted item not returned by scope.query(items)', async () => {
       const item = await createItem(
         TENANT_A_ID,
-        { name: 'Scope Delete Test Item' },
+        { name: 'Scope Delete Test Item', type: 'goods' },
         TEST_USER_ID,
       );
 
@@ -82,13 +82,13 @@ describe('Soft Deletes', () => {
     it('non-deleted items remain in scope.query(items)', async () => {
       const item = await createItem(
         TENANT_A_ID,
-        { name: 'Surviving Item' },
+        { name: 'Surviving Item', type: 'goods' },
         TEST_USER_ID,
       );
 
       const toDelete = await createItem(
         TENANT_A_ID,
-        { name: 'Item To Delete' },
+        { name: 'Item To Delete', type: 'goods' },
         TEST_USER_ID,
       );
 
@@ -109,7 +109,7 @@ describe('Soft Deletes', () => {
     it('listItems excludes soft-deleted', async () => {
       const item = await createItem(
         TENANT_A_ID,
-        { name: 'List Exclusion Test Item' },
+        { name: 'List Exclusion Test Item', type: 'goods' },
         TEST_USER_ID,
       );
 
@@ -145,7 +145,7 @@ describe('Soft Deletes', () => {
     it('getItem returns null for soft-deleted item', async () => {
       const item = await createItem(
         TENANT_A_ID,
-        { name: 'GetItem Null Test' },
+        { name: 'GetItem Null Test', type: 'goods' },
         TEST_USER_ID,
       );
 
@@ -181,7 +181,7 @@ describe('Soft Deletes', () => {
     it('direct SQL query finds the soft-deleted row with deletedAt set', async () => {
       const item = await createItem(
         TENANT_A_ID,
-        { name: 'DB Exists Check Item' },
+        { name: 'DB Exists Check Item', type: 'goods' },
         TEST_USER_ID,
       );
 

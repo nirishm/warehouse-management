@@ -91,7 +91,7 @@ describe('Audit Trail', () => {
   it('createItem writes action=create, entityType=item, newData contains name', async () => {
     const item = await createItem(
       TENANT_A_ID,
-      { name: 'Audit Test Widget', defaultUnitId: UNITS.piece.id },
+      { name: 'Audit Test Widget', type: 'goods', defaultUnitId: UNITS.piece.id },
       TEST_USER_ID,
     );
 
@@ -109,7 +109,7 @@ describe('Audit Trail', () => {
   it('updateItem writes action=update with oldData and newData', async () => {
     const item = await createItem(
       TENANT_A_ID,
-      { name: 'Update Audit Item' },
+      { name: 'Update Audit Item', type: 'goods' },
       TEST_USER_ID,
     );
 
@@ -127,7 +127,7 @@ describe('Audit Trail', () => {
   it('softDeleteItem writes action=delete with oldData and null newData', async () => {
     const item = await createItem(
       TENANT_A_ID,
-      { name: 'Delete Audit Item' },
+      { name: 'Delete Audit Item', type: 'goods' },
       TEST_USER_ID,
     );
 
@@ -184,7 +184,7 @@ describe('Audit Trail', () => {
   it('all audit entries have correct tenantId', async () => {
     const item = await createItem(
       TENANT_A_ID,
-      { name: 'TenantId Check Item' },
+      { name: 'TenantId Check Item', type: 'goods' },
       TEST_USER_ID,
     );
 
@@ -195,7 +195,7 @@ describe('Audit Trail', () => {
   it('all audit entries have non-null userId', async () => {
     const item = await createItem(
       TENANT_A_ID,
-      { name: 'UserId Check Item' },
+      { name: 'UserId Check Item', type: 'goods' },
       TEST_USER_ID,
     );
 
@@ -206,7 +206,7 @@ describe('Audit Trail', () => {
   it('create audit entries have null oldData', async () => {
     const item = await createItem(
       TENANT_A_ID,
-      { name: 'Create OldData Check' },
+      { name: 'Create OldData Check', type: 'goods' },
       TEST_USER_ID,
     );
 
@@ -218,7 +218,7 @@ describe('Audit Trail', () => {
   it('update audit entries have both oldData and newData', async () => {
     const item = await createItem(
       TENANT_A_ID,
-      { name: 'Both Data Check Item' },
+      { name: 'Both Data Check Item', type: 'goods' },
       TEST_USER_ID,
     );
     await updateItem(TENANT_A_ID, item.id, { name: 'Both Data Check Updated' }, TEST_USER_ID);
@@ -232,7 +232,7 @@ describe('Audit Trail', () => {
   it('delete audit entries have oldData and null newData', async () => {
     const item = await createItem(
       TENANT_A_ID,
-      { name: 'Delete Both Data Check' },
+      { name: 'Delete Both Data Check', type: 'goods' },
       TEST_USER_ID,
     );
     await softDeleteItem(TENANT_A_ID, item.id, TEST_USER_ID);

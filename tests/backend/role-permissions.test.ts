@@ -15,6 +15,8 @@ function makeCtx(role: TenantContext['role']): TenantContext {
     tenantId: '00000000-0000-0000-0000-000000000001',
     tenantSlug: 'test',
     role,
+    userId: '00000000-0000-0000-0000-000000000099',
+    userEmail: 'test@example.com',
     enabledModules: [],
   };
 }
