@@ -3,16 +3,16 @@
 ## Architecture · Multi-Tenancy · Auth · Database Schema
 
 > General-purpose Inventory & Warehouse Management SaaS.
-> Drizzle ORM, JWT middleware, shared-schema + RLS, Vercel Pro + Supabase.
+> Drizzle ORM, JWT middleware, shared-schema + RLS, Vercel + Inngest (Solution D).
 > Accounting/compliance excluded (Tally handles that).
 > **This is the Claude Code build reference.** Every architectural decision is final.
 
 **Companion docs:**
-- [Part 2 — Modules, Frontend, Background Jobs, Mobile Operator View](./wareos_v2_final_part2.md)
+- [Part 2 — Modules, Frontend, Background Jobs, Offline](./wareos_v2_final_part2.md)
 - [Part 3 — Testing, DevOps, Security, Scalability, Roadmap](./wareos_v2_final_part3.md)
 - [Design System Reference](./design_reference.html)
 
-**Last updated:** 2026-03-13
+**Last updated:** 2026-03-12
 
 ---
 
@@ -25,7 +25,7 @@ General-purpose, multi-tenant SaaS for inventory + warehouse management. **Zoho 
 | Role | Use Case |
 |---|---|
 | **Warehouse Manager** | Orders, stock, transfers, documents |
-| **Warehouse Operator / Picker** | Receive goods, pick & pack, scan barcodes (mobile browser — operator view) |
+| **Warehouse Operator / Picker** | Receive goods, pick & pack, scan barcodes (mobile/PWA) |
 | **Tenant Admin** | Users, permissions, locations, items, custom fields |
 | **Super Admin** (platform) | Tenant provisioning, access requests, platform health |
 | **Customer** (portal, Phase 3) | View orders, track shipments, update info |
@@ -57,27 +57,24 @@ General-purpose, multi-tenant SaaS for inventory + warehouse management. **Zoho 
 | Users & Roles | ✅ Core | 1 | + role templates |
 | Custom Templates | 🆕 Planned | 3 | Tenant-customizable PDF templates |
 | Reporting Tags | 🆕 Planned | 3 | Tag-based report filtering |
-| Automation / Workflow Rules | 🆕 Planned | 4 | If-this-then-that per module (requires Inngest) |
-| Webhooks | 🆕 Planned | 4 | Event-driven external notifications (requires Inngest) |
+| Automation / Workflow Rules | 🆕 Planned | 3 | If-this-then-that per module |
+| Webhooks | 🆕 Planned | 3 | Event-driven external notifications |
 | Bin/Shelf/Rack Locations | 🆕 Planned | 3 | Sub-warehouse location tracking (gap from Zoho audit) |
 | Shipping Carrier Integration | 🆕 Planned | 3 | Delhivery/Shiprocket for India (gap from Zoho audit) |
-| Mobile Operator View | ✅ Core | 1 | Mobile-responsive operator UI in same Next.js app. Online only. No service worker. |
-| React Native App | 🆕 Planned | 4 | Native app for enterprise customers |
+| Mobile App | 🔜 PWA Phase 2 | 2/4 | Online-first PWA Phase 2, React Native Phase 4 |
 | GST/E-Invoice/Accounting | ⏭️ Excluded | — | Tally handles this |
 
 ---
 
-## 2. Architecture: Vercel Pro + Supabase
+## 2. Architecture Decision: Solution D (Vercel + Inngest)
 
 > [!IMPORTANT]
-> **Hosting is settled: Vercel Pro + Supabase + Upstash Redis.**
-> Background jobs use **Vercel Cron** (Phase 1–3) and **Supabase Edge Functions** for event-driven work.
-> **Inngest is introduced in Phase 4** for durable step functions and complex workflow automation.
-> This was chosen because:
-> 1. **Claude Code compatibility** — single-deploy model, no Docker/SSH
-> 2. **Zero server management** — critical for a solo founder directing an AI agent
-> 3. **Vercel Cron + Supabase Edge Functions** cover all Phase 1–3 background job needs
-> 4. **Inngest deferred** until Phase 4 when automation complexity justifies the added dependency
+> **Hosting is settled: Vercel Pro + Inngest + Supabase + Upstash Redis.**
+> This was chosen over VPS + Coolify (Solution B) specifically because:
+> 1. **Claude Code compatibility** — single-deploy model, file-based Inngest functions, no Docker/SSH
+> 2. **Durable step functions** — Inngest's step-level retry is superior to DIY BullMQ
+> 3. **Zero server management** — critical for a solo founder who is new to coding
+> 4. **The cost trade-off is acceptable** — $20/mo floor vs $4/mo, but saves weeks of DevOps
 
 ```
   Vercel Pro ($20/mo) — Fluid Compute enabled
@@ -89,58 +86,34 @@ General-purpose, multi-tenant SaaS for inventory + warehouse management. **Zoho 
   │ └──────────────┘  └────────────────────────────┘  │
   │                                                    │
   │ ┌────────────────────────────────────────────────┐ │
-  │ │ Vercel Cron Functions                          │ │
-  │ │  • Stock alert check (every 5 min)             │ │
-  │ │  • Materialized VIEW refresh (every 5 min)     │ │
-  │ │  • Scheduled email reports (daily/weekly)      │ │
+  │ │ Inngest Functions (run inside Vercel functions) │ │
+  │ │  • Bulk imports (chunked into steps)            │ │
+  │ │  • PDF reports                                  │ │
+  │ │  • Stock alert cron (every 5 min)               │ │
+  │ │  • Event bus: sale/confirmed → create picklist  │ │
+  │ │  • Webhook fan-out                              │ │
+  │ │  • Retry + error recovery per step              │ │
   │ └────────────────────────────────────────────────┘ │
   └───────────────────────┬────────────────────────────┘
                           ▼
   ┌──────────────────────────────────────────────────┐
-  │ Supabase (Free → Pro at Phase 3)                 │
+  │ Supabase (Free → Pro)                            │
   │ Postgres + Auth + Realtime + Storage             │
-  │                                                  │
-  │ ┌────────────────────────────────────────────┐   │
-  │ │ Supabase Edge Functions                    │   │
-  │ │  • Event handlers (sale/confirmed, etc.)   │   │
-  │ │  • PDF generation (react-pdf)              │   │
-  │ │  • Bulk import processing (chunked)        │   │
-  │ │  • Webhook delivery (Phase 3)              │   │
-  │ └────────────────────────────────────────────┘   │
-  │                                                  │
-  │ ┌────────────────────────────────────────────┐   │
-  │ │ Supabase Database Webhooks                 │   │
-  │ │  • DB mutations → Edge Function triggers   │   │
-  │ └────────────────────────────────────────────┘   │
   ├──────────────────────────────────────────────────┤
   │ Upstash Redis (Free → Paid)                      │
-  │ Rate limiting + JWT blocklist + job progress     │
+  │ Rate limiting + JWT blocklist + caching           │
   └──────────────────────────────────────────────────┘
 ```
 
-### Background Jobs: What Runs Where
-
-| Job | Phase 1–2 | Phase 3 | Phase 4+ |
-|---|---|---|---|
-| Stock alert cron | Vercel Cron (5 min) | Vercel Cron | Vercel Cron or Inngest |
-| Materialized VIEW refresh | Vercel Cron | Vercel Cron | Vercel Cron or Inngest |
-| PDF generation | Supabase Edge Fn | Supabase Edge Fn | Inngest step |
-| Bulk CSV import | Chunked API + Redis progress | Chunked API + Redis progress | Inngest durable steps |
-| Email notifications | Supabase Edge Fn | Supabase Edge Fn | Inngest fan-out |
-| Webhook delivery | — | Supabase Edge Fn + pg_net | Inngest (guaranteed retry) |
-| Workflow automation | — | — | Inngest (Phase 4) |
-
 ### Cost Trajectory
 
-| Scale | Vercel | Supabase | Upstash | Resend | Sentry | Total |
-|---|---|---|---|---|---|---|
-| **Dev / Pre-revenue** | $20 | $0 | $0 | $0 | $0 | **$20/mo** |
-| **Up to 50 tenants** | $20 | $0 | $0 | $0 | $0 | **$20/mo** |
-| **50–200 tenants (Phase 3)** | $20 | $25 | $5 | $0 | $0 | **$50/mo** |
-| **200–500 tenants** | $20 | $25 | $10 | $20 | $0 | **$75/mo** |
-| **500+ tenants** | $20 | $35+ | $15 | $20 | $26 | **$116/mo** |
-
-> Note: Inngest is not in the cost table until Phase 4. When introduced, add ~$50–$250/mo depending on execution volume.
+| Scale | Vercel | Inngest | Supabase | Upstash | Resend | Sentry | Total |
+|---|---|---|---|---|---|---|---|
+| **Dev / Pre-revenue** | $20 | $0 | $0 | $0 | $0 | $0 | **$20/mo** |
+| **Up to 50 tenants** | $20 | $0 | $25 | $0 | $0 | $0 | **$45/mo** |
+| **50–200 tenants** | $20 | ~$50 | $25 | $5 | $0 | $0 | **$100/mo** |
+| **200–500 tenants** | $20 | ~$150 | $35 | $10 | $20 | $0 | **$235/mo** |
+| **500+ tenants** | $20 | ~$250 | $35+ | $15 | $20 | $26 | **$366/mo** |
 
 ---
 
@@ -156,15 +129,14 @@ General-purpose, multi-tenant SaaS for inventory + warehouse management. **Zoho 
 | UI | Tailwind CSS v4 + shadcn/ui | Utility-first, accessible |
 | Tables | TanStack Table v8 | Headless: sort, filter, pagination |
 | Validation | Zod v4 | Runtime validation, shared types |
-| Background Jobs | **Vercel Cron** (cron) + **Supabase Edge Functions** (event-driven) | Covers all Phase 1–3 needs without Inngest |
+| Background Jobs | **Inngest** (from day 1) | Durable step functions, event bus, cron scheduling |
 | Cache | **Upstash Redis** (from day 1) | Rate limiting, JWT blocklist, job progress |
-| PDF | @react-pdf/renderer | Challans, GRNs, packing slips (Phase 2, via Edge Functions) |
+| PDF | @react-pdf/renderer | Challans, GRNs, packing slips (Phase 2) |
 | Barcode | qrcode + JsBarcode | QR + 1D barcode generation (Phase 2) |
 | CSV | PapaParse | Bulk import/export (Phase 2) |
 | Email | Resend | Transactional emails |
 | Testing | Vitest + Playwright | Unit + E2E |
 | Charts | Recharts | Stock trends, movement bars, top-items pie |
-| Durable Workflows | **Inngest** | **Phase 4 only** — automation, guaranteed webhooks, complex step functions |
 
 ### Why Drizzle Over Prisma
 
@@ -179,9 +151,8 @@ General-purpose, multi-tenant SaaS for inventory + warehouse management. **Zoho 
 
 | When | Add | Why |
 |---|---|---|
-| Phase 3 | Supabase Pro | Read replicas, larger DB, daily backups |
-| Phase 4 | Inngest | Durable step functions, workflow automation, guaranteed webhooks |
-| Phase 4 | React Native (Expo) | Native app for enterprise customers who need it. Share Zod schemas + API types with web. |
+| 50+ tenants | Read replicas | Offload analytics queries |
+| Phase 4 | React Native (Expo) | Share Zod schemas + API types |
 | Full-text search needed | Meilisearch | Fast search across items, orders, contacts |
 | Production monitoring | Sentry + Axiom | Error tracking + structured logging |
 | Feature flags | PostHog | Granular toggling beyond module enable/disable |
@@ -604,22 +575,7 @@ CREATE TABLE picklist_items (
     bin_location TEXT
 );
 
--- Job Progress Tracking (Phase 2 — replaces Inngest progress tracking)
-CREATE TABLE job_progress (
-    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id   UUID NOT NULL,
-    job_type    TEXT NOT NULL,   -- 'bulk_import', 'pdf_report', etc.
-    status      TEXT NOT NULL DEFAULT 'pending'
-                CHECK (status IN ('pending','running','completed','failed')),
-    total       INT,
-    processed   INT DEFAULT 0,
-    error       TEXT,
-    result_url  TEXT,            -- Supabase Storage URL for output files
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
--- Workflow Automation (Phase 4 — requires Inngest)
+-- Workflow Automation (Phase 3)
 CREATE TABLE workflow_rules (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id    UUID NOT NULL,
@@ -666,13 +622,12 @@ CREATE TABLE bins (
 | `sequence_counters` | Auto-numbering: DSP-000001, PUR-000001, etc. | 1 |
 | `alert_thresholds` | Per-item, per-location low-stock alerts | 1 |
 | `payments` | Payment records for purchases and sales | 1 |
-| `job_progress` | Background job tracking (bulk import, PDF reports) | 2 |
 | `returns` / `return_items` | Sale + purchase returns with credit memos | 2 |
 | `lots` / `batches` | Batch/expiry tracking | 2 |
 
 ### 6.6 stock_levels VIEW
 
-Same computed VIEW as v1 (inbound/outbound/in_transit CTEs), but with `tenant_id` scoping. At scale → **MATERIALIZED VIEW** refreshed by **Vercel Cron** every 5 min.
+Same computed VIEW as v1 (inbound/outbound/in_transit CTEs), but with `tenant_id` scoping. At scale → **MATERIALIZED VIEW** refreshed by Inngest cron every 5 min.
 
 ---
 
@@ -773,4 +728,4 @@ export const POST = withTenantContext(async (req, ctx) => {
 
 ---
 
-> **Continues in [Part 2](./wareos_v2_final_part2.md)** → Modules, Frontend Architecture, Background Jobs, Mobile Operator View
+> **Continues in [Part 2](./wareos_v2_final_part2.md)** → Modules, Frontend Architecture, Background Jobs, Offline PWA
