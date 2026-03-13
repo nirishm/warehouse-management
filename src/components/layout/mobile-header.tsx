@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, LogOut, User } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useTenant } from "./tenant-provider";
 import {
@@ -13,13 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { GlobalSearch } from "@/components/search/global-search";
+import { LogOut } from "lucide-react";
 
-export function Header() {
+export function MobileHeader() {
   const { userEmail, role } = useTenant();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
 
   async function handleSignOut() {
     if (signingOut) return;
@@ -29,53 +27,41 @@ export function Header() {
     router.push("/login");
   }
 
-  // Display initials from email
-  const initials = userEmail
-    ? userEmail.slice(0, 2).toUpperCase()
-    : "??";
+  const initials = userEmail ? userEmail.slice(0, 2).toUpperCase() : "??";
 
   return (
     <header
       style={{
-        height: "var(--header-h)",
+        height: "var(--mobile-header-h)",
         backgroundColor: "var(--bg-base)",
         borderBottom: "1px solid var(--border)",
       }}
-      className="hidden md:flex sticky top-0 z-40 items-center px-[var(--content-px)] gap-3"
+      className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4"
     >
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* Search trigger */}
-      <button
-        style={{
-          border: "1px solid var(--border)",
-          borderRadius: "8px",
-          color: "var(--text-muted)",
-          backgroundColor: "var(--bg-off)",
-        }}
-        className="hidden md:flex items-center gap-2 px-3 py-1.5 text-[13px] transition-colors hover:border-[var(--border-mid)]"
-        onClick={() => setSearchOpen(true)}
-        aria-label="Search (⌘K)"
-      >
-        <Search className="size-3.5 shrink-0" />
-        <span>Search</span>
-        <span
-          style={{
-            color: "var(--text-dim)",
-            border: "1px solid var(--border-mid)",
-            borderRadius: "4px",
-          }}
-          className="ml-1 px-1 py-0.5 text-[11px]"
+      {/* Wordmark */}
+      <div className="flex items-center gap-1.5">
+        <svg
+          width="22"
+          height="20"
+          viewBox="0 0 64 58"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
         >
-          ⌘K
+          <rect x="6" y="43" width="52" height="15" rx="5" fill="#E8520A" />
+          <rect x="13" y="28" width="38" height="13" rx="4" fill="#F07030" />
+          <rect x="20" y="14" width="24" height="13" rx="4" fill="#F5A472" opacity="0.9" />
+          <rect x="26" y="2" width="12" height="11" rx="3" fill="#FAC8A8" opacity="0.75" />
+        </svg>
+        <span
+          style={{ color: "var(--text-primary)", letterSpacing: "-0.01em" }}
+          className="text-[16px] font-bold"
+        >
+          WareOS
         </span>
-      </button>
+      </div>
 
-      {/* Global Search dialog */}
-      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
-
-      {/* User dropdown */}
+      {/* Avatar dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
@@ -83,16 +69,16 @@ export function Header() {
               backgroundColor: "var(--accent-tint)",
               color: "var(--accent-color)",
               borderRadius: "9999px",
-              width: "36px",
-              height: "36px",
+              width: "28px",
+              height: "28px",
             }}
-            className="flex items-center justify-center text-[13px] font-bold shrink-0 hover:opacity-80 transition-opacity"
+            className="flex items-center justify-center text-[10px] font-bold shrink-0"
             aria-label="User menu"
           >
             {initials}
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuLabel className="font-400">
             <div className="flex flex-col gap-0.5">
               <span
@@ -116,14 +102,6 @@ export function Header() {
               </span>
             </div>
           </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="gap-2 cursor-pointer"
-            onClick={() => {}}
-          >
-            <User className="size-4" />
-            Profile
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             destructive
