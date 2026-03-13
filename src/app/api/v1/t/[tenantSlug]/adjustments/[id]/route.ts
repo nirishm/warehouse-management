@@ -7,7 +7,7 @@ import {
   softDeleteAdjustment,
 } from '@/modules/adjustments/queries/adjustments';
 import { updateAdjustmentSchema } from '@/modules/adjustments/validations/adjustment';
-import { getUserLocationScope } from '@/core/db/location-scope';
+import { getUserLocationScope, assertLocationAccess } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
@@ -42,6 +42,12 @@ export const PATCH = withTenantContext(
         throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR');
       }
 
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const existingAdjustment = await getAdjustment(ctx.tenantId, id, locationScope);
+      if (!existingAdjustment) {
+        throw new ApiError(404, 'Adjustment not found', 'NOT_FOUND');
+      }
+
       const adjustment = await updateAdjustment(ctx.tenantId, id, parsed.data, ctx.userId);
       if (!adjustment) {
         throw new ApiError(404, 'Adjustment not found', 'NOT_FOUND');
@@ -58,6 +64,12 @@ export const DELETE = withTenantContext(
   async (req: NextRequest, ctx) => {
     try {
       const id = extractId(req);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const existingAdjustment = await getAdjustment(ctx.tenantId, id, locationScope);
+      if (!existingAdjustment) {
+        throw new ApiError(404, 'Adjustment not found', 'NOT_FOUND');
+      }
+
       const adjustment = await softDeleteAdjustment(ctx.tenantId, id, ctx.userId);
       if (!adjustment) {
         throw new ApiError(404, 'Adjustment not found', 'NOT_FOUND');

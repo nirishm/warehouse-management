@@ -3,7 +3,7 @@ import { withTenantContext } from '@/core/auth/guards';
 import { ApiError, errorResponse } from '@/core/api/error-handler';
 import { getSale, updateSale, softDeleteSale } from '@/modules/sale/queries/sales';
 import { updateSaleSchema } from '@/modules/sale/validations/sale';
-import { getUserLocationScope } from '@/core/db/location-scope';
+import { getUserLocationScope, assertLocationAccess } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 function extractId(req: NextRequest): string {
@@ -38,6 +38,12 @@ export const PATCH = withTenantContext(
         throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR');
       }
 
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const existingSale = await getSale(ctx.tenantId, id, locationScope);
+      if (!existingSale) {
+        throw new ApiError(404, 'Sale not found', 'NOT_FOUND');
+      }
+
       const sale = await updateSale(ctx.tenantId, id, parsed.data, ctx.userId);
       if (!sale) {
         throw new ApiError(404, 'Sale not found', 'NOT_FOUND');
@@ -54,6 +60,12 @@ export const DELETE = withTenantContext(
   async (req: NextRequest, ctx) => {
     try {
       const id = extractId(req);
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      const existingSale = await getSale(ctx.tenantId, id, locationScope);
+      if (!existingSale) {
+        throw new ApiError(404, 'Sale not found', 'NOT_FOUND');
+      }
+
       const sale = await softDeleteSale(ctx.tenantId, id, ctx.userId);
       if (!sale) {
         throw new ApiError(404, 'Sale not found', 'NOT_FOUND');

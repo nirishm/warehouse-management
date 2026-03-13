@@ -4,7 +4,7 @@ import { ApiError, errorResponse } from '@/core/api/error-handler';
 import { parsePagination } from '@/lib/pagination';
 import { listAdjustments, createAdjustment } from '@/modules/adjustments/queries/adjustments';
 import { createAdjustmentSchema } from '@/modules/adjustments/validations/adjustment';
-import { getUserLocationScope } from '@/core/db/location-scope';
+import { getUserLocationScope, assertLocationAccess } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 export const GET = withTenantContext(
@@ -46,6 +46,9 @@ export const POST = withTenantContext(
       if (!parsed.success) {
         throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR');
       }
+
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      assertLocationAccess(locationScope, parsed.data.locationId);
 
       const adjustment = await createAdjustment(ctx.tenantId, parsed.data, ctx.userId);
       return NextResponse.json({ data: adjustment }, { status: 201 });

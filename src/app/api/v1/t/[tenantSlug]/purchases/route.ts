@@ -4,7 +4,7 @@ import { ApiError, errorResponse } from '@/core/api/error-handler';
 import { parsePagination } from '@/lib/pagination';
 import { listPurchases, createPurchase } from '@/modules/purchase/queries/purchases';
 import { createPurchaseSchema } from '@/modules/purchase/validations/purchase';
-import { getUserLocationScope } from '@/core/db/location-scope';
+import { getUserLocationScope, assertLocationAccess } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 export const GET = withTenantContext(
@@ -45,6 +45,9 @@ export const POST = withTenantContext(
       if (!parsed.success) {
         throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR');
       }
+
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      assertLocationAccess(locationScope, parsed.data.locationId);
 
       const purchase = await createPurchase(ctx.tenantId, parsed.data, ctx.userId);
       return NextResponse.json({ data: purchase }, { status: 201 });

@@ -4,7 +4,7 @@ import { ApiError, errorResponse } from '@/core/api/error-handler';
 import { parsePagination } from '@/lib/pagination';
 import { listTransfers, createTransfer } from '@/modules/transfer/queries/transfers';
 import { createTransferSchema } from '@/modules/transfer/validations/transfer';
-import { getUserLocationScope } from '@/core/db/location-scope';
+import { getUserLocationScope, assertTransferLocationAccess } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 
 export const GET = withTenantContext(
@@ -46,6 +46,9 @@ export const POST = withTenantContext(
       if (!parsed.success) {
         throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR');
       }
+
+      const locationScope = await getUserLocationScope(db, ctx.tenantId, ctx.userId, ctx.role);
+      assertTransferLocationAccess(locationScope, parsed.data.originLocationId);
 
       const transfer = await createTransfer(ctx.tenantId, parsed.data, ctx.userId);
       return NextResponse.json({ data: transfer }, { status: 201 });
