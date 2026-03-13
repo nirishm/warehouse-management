@@ -3,7 +3,7 @@ export default function TenantLoading() {
     <div className="px-[var(--content-px)] py-6">
       {/* Page title skeleton */}
       <div
-        style={{ background: "var(--border)", borderRadius: "6px" }}
+        style={{ backgroundColor: "var(--border)", borderRadius: "6px" }}
         className="h-8 w-48 animate-pulse"
       />
 
@@ -13,7 +13,7 @@ export default function TenantLoading() {
           <div
             key={i}
             style={{
-              background: "var(--bg-base)",
+              backgroundColor: "var(--bg-base)",
               borderRadius: "var(--card-radius)",
               border: "1px solid var(--border)",
             }}
@@ -26,7 +26,7 @@ export default function TenantLoading() {
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            style={{ background: "var(--border)", borderRadius: "6px" }}
+            style={{ backgroundColor: "var(--border)", borderRadius: "6px" }}
             className="h-10 w-full animate-pulse"
           />
         ))}

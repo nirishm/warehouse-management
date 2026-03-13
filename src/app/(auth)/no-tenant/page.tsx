@@ -11,7 +11,7 @@ export default async function NoTenantPage() {
     <div className="text-center">
       <div
         className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center"
-        style={{ background: 'var(--accent-tint)' }}
+        style={{ backgroundColor: 'var(--accent-tint)' }}
       >
         <svg
           width="24"

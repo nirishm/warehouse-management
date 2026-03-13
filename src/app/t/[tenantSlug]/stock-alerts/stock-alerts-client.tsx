@@ -379,7 +379,7 @@ export function StockAlertsClient({ tenantSlug }: StockAlertsClientProps) {
       {activeTab === "alerts" && !alertsLoading && alerts.length > 0 && (
         <div
           style={{
-            background: "var(--red-bg)",
+            backgroundColor: "var(--red-bg)",
             border: "1px solid var(--red)",
             borderRadius: "var(--card-radius)",
           }}

@@ -140,7 +140,7 @@ export function LocationsClient({ tenantSlug }: LocationsClientProps) {
         return (
           <span
             style={{
-              background: "var(--bg-off)",
+              backgroundColor: "var(--bg-off)",
               color: "var(--text-muted)",
               borderRadius: "4px",
               padding: "2px 8px",

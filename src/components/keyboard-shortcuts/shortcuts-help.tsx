@@ -47,7 +47,7 @@ export function ShortcutsHelp() {
                 {s.label}
               </span>
               <kbd
-                style={{ background: "var(--bg-off)", color: "var(--text-primary)", border: "1px solid var(--border)" }}
+                style={{ backgroundColor: "var(--bg-off)", color: "var(--text-primary)", border: "1px solid var(--border)" }}
                 className="text-[12px] font-bold px-2 py-1 rounded-md min-w-[28px] text-center"
               >
                 {s.key}

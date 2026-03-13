@@ -22,7 +22,7 @@ export function OfflineBanner() {
 
   return (
     <div
-      style={{ background: "var(--red)", color: "#fff" }}
+      style={{ backgroundColor: "var(--red)", color: "#fff" }}
       className="fixed top-0 left-0 right-0 z-[9999] text-center py-2 text-[13px] font-bold"
     >
       You&apos;re offline. Some features may not be available.

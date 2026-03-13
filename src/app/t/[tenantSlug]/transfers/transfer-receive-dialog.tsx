@@ -177,7 +177,7 @@ export function TransferReceiveDialog({
                   key={item.id}
                   className="grid grid-cols-[1fr_100px_120px_100px] gap-2 items-center"
                   style={{
-                    background: "var(--bg-off)",
+                    backgroundColor: "var(--bg-off)",
                     borderRadius: "var(--card-radius)",
                     padding: "10px 12px",
                   }}
@@ -226,7 +226,7 @@ export function TransferReceiveDialog({
             {totalShortage > 0 && (
               <div
                 style={{
-                  background: "var(--orange-bg)",
+                  backgroundColor: "var(--orange-bg)",
                   border: "1px solid var(--accent-color)",
                   borderRadius: "var(--card-radius)",
                 }}

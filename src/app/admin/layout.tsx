@@ -20,10 +20,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div style={{ background: 'var(--bg-off)' }} className="min-h-screen">
+    <div style={{ backgroundColor: 'var(--bg-off)' }} className="min-h-screen">
       <header
         className="border-b border-[var(--border)] px-6 py-4"
-        style={{ background: 'var(--bg-base)' }}
+        style={{ backgroundColor: 'var(--bg-base)' }}
       >
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <h1 style={{ color: 'var(--text-primary)' }} className="text-[17px] font-bold">

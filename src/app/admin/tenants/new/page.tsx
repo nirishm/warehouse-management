@@ -66,7 +66,7 @@ export default function NewTenantPage() {
           type="submit"
           disabled={submitting}
           className="rounded-full h-[48px] w-fit px-6"
-          style={{ background: 'var(--accent-color)', color: 'white' }}
+          style={{ backgroundColor: 'var(--accent-color)', color: 'white' }}
         >
           {submitting ? 'Creating...' : 'Create Tenant'}
         </Button>

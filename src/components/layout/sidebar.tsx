@@ -95,7 +95,7 @@ export function Sidebar() {
           active
             ? {
                 borderLeft: "2px solid var(--accent-color)",
-                background: "var(--accent-tint)",
+                backgroundColor: "var(--accent-tint)",
                 color: "var(--accent-color)",
               }
             : {
@@ -115,7 +115,7 @@ export function Sidebar() {
     <div
       style={{
         width: "var(--sidebar-w)",
-        background: "var(--bg-base)",
+        backgroundColor: "var(--bg-base)",
         borderRight: "1px solid var(--border)",
       }}
       className="flex flex-col h-full"

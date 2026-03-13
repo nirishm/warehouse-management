@@ -6,7 +6,7 @@ export default async function ItemsPage() {
   const tenantSlug = headersList.get("x-tenant-slug") ?? "";
 
   return (
-    <div style={{ background: "var(--bg-off)" }} className="min-h-full">
+    <div style={{ backgroundColor: "var(--bg-off)" }} className="min-h-full">
       <ItemsClient tenantSlug={tenantSlug} />
     </div>
   );

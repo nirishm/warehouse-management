@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <div
-      style={{ background: "var(--bg-off)" }}
+      style={{ backgroundColor: "var(--bg-off)" }}
       className="min-h-screen flex items-center justify-center px-4"
     >
       <div
@@ -29,7 +29,7 @@ export default function NotFound() {
         </p>
         <Link
           href="/"
-          style={{ background: "var(--accent-color)" }}
+          style={{ backgroundColor: "var(--accent-color)" }}
           className="inline-flex items-center justify-center text-white text-[14px] font-bold px-6 h-[48px] rounded-full hover:opacity-90 transition-opacity"
         >
           Go Home

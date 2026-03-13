@@ -5,7 +5,7 @@ export default async function StockAlertsPage() {
   const headersList = await headers();
   const tenantSlug = headersList.get("x-tenant-slug") ?? "";
   return (
-    <div style={{ background: "var(--bg-off)" }} className="min-h-full">
+    <div style={{ backgroundColor: "var(--bg-off)" }} className="min-h-full">
       <StockAlertsClient tenantSlug={tenantSlug} />
     </div>
   );

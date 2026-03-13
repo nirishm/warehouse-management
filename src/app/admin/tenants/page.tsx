@@ -57,7 +57,7 @@ export default function TenantsPage() {
         <Button
           onClick={() => (window.location.href = '/admin/tenants/new')}
           className="rounded-full h-[48px] px-6"
-          style={{ background: 'var(--accent-color)', color: 'white' }}
+          style={{ backgroundColor: 'var(--accent-color)', color: 'white' }}
         >
           New Tenant
         </Button>

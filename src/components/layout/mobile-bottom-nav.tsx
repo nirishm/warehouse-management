@@ -31,7 +31,7 @@ export function MobileBottomNav() {
     <nav
       style={{
         height: "calc(var(--mobile-nav-h) + env(safe-area-inset-bottom))",
-        background: "var(--bg-base)",
+        backgroundColor: "var(--bg-base)",
         borderTop: "1px solid var(--border)",
         paddingBottom: "env(safe-area-inset-bottom)",
       }}

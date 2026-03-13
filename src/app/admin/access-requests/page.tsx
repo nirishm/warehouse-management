@@ -112,7 +112,7 @@ export default function AccessRequestsPage() {
                 {tenants.length > 0 && (
                   <select
                     className="border border-[var(--border)] rounded-md px-3 py-1.5 text-[13px]"
-                    style={{ color: 'var(--text-primary)', background: 'var(--bg-base)' }}
+                    style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-base)' }}
                     defaultValue={tenants[0]?.id}
                     id={`tenant-${r.id}`}
                   >
@@ -132,7 +132,7 @@ export default function AccessRequestsPage() {
                   }}
                   disabled={processing === r.id}
                   className="rounded-full h-[36px] px-4 text-[13px]"
-                  style={{ background: 'var(--green)', color: 'white' }}
+                  style={{ backgroundColor: 'var(--green)', color: 'white' }}
                 >
                   Approve
                 </Button>

@@ -106,7 +106,7 @@ export function UnitsClient({ tenantSlug }: UnitsClientProps) {
         <span
           style={{
             color: "var(--accent-color)",
-            background: "var(--accent-tint)",
+            backgroundColor: "var(--accent-tint)",
             borderRadius: "4px",
             padding: "2px 8px",
             fontSize: "13px",
@@ -126,7 +126,7 @@ export function UnitsClient({ tenantSlug }: UnitsClientProps) {
         return (
           <span
             style={{
-              background: "var(--bg-off)",
+              backgroundColor: "var(--bg-off)",
               color: "var(--text-muted)",
               borderRadius: "4px",
               padding: "2px 8px",

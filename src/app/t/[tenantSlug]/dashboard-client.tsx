@@ -249,7 +249,7 @@ export function DashboardClient({ tenantSlug }: { tenantSlug: string }) {
                 />
                 <Tooltip
                   contentStyle={{
-                    background: "var(--bg-base)",
+                    backgroundColor: "var(--bg-base)",
                     border: "1px solid var(--border)",
                     borderRadius: "8px",
                     fontSize: 13,
@@ -275,7 +275,7 @@ export function DashboardClient({ tenantSlug }: { tenantSlug: string }) {
               <div className="flex items-center gap-2">
                 <span
                   className="inline-block w-3 h-3 rounded-sm"
-                  style={{ background: "var(--green)" }}
+                  style={{ backgroundColor: "var(--green)" }}
                 />
                 <span
                   style={{ color: "var(--text-muted)" }}
@@ -287,7 +287,7 @@ export function DashboardClient({ tenantSlug }: { tenantSlug: string }) {
               <div className="flex items-center gap-2">
                 <span
                   className="inline-block w-3 h-3 rounded-sm"
-                  style={{ background: "var(--accent-color)" }}
+                  style={{ backgroundColor: "var(--accent-color)" }}
                 />
                 <span
                   style={{ color: "var(--text-muted)" }}

@@ -202,7 +202,7 @@ export function StockClient({ tenantSlug }: StockClientProps) {
           <div
             key={card.label}
             style={{
-              background: "var(--bg-base)",
+              backgroundColor: "var(--bg-base)",
               border: "1px solid var(--border)",
               borderRadius: "var(--card-radius)",
             }}

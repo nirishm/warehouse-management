@@ -22,7 +22,7 @@ export function NoTenantActions() {
       <Link
         href="/"
         className="inline-flex h-[48px] items-center justify-center rounded-full text-[14px] font-bold text-white"
-        style={{ background: 'var(--accent-color)' }}
+        style={{ backgroundColor: 'var(--accent-color)' }}
       >
         Try Again
       </Link>
@@ -32,7 +32,7 @@ export function NoTenantActions() {
         className="inline-flex h-[48px] items-center justify-center rounded-full text-[14px] font-bold"
         style={{
           color: 'var(--text-muted)',
-          background: 'var(--bg-base)',
+          backgroundColor: 'var(--bg-base)',
           border: '1px solid var(--border-default)',
         }}
       >

@@ -15,7 +15,7 @@ export default function GlobalError({
 
   return (
     <div
-      style={{ background: "var(--bg-off)" }}
+      style={{ backgroundColor: "var(--bg-off)" }}
       className="min-h-screen flex items-center justify-center px-4"
     >
       <div
@@ -49,7 +49,7 @@ export default function GlobalError({
         )}
         <button
           onClick={reset}
-          style={{ background: "var(--accent-color)" }}
+          style={{ backgroundColor: "var(--accent-color)" }}
           className="text-white text-[14px] font-bold px-6 h-[48px] rounded-full hover:opacity-90 transition-opacity"
         >
           Try Again

@@ -45,7 +45,7 @@ export function Header() {
     <header
       style={{
         height: "var(--header-h)",
-        background: "var(--bg-base)",
+        backgroundColor: "var(--bg-base)",
         borderBottom: "1px solid var(--border)",
       }}
       className="sticky top-0 z-40 flex items-center px-[var(--content-px)] gap-3"
@@ -76,7 +76,7 @@ export function Header() {
           border: "1px solid var(--border)",
           borderRadius: "8px",
           color: "var(--text-muted)",
-          background: "var(--bg-off)",
+          backgroundColor: "var(--bg-off)",
         }}
         className="hidden md:flex items-center gap-2 px-3 py-1.5 text-[13px] transition-colors hover:border-[var(--border-mid)]"
         onClick={() => setSearchOpen(true)}
@@ -114,7 +114,7 @@ export function Header() {
         <DropdownMenuTrigger asChild>
           <button
             style={{
-              background: "var(--accent-tint)",
+              backgroundColor: "var(--accent-tint)",
               color: "var(--accent-color)",
               borderRadius: "9999px",
               width: "36px",
@@ -138,7 +138,7 @@ export function Header() {
               <span
                 style={{
                   color: "var(--accent-color)",
-                  background: "var(--accent-tint)",
+                  backgroundColor: "var(--accent-tint)",
                   borderRadius: "4px",
                   padding: "1px 6px",
                   display: "inline-block",

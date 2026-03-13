@@ -183,7 +183,7 @@ export default function TenantDetailPage() {
               className="flex items-center gap-2 p-3 rounded-lg border text-left text-[13px] transition-colors"
               style={{
                 borderColor: modules.includes(mod) ? 'var(--accent-color)' : 'var(--border)',
-                background: modules.includes(mod) ? 'var(--accent-tint)' : 'transparent',
+                backgroundColor: modules.includes(mod) ? 'var(--accent-tint)' : 'transparent',
                 color: modules.includes(mod) ? 'var(--accent-color)' : 'var(--text-muted)',
                 opacity: mod === 'inventory' ? 0.5 : 1,
               }}

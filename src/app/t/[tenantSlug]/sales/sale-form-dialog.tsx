@@ -436,7 +436,7 @@ export function SaleFormDialog({
             <div className="flex justify-end pt-1">
               <div
                 style={{
-                  background: "var(--bg-off)",
+                  backgroundColor: "var(--bg-off)",
                   border: "1px solid var(--border)",
                   borderRadius: "var(--card-radius)",
                   padding: "10px 16px",

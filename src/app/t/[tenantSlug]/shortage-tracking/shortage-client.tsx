@@ -192,7 +192,7 @@ export function ShortageClient({ tenantSlug }: ShortageClientProps) {
           <div
             key={card.label}
             style={{
-              background: "var(--bg-base)",
+              backgroundColor: "var(--bg-base)",
               border: "1px solid var(--border)",
               borderRadius: "var(--card-radius)",
             }}
