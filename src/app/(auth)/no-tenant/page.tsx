@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import { NoTenantActions } from './no-tenant-actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,6 +38,7 @@ export default async function NoTenantPage() {
       <p style={{ color: 'var(--text-dim)' }} className="text-[13px]">
         An administrator will review your request and grant access shortly.
       </p>
+      <NoTenantActions />
     </div>
   );
 }
