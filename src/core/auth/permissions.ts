@@ -37,6 +37,7 @@ const OPERATOR_PERMISSIONS: Permission[] = [
   'orders:update',
   'receive:create',
   'barcodes:scan',
+  'transfers:create',
 ];
 
 const MANAGER_PERMISSIONS: Permission[] = [
