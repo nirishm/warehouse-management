@@ -1,4 +1,5 @@
-import { eq, and, ilike, isNull, sql } from 'drizzle-orm';
+import { eq, and, ilike, isNull, sql, inArray } from 'drizzle-orm';
+import type { LocationScope } from '@/core/db/location-scope';
 import { db } from '@/core/db/drizzle';
 import { withTenantScope } from '@/core/db/tenant-scope';
 import { purchases, purchaseItems, auditLog } from '@/core/db/schema';
@@ -26,9 +27,15 @@ export async function listPurchases(
     search?: string;
     status?: string;
     contactId?: string;
+    locationScope?: LocationScope;
   },
   pagination?: { limit: number; offset: number },
 ) {
+  if (filters?.locationScope !== undefined && filters.locationScope !== null
+      && filters.locationScope.length === 0) {
+    return { data: [], total: 0 };
+  }
+
   const conditions = [eq(purchases.tenantId, tenantId), isNull(purchases.deletedAt)];
 
   if (filters?.search) {
@@ -41,6 +48,9 @@ export async function listPurchases(
   }
   if (filters?.contactId) {
     conditions.push(eq(purchases.contactId, filters.contactId));
+  }
+  if (filters?.locationScope && filters.locationScope.length > 0) {
+    conditions.push(inArray(purchases.locationId, filters.locationScope));
   }
 
   const where = and(...conditions);
@@ -62,7 +72,15 @@ export async function listPurchases(
   return { data, total: Number(countResult[0]?.count ?? 0) };
 }
 
-export async function getPurchase(tenantId: string, id: string): Promise<PurchaseWithItems | null> {
+export async function getPurchase(
+  tenantId: string,
+  id: string,
+  locationScope?: LocationScope,
+): Promise<PurchaseWithItems | null> {
+  if (locationScope !== undefined && locationScope !== null && locationScope.length === 0) {
+    return null;
+  }
+
   const result = await db
     .select()
     .from(purchases)
@@ -71,6 +89,12 @@ export async function getPurchase(tenantId: string, id: string): Promise<Purchas
     );
 
   if (!result[0]) return null;
+
+  if (locationScope !== undefined && locationScope !== null) {
+    if (result[0].locationId && !locationScope.includes(result[0].locationId)) {
+      return null;
+    }
+  }
 
   const items = await db
     .select()
