@@ -66,8 +66,8 @@ export function MobileHeader() {
         <DropdownMenuTrigger asChild>
           <button
             style={{
-              backgroundColor: "var(--bg-off)",
-              color: "var(--text-muted)",
+              backgroundColor: "var(--accent-tint)",
+              color: "var(--accent-color)",
               borderRadius: "9999px",
               width: "28px",
               height: "28px",

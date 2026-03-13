@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, Search, LogOut, User } from "lucide-react";
+import { Search, LogOut, User } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useTenant } from "./tenant-provider";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,12 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Sidebar } from "./sidebar";
 import { GlobalSearch } from "@/components/search/global-search";
 
 export function Header() {
@@ -50,23 +43,6 @@ export function Header() {
       }}
       className="hidden md:flex sticky top-0 z-40 items-center px-[var(--content-px)] gap-3"
     >
-      {/* Mobile menu trigger */}
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden shrink-0"
-            aria-label="Open navigation"
-          >
-            <Menu className="size-5" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-[var(--sidebar-w)]">
-          <Sidebar />
-        </SheetContent>
-      </Sheet>
-
       {/* Spacer */}
       <div className="flex-1" />
 
@@ -94,16 +70,6 @@ export function Header() {
         >
           ⌘K
         </span>
-      </button>
-
-      {/* Mobile search icon */}
-      <button
-        className="md:hidden"
-        style={{ color: "var(--text-muted)" }}
-        aria-label="Search"
-        onClick={() => setSearchOpen(true)}
-      >
-        <Search className="size-5" />
       </button>
 
       {/* Global Search dialog */}

@@ -46,8 +46,7 @@ export default async function TenantLayout({
           <MobileHeader />
           <Header />
           <main
-            style={{ paddingBottom: "calc(var(--mobile-nav-h) + 24px)" }}
-            className="px-4 md:px-[var(--content-px)] py-5 md:py-6 md:pb-6"
+            className="px-4 md:px-[var(--content-px)] py-5 md:py-6 pb-[calc(var(--mobile-nav-h)+24px)] md:pb-6"
           >
             {children}
           </main>
